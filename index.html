@@ -823,8 +823,40 @@ function save(){
   state.updatedAt=Date.now();
   try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
   if(dbRef){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ dbRef.set(JSON.parse(JSON.stringify(state))).catch(()=>setSync(false)); },700); }
+  if(FS.id){ clearTimeout(FS.t); FS.t=setTimeout(fsPush,800); }
 }
-function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Synced on phone and laptop":"Saved on this device"; }
+/* ---------- sync on the public site (Firebase Firestore, private sync code) ---------- */
+const FS={id:null,t:null,busy:false};
+try{
+  const m=location.hash.match(/sync=([a-f0-9]{32,64})/i);
+  if(m){ localStorage.setItem(LS+"-sync",m[1]); history.replaceState(null,"",location.pathname+location.search); }
+  FS.id=localStorage.getItem(LS+"-sync");
+}catch(e){}
+const fsURL=()=>"https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+FS.id;
+async function fsPush(){
+  if(!FS.id) return;
+  try{
+    const body={fields:{json:{stringValue:JSON.stringify(state)},updatedAt:{integerValue:String(state.updatedAt||0)}}};
+    const r=await fetch(fsURL(),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    setSync(r.ok);
+  }catch(e){ setSync(false); }
+}
+async function fsPull(first){
+  if(!FS.id||FS.busy) return; FS.busy=true;
+  try{
+    const r=await fetch(fsURL(),{cache:"no-store"});
+    if(r.status===404){ if(state.updatedAt) await fsPush(); else setSync(true); return; }
+    if(!r.ok){ setSync(false); return; }
+    const d=await r.json(); const remote=JSON.parse(d.fields.json.stringValue);
+    setSync(true);
+    if(remote&&remote.days&&(remote.updatedAt||0)>(state.updatedAt||0)){
+      state=remote; try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
+      if(!busy&&!document.querySelector("textarea:focus")&&!$("scrim").classList.contains("open")) render(false);
+    } else if(first&&(state.updatedAt||0)>(remote.updatedAt||0)){ await fsPush(); }
+  }catch(e){ setSync(false); }
+  finally{ FS.busy=false; }
+}
+function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Synced on phone and laptop":(FS&&FS.id?"Sync paused, will retry":"Saved on this device only"); }
 
 /* ---------- derived ---------- */
 let selKey = keyOf(new Date());
@@ -1235,7 +1267,11 @@ setInterval(()=>{ const m=Math.floor(nowMin()); if(m===lastMin) return; lastMin=
 /* ---------- cross-device sync ---------- */
 (async()=>{
   try{
-    if(!window.claude||typeof window.claude.use!=="function") return;
+    if(!window.claude||typeof window.claude.use!=="function"){
+      if(FS.id){ await fsPull(true); setInterval(()=>{ if(!document.hidden) fsPull(false); },15000);
+        document.addEventListener("visibilitychange",()=>{ if(!document.hidden) fsPull(false); }); window.addEventListener("focus",()=>fsPull(false)); }
+      return;
+    }
     const db=await window.claude.use("db"), user=await window.claude.use("user");
     if(!db||!user) return; const uid=await user.id(); if(!uid) return;
     dbRef=db.doc("data/users/"+uid+"/reset");
