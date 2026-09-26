@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Harsh Reset</title>
-<meta name="build" content="1790434559">
+<meta name="build" content="1790434883">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -714,7 +714,7 @@ function dayOne(){ return {label:"Day 1: set up and start", start:"10:00", end:"
       S("Send it back",["Reply to Claude with only your Keep companies.","Add this line: 'Add these to my Notion pipeline and set up careers-page monitors.'"])],claude:P_TARGET,minimum:"Ask for the list and mark 10 companies."}),
   B({id:"export",t:"17:15",d:15,kind:"close",title:"Export WhatsApp job groups",why:"Tomorrow's sweep reads these files, so jobs from your groups are not missed.",finish:"Every job group exported and saved.",line:LINES.close,
     steps:[S("Export each job group",["Open WhatsApp. Open one job group.","Tap the group name at the top.","Scroll down. Tap 'Export chat'. Choose 'Without media'.","Email it to yourself or save it to Files. Repeat for each job group."])],minimum:"Export just your most active job group."}),
-  closeBlock("close","17:40",20,"Day 2 starts at 9:30 AM with the Daily Scout.")
+  closeBlock("close","17:40",20,"Day 2 starts at 1:00 PM with the Daily Scout.")
 ]};}
 
 /* Day 2: first full system day */
@@ -734,7 +734,7 @@ function dayTwo(){ return {label:"Day 2: full system", start:"09:30", end:"19:00
     steps:[S("Ask Claude to build it",["Tap 'Copy' on the box below.","Paste it in Claude chat. Send.","Claude will build a skill called job-scout."],["claude"]),
       S("Test it once",["Copy any one job link from LinkedIn.","Send it to Claude with: 'Use job-scout on this job.'","If the answer looks wrong, reply in one line with what's wrong. Fix only once.","Stop after one hour."])],claude:P_SKILL,minimum:"Get a draft of the skill. Test it tomorrow."}),
   B(Object.assign(applyBlock("apply2","16:45",70,3,"Open today's Daily Scout brief. Take the 3 roles marked Priority. After applying to each, copy the prompt below to get Claude's referral or hiring-manager message, and send it."),{title:"3 priority applications + outreach",snips:[],claude:P_PRIORITY})),
-  closeBlock("close","18:10",20,"Daily Scout at 9:45 AM, then apply.")
+  closeBlock("close","18:10",20,"start at 1:00 PM, Daily Scout at 1:15 PM, then apply.")
 ]};}
 
 /* Day 3 and after: regular job day */
@@ -750,7 +750,7 @@ function dayRegular(){ return {label:"Job day", start:"09:30", end:"19:00", remi
   B({id:"learn",t:"15:00",d:60,core:false,title:"Interview prep or Apollo practice",why:"If an interview is scheduled, prepare for it. If not, learn by doing.",finish:"Interview: research + 3 stories ready. No interview: 5 hiring managers found.",line:"Learning sticks when it's tied to real work.",
     steps:[S("Interview coming up?",["Yes: open the Interview Handbook. Prepare only for that company. Research them and write 3 stories from your work.","No: go to the next slide."]),
       S("Practice on Apollo",["Go to apollo.io. Sign up free with Google.","Search one company from your target list.","Find the founder or head of growth. Copy their name and email.","Add them to that company's row in Notion. Do this for 5 companies."])],minimum:"20 minutes, 2 companies."}),
-  closeBlock("close","16:15",20,"Daily Scout at 9:45 AM.")
+  closeBlock("close","16:15",20,"start at 1:00 PM, Daily Scout at 1:15 PM.")
 ]};}
 
 /* ---------- dates ---------- */
@@ -771,7 +771,15 @@ function planFor(key){
   const i=planIndex(key);
   if(i===-1) return {label:"No plan today",start:"09:30",end:"19:00",reminders:"Your plan starts on "+niceDate(PLAN_START)+".",blocks:[],none:"before"};
   if(i===-2) return {label:"Moved to tomorrow",start:"09:30",end:"19:00",reminders:"You moved this day's plan to the next day.",blocks:[],none:"skipped"};
-  return i===0?dayOne():i===1?dayTwo():dayRegular();
+  return startAt(i===0?dayOne():i===1?dayTwo():dayRegular(), DAY_START);
+}
+/* every job day starts at 1:00 PM; the whole plan moves with it */
+const DAY_START="13:00";
+function startAt(p,hhmm){
+  const t2=m=>pad(Math.floor(m/60))+":"+pad(m%60);
+  const off=toMin(hhmm)-toMin(p.blocks[0].t);
+  p.blocks.forEach(b=>{ b.t=t2(toMin(b.t)+off); });
+  p.start=t2(toMin(p.start)+off); p.end=t2(toMin(p.end)+off); return p;
 }
 function niceDate(key){ const [y,m,dd]=key.split("-").map(Number); const d=new Date(y,m-1,dd); return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+dd+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]; }
 const toMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m;};
