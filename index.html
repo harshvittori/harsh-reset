@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Harsh Reset</title>
-<meta name="build" content="1790433878">
+<meta name="build" content="1790434559">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -547,6 +547,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
         <button data-r="distract">Got distracted</button>
         <button data-r="mood">Not feeling it</button>
         <button data-r="late">Running late</button>
+        <button data-r="shiftday">Not starting today</button>
       </div>
     </div>
     <p class="quote" id="quote"></p>
@@ -584,6 +585,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
   </div>
   <div class="dr-foot">
     <button class="pill" data-look aria-label="Change look"></button>
+    <button class="pill" data-r="shiftday">Move today to tomorrow</button>
     <button class="pill" id="resetDay">Reset this day</button>
   </div>
 </aside>
@@ -670,151 +672,108 @@ const closeBlock = (id,t,d,tomorrow)=>B({id,t,d,kind:"close",title:"Close the da
     S("Set up tomorrow",["Tomorrow: "+tomorrow,"Write your first task for tomorrow in your notebook.","Set your phone alarm.","Close all laptop tabs. Shut the laptop."])],
   minimum:"Just set the alarm and write one line: tomorrow's first task."});
 
-/* ---------- day plans ---------- */
-function daySat26(){ return {label:"Reset day 1", start:"15:55", end:"23:00", reminders:"Today's target: 5 applications, 3 messages, alerts live, pipeline live.", blocks:[
-  wake("15:55"),
-  B({id:"alerts",t:"16:15",d:60,title:"Set up job alerts",why:"Right now you scroll LinkedIn for hours and get tired. With alerts, jobs arrive in your email every day without searching.",finish:"3 LinkedIn alerts + Wellfound done, and a JobAlerts label in Gmail.",line:LINES.setup,
+/* ---------- job-only day plans ---------- */
+const prepBlock=(t)=>B({id:"prep",t,d:10,kind:"start",title:"Before you start",why:"Two minutes of setup removes most distractions for the whole day.",finish:"Clean desk, phone away, only the tabs you need.",line:"Set the stage once, then just work.",
+  steps:[S("Before you start",["Clear your desk. Keep only laptop, notebook, pen and water.","Phone on silent, face down, out of reach.","Close every browser tab. Open only linkedin.com and gmail.com.","Open 'Full day' and read today's target once."])],
+  minimum:"Just put the phone away and close extra tabs."});
+const scoutBlock=(t,d)=>B({id:"scout",t,d,kind:"claude",title:"Run the Daily Scout",why:"This brief replaces daily searching and deciding. No more LinkedIn scrolling.",finish:"Today's apply list, messages and follow-ups in hand.",line:LINES.claude,
+  steps:[S("Send the Daily Scout",["Tap 'Copy' on the box below.","Paste it in Claude chat. Send.","Wait for the brief. It's a short list."],["claude"]),
+    S("Read the brief",["Read the 'apply list'. These are today's jobs.","Look at 1 or 2 jobs Claude marked Skip. If one clearly fits you, tell Claude: 'This one should be Apply.'","Don't open LinkedIn Jobs to browse. The brief is your list."])],claude:P_SCOUT,minimum:"Send the prompt and read only the apply list."});
+const portal=(name,site)=>S(name,["Go to "+site+". Sign up with Google.","Fill only the required fields.","Roles: Growth, Business Development, Operations.","Locations: Delhi NCR, Remote, Bengaluru.","Turn on daily job alert emails."]);
+
+/* Day 1: setup day (alerts, first applications, pipeline, people, target list) */
+function dayOne(){ return {label:"Day 1: set up and start", start:"10:00", end:"19:00", reminders:"Today's target: alerts live, 5 applications, pipeline live, 3 messages, target list.", blocks:[
+  prepBlock("10:00"),
+  B({id:"alerts",t:"10:15",d:60,title:"Set up job alerts",why:"Right now you scroll LinkedIn for hours and get tired. With alerts, jobs arrive in your email every day without searching.",finish:"3 LinkedIn alerts + Wellfound done, and a JobAlerts label in Gmail.",line:LINES.setup,
     steps:[S("LinkedIn: search",["Go to linkedin.com/jobs.","Click the first search box. It says 'Search by title, skill, or company'.","Tap 'Copy' on the box below. Paste it into that search box.","Click the second box (location). Type Delhi, India. Pick it from the list.","Press Enter."],[KW]),
       S("LinkedIn: filters",["At the top of the results, click 'Date posted'. Choose 'Past week'. Click 'Show results'.","Click 'Experience level'. Tick 'Entry level' and 'Associate'. Click 'Show results'."]),
       S("LinkedIn: turn on the alert",["Above the job list, find the 'Set alert' switch (or a bell icon).","Turn it on.","If it asks how often: choose 'Daily' and 'Email and notification'.","Can't find it? Scroll to the very top of the job list."]),
       S("LinkedIn: two more alerts",["Keep the same keywords in the first box.","Alert 2: change location to India. Click 'Remote' in the filters and choose Remote. Turn on the alert.","Alert 3: change location to Bengaluru. Remove the Remote filter. Turn on the alert.","Check the Date posted and Experience filters are still on each time."]),
       S("Wellfound",["Go to wellfound.com. Click 'Sign up'. Choose 'Continue with Google'.","Fill only the fields with a red star.","Roles: Growth, Business Development, Operations.","Locations: Delhi, Remote, Bengaluru. Experience: 1 year.","Upload the GTM/Demand Gen resume. In settings, turn on job alert emails."]),
       S("Gmail: find job emails",["Go to gmail.com.","Tap 'Copy' on the box below. Paste it into the Gmail search bar at the top. Press Enter.","At the right end of the search bar, click the small sliders icon.","Click 'Create filter'."],[GM]),
-      S("Gmail: make the label",["Tick 'Skip the Inbox (Archive it)'.","Tick 'Apply the label'. Click 'Choose label', then 'New label'. Type JobAlerts. Click 'Create'.","Tick 'Also apply filter to matching conversations'. Click 'Create filter'.","Check: 'JobAlerts' now shows on the left side of Gmail.","Instahyre, Cutshort and Naukri are for Monday. Stop here."])],
+      S("Gmail: make the label",["Tick 'Skip the Inbox (Archive it)'.","Tick 'Apply the label'. Click 'Choose label', then 'New label'. Type JobAlerts. Click 'Create'.","Tick 'Also apply filter to matching conversations'. Click 'Create filter'.","Check: 'JobAlerts' now shows on the left side of Gmail.","Instahyre, Cutshort and Naukri are for Day 2. Stop here."],[GM])],
     snips:[{label:KW,text:BOOL},{label:GM,text:GMAILQ}],
-    minimum:"Just the LinkedIn Delhi alert and the Gmail label. The rest tomorrow.",next:"Tea time. Keep the LinkedIn tab open."}),
-  brk("chai","17:15",15,"Tea break"),
-  applyBlock("apply1","17:30",75,5),
-  walk("walk","18:45",30),
-  B({id:"pipe",t:"19:15",d:45,kind:"claude",title:"Build your pipeline with Claude",why:"Notes in a notebook get lost. Notion will hold each application's status and follow-up date, and from Monday the AI writes into it.",finish:"Notion database live, your applications inside, follow-up date 30 September.",line:LINES.claude,
-    steps:[S("Ask Claude",["Tap 'Copy' on the box below.","Open Claude chat (claude.ai or the Claude app). Paste it. Send.","Wait for Claude to send you a Notion link."],["claude"]),
+    minimum:"Just the LinkedIn Delhi alert and the Gmail label.",next:"Next: your first applications."}),
+  applyBlock("apply1","11:30",75,5),
+  B({id:"pipe",t:"14:00",d:45,kind:"claude",title:"Build your pipeline with Claude",why:"Notes in a notebook get lost. Notion will hold each application's status and follow-up date, and from Day 2 the AI writes into it.",finish:"Notion database live, today's applications inside.",line:LINES.claude,
+    steps:[S("Ask Claude",["Tap 'Copy' on the box below.","Open Claude chat. Paste it. Send.","Wait for Claude to send you a Notion link."],["claude"]),
       S("Check it",["Click the Notion link.","At the top you'll see 3 tabs: Today's queue, Follow-ups due, Parked.","Click each tab once to make sure they open."]),
-      S("Add your applications",["Click '+ New'.","Fill in Company, Role, and Link (the job's web address).","Status: Applied. Date applied: today. Next action date: Wednesday, 30 September.","Resume track: the resume you sent.","Repeat for each application. Something looks wrong? Take a screenshot and send it to Claude."])],
-    claude:P_PIPE,minimum:"Get the pipeline built. Add entries tomorrow morning.",next:"After dinner comes the people block. Start thinking of 5 people now."}),
-  meal("dinner","20:00",45,"Dinner"),
-  B({id:"people",t:"20:45",d:60,counter:"msgs",title:"List 10 people, message 3",why:"Referrals and warm intros work far better than cold applications. Send your first message today so the fear doesn't grow by Monday.",finish:"10 names in your notebook, 3 messages sent.",line:LINES.people,
+      S("Add your applications",["Click '+ New'.","Fill in Company, Role, and Link (the job's web address).","Status: Applied. Date applied: today. Next action date: 4 days from today.","Resume track: the resume you sent.","Repeat for each application."])],
+    claude:P_PIPE,minimum:"Get the pipeline built. Add entries later today."}),
+  B({id:"people",t:"15:00",d:60,counter:"msgs",title:"List 10 people, message 3",why:"Referrals and warm intros work far better than cold applications.",finish:"10 names in your notebook, 3 messages sent.",line:LINES.people,
     steps:[S("Ring 1: people you know",["Open your notebook. Write 'Ring 1' at the top.","Write 5 names of people who know you and work at a startup, SaaS or tech company.","Write their company next to each name.","Can't think of 5? Go to linkedin.com, click 'My Network', then 'Connections', and scroll."]),
       S("Ring 2: find FLAME alumni",["In the LinkedIn search bar, type FLAME University. Open the university page.","Click 'Alumni'.","In the alumni search box, type growth.","Under 'Where they live', choose Delhi, Gurgaon and Noida."]),
       S("Ring 2: pick 5",["Pick 5 people who work at startups or tech companies.","Need more? Search 'business development' the same way.","In your notebook, write 'Ring 2' and list the 5 names with their company."]),
       S("Get your messages",["Easiest: copy the Claude prompt below. Replace [paste list] with your 10 names and companies. Send it to Claude.","Or use the ready messages below. Replace [Name] and [Company]."],["claude",FR,AL]),
-      S("Send 3 messages",["Start with the 3 easiest people, people who know you.","Friends: send on WhatsApp. Alumni: on LinkedIn, click 'Connect', then 'Add a note', and paste.","Read it once. Send.","Tap + on the counter after each. The other 7 go on Monday."])],
+      S("Send 3 messages",["Start with the 3 easiest people, people who know you.","Friends: send on WhatsApp. Alumni: on LinkedIn, click 'Connect', then 'Add a note', and paste.","Read it once. Send.","Tap + on the counter after each. The other 7 go on Day 2."])],
     snips:[{label:FR,text:MSG_FRIEND},{label:AL,text:MSG_ALUM}],claude:P_DRAFT,
-    minimum:"Write 5 names and send 1 message. Just one.",next:"Time to close the day soon."}),
-  closeBlock("close","21:45",30,"a light Sunday. Wake at 10 AM. 3 applications at 11 AM."),
-  free("free","22:15",45)
-]};}
-
-function daySun27(){ return {label:"Light day", start:"10:00", end:"23:00", reminders:"Today is light, but not zero. 3 applications and a target list, then rest.", blocks:[
-  wake("10:00"), breakfast("10:20"),
-  applyBlock("apply","11:00",60,3,"Open Gmail. Click 'JobAlerts' on the left. Open job emails from since last night. Not enough? Use your LinkedIn Delhi search."),
-  B({id:"target",t:"12:00",d:45,kind:"claude",title:"Target company list with Claude",why:"The company list powers the careers-page monitors. Then you never have to check company sites yourself.",finish:"Keep or Drop marked on about 40 companies, Keep list sent back to Claude.",line:LINES.claude,
+    minimum:"Write 5 names and send 1 message. Just one."}),
+  B({id:"target",t:"16:15",d:45,kind:"claude",title:"Target company list with Claude",why:"The company list powers the careers-page monitors. Then you never have to check company sites yourself.",finish:"Keep or Drop marked on about 40 companies, Keep list sent back to Claude.",line:LINES.claude,
     steps:[S("Ask Claude for the list",["Tap 'Copy' on the box below.","Paste it in Claude chat. Send.","Wait for a list of about 40 companies."],["claude"]),
       S("Keep or Drop",["Set a 20-minute timer.","For each company, write Keep or Drop.","Keep: sounds interesting and is in your cities or remote. Drop: anything else.","Don't research. Go with your first feeling."]),
-      S("Send it back",["Reply to Claude with only your Keep companies.","Add this line: 'Add these to my Notion pipeline and set up careers-page monitors.'"])],claude:P_TARGET,minimum:"Ask for the list and mark 10 companies.",next:"Now lunch and a long break. You earned it."}),
-  meal("lunch","12:45",60,"Lunch"),
-  free("off","13:45",225,"Time off, rest"),
-  B({id:"pending",t:"17:30",d:60,kind:"work",core:false,title:"Pending work: Shiv handbook",why:"When work for others keeps moving, guilt doesn't leak into your job search.",finish:"One section finished and saved.",line:LINES.pending,
-    steps:[S("One section of Shiv's handbook",["Open Shiv's handbook file.","Do only the next section. Not sure which? Ask Claude: 'What's the next section of Shiv's handbook?'","Set a 1-hour timer. When it rings, save and close, even if unfinished."])],minimum:"20 minutes, one sub-section.",next:"Walk time."}),
-  walk("walk","18:30",30),
-  free("eve","19:00",60,"Family and personal time"),
-  meal("dinner","20:00",45,"Dinner"),
-  B({id:"plan",t:"20:45",d:30,kind:"close",title:"Get ready for Monday",why:"Tomorrow is the first full system day. 30 minutes tonight removes tomorrow morning's hesitation.",finish:"Alarm set, WhatsApp exports saved, list of 7 remaining people ready.",line:LINES.close,
-    steps:[S("Export WhatsApp job groups",["Open WhatsApp. Open one job group.","Tap the group name at the top.","Scroll down. Tap 'Export chat'. Choose 'Without media'.","Email it to yourself or save it to Files. Repeat for each job group."]),
-      S("Ready for Monday",["In your notebook, write the 7 people you haven't messaged yet.","Set your alarm for 8:30 AM."])],minimum:"Just the alarm and the 7 names.",next:"The rest of the night is yours."}),
-  free("free","21:15",105)
+      S("Send it back",["Reply to Claude with only your Keep companies.","Add this line: 'Add these to my Notion pipeline and set up careers-page monitors.'"])],claude:P_TARGET,minimum:"Ask for the list and mark 10 companies."}),
+  B({id:"export",t:"17:15",d:15,kind:"close",title:"Export WhatsApp job groups",why:"Tomorrow's sweep reads these files, so jobs from your groups are not missed.",finish:"Every job group exported and saved.",line:LINES.close,
+    steps:[S("Export each job group",["Open WhatsApp. Open one job group.","Tap the group name at the top.","Scroll down. Tap 'Export chat'. Choose 'Without media'.","Email it to yourself or save it to Files. Repeat for each job group."])],minimum:"Export just your most active job group."}),
+  closeBlock("close","17:40",20,"Day 2 starts at 9:30 AM with the Daily Scout.")
 ]};}
 
-const scoutBlock=(t,d)=>B({id:"scout",t,d,kind:"claude",title:"Run the Daily Scout",why:"This brief replaces daily searching and deciding. No more LinkedIn scrolling.",finish:"Today's apply list, messages and follow-ups in hand.",line:LINES.claude,
-  steps:[S("Send the Daily Scout",["Tap 'Copy' on the box below.","Paste it in Claude chat. Send.","Wait for the brief. It's a short list."],["claude"]),
-    S("Read the brief",["Read the 'apply list'. These are today's jobs.","Look at 1 or 2 jobs Claude marked Skip. If one clearly fits you, tell Claude: 'This one should be Apply.'","Don't open LinkedIn Jobs to browse. The brief is your list."])],claude:P_SCOUT,minimum:"Send the prompt and read only the apply list."});
-const exerciseBlock=()=>B({id:"exercise",t:"18:00",d:60,kind:"rest",core:false,title:"Exercise or a long walk",why:"When your body moves, your routine moves.",finish:"45+ minutes of movement.",line:LINES.rest,
-  steps:[S("Move for 45 minutes",["Choose one: gym, fast walk, yoga or a home workout.","Use the phone only for music.","After: shower and drink water."])],minimum:"20-minute walk."});
-const portal=(name,site)=>S(name,["Go to "+site+". Sign up with Google.","Fill only the required fields.","Roles: Growth, Business Development, Operations.","Locations: Delhi NCR, Remote, Bengaluru.","Turn on daily job alert emails."]);
-
-function dayMon28(){ return {label:"First full system day", start:"08:30", end:"23:00", reminders:"Today the full system goes live. Target: 8 applications, 7+ messages, sweep done.", blocks:[
-  wake("08:30"), breakfast("08:50"),
-  scoutBlock("09:20",25),
-  B({id:"alerts2",t:"09:45",d:45,title:"Instahyre, Cutshort, Naukri alerts",why:"More sources, more jobs, no extra effort.",finish:"Alerts live on all three, emails landing in the JobAlerts label.",line:LINES.setup,
+/* Day 2: first full system day */
+function dayTwo(){ return {label:"Day 2: full system", start:"09:30", end:"19:00", reminders:"Target: 8 applications, 7+ messages, sweep done, scoring skill built.", blocks:[
+  prepBlock("09:30"),
+  scoutBlock("09:45",25),
+  B({id:"alerts2",t:"10:15",d:45,title:"Instahyre, Cutshort, Naukri alerts",why:"More sources, more jobs, no extra effort.",finish:"Alerts live on all three, emails landing in the JobAlerts label.",line:LINES.setup,
     steps:[portal("Instahyre","instahyre.com"),portal("Cutshort","cutshort.io"),
-      S("Naukri",["Go to naukri.com. Log in or sign up.","Search: growth, business development, GTM. Location: Delhi NCR.","Click 'Create job alert' (or 'Save search'). Choose daily.","Your Gmail filter already sends these emails to JobAlerts."])],minimum:"Just Instahyre.",next:"Break, then the apply block."}),
-  brk("brk1","10:30",15),
-  applyBlock("apply1","10:45",75,5,"Open today's Daily Scout brief in Claude. Use its apply list. Not enough? Open Gmail > JobAlerts."),
-  outreachBlock("outreach","12:00",45,"Yesterday's remaining 7 +"),
-  meal("lunch","12:45",75,"Lunch and rest"),
-  B({id:"sweep",t:"14:00",d:60,kind:"claude",title:"Monday Sweep",why:"Once a week, catch new companies and fresh roles so the pipeline is never empty.",finish:"New companies added, new roles scored in Notion.",line:LINES.claude,
-    steps:[S("Attach the WhatsApp files",["Open Claude chat.","Click the + or paperclip button.","Attach the WhatsApp .txt files you exported yesterday."]),
+      S("Naukri",["Go to naukri.com. Log in or sign up.","Search: growth, business development, GTM. Location: Delhi NCR.","Click 'Create job alert' (or 'Save search'). Choose daily.","Your Gmail filter already sends these emails to JobAlerts."])],minimum:"Just Instahyre."}),
+  applyBlock("apply1","11:15",75,5,"Open today's Daily Scout brief in Claude. Use its apply list. Not enough? Open Gmail > JobAlerts."),
+  outreachBlock("outreach","12:30",45,"The 7 remaining people +"),
+  B({id:"sweep",t:"14:15",d:60,kind:"claude",title:"Weekly Sweep",why:"Once a week, catch new companies and fresh roles so the pipeline is never empty.",finish:"New companies added, new roles scored in Notion.",line:LINES.claude,
+    steps:[S("Attach the WhatsApp files",["Open Claude chat.","Click the + or paperclip button.","Attach the WhatsApp .txt files you exported on Day 1."]),
       S("Send the sweep",["Tap 'Copy' on the box below.","Paste it in the same message. Send.","Wait for Claude to finish."],["claude"]),
-      S("Leave the results",["New jobs will show in tomorrow's Daily Scout.","Don't act on them today."])],claude:P_SWEEP,minimum:"Send the prompt. Exports later.",next:"Walk, then the scoring skill."}),
-  walk("walk1","15:00",30),
-  B({id:"skill",t:"15:30",d:60,kind:"claude",core:false,title:"Build the scoring skill",why:"Once the rubric is a skill, the same rules apply every day. This is the last bit of system-building. After this, no building for 30 days.",finish:"job-scout skill built and tested once.",line:LINES.claude,
+      S("Leave the results",["New jobs will show in tomorrow's Daily Scout.","Don't act on them today."])],claude:P_SWEEP,minimum:"Send the prompt. Files later."}),
+  B({id:"skill",t:"15:30",d:60,kind:"claude",core:false,title:"Build the scoring skill",why:"Once the rubric is a skill, the same rules apply every day. This is the last bit of system-building.",finish:"job-scout skill built and tested once.",line:LINES.claude,
     steps:[S("Ask Claude to build it",["Tap 'Copy' on the box below.","Paste it in Claude chat. Send.","Claude will build a skill called job-scout."],["claude"]),
-      S("Test it once",["Copy any one job link from LinkedIn.","Send it to Claude with: 'Use job-scout on this job.'","If the answer looks wrong, reply in one line with what's wrong. Fix only once.","Stop after one hour."])],claude:P_SKILL,minimum:"Get a draft of the skill. Test it tomorrow.",next:"Tea, then priority roles."}),
-  brk("tea","16:30",20,"Tea break"),
-  B(Object.assign(applyBlock("apply2","16:50",70,3,"Open today's Daily Scout brief. Take the 3 roles marked Priority. After applying to each, copy the prompt below to get Claude's referral or hiring-manager message, and send it."),{title:"3 priority applications + outreach",snips:[],claude:P_PRIORITY})),
-  exerciseBlock(),
-  B({id:"pending",t:"19:00",d:60,core:false,title:"Pending work: Nishant or Shiv",why:"When work for others keeps moving, your mind stays light.",finish:"One concrete step done and saved.",line:LINES.pending,
-    steps:[S("One step on pending work",["Open the work with the nearest deadline: Nishant's project or Shiv's handbook.","Not sure which? Ask Claude.","Set a 1-hour timer. Do one step. Save and close."])],minimum:"20 minutes, one small step."}),
-  meal("dinner","20:00",45,"Dinner"),
-  closeBlock("close","20:45",30,"Daily Scout at 9:20 AM, then apply at 9:40 AM."),
-  free("free","21:15",105)
+      S("Test it once",["Copy any one job link from LinkedIn.","Send it to Claude with: 'Use job-scout on this job.'","If the answer looks wrong, reply in one line with what's wrong. Fix only once.","Stop after one hour."])],claude:P_SKILL,minimum:"Get a draft of the skill. Test it tomorrow."}),
+  B(Object.assign(applyBlock("apply2","16:45",70,3,"Open today's Daily Scout brief. Take the 3 roles marked Priority. After applying to each, copy the prompt below to get Claude's referral or hiring-manager message, and send it."),{title:"3 priority applications + outreach",snips:[],claude:P_PRIORITY})),
+  closeBlock("close","18:10",20,"Daily Scout at 9:45 AM, then apply.")
 ]};}
 
-function dayWeekday(dateObj){ const dow=dateObj.getDay(); const isWed = dow===3; return {label: isWed?"Follow-up day":"Regular weekday", start:"08:30", end:"23:00",
-  reminders: isWed?"Today is the first follow-up for Saturday's applications. The Daily Scout will list them.":"Weekly target: 15-20 applications, 15 messages. On a bad day, the floor is still 2 applications + 2 messages.", blocks:[
-  wake("08:30"), breakfast("08:50"),
-  scoutBlock("09:20",20),
-  applyBlock("apply1","09:40",60,4,"Open today's Daily Scout brief in Claude. Start with roles marked Priority."),
-  brk("brk1","10:40",15),
-  outreachBlock("outreach","10:55",45,"3-5"),
-  B(Object.assign(applyBlock("apply2","11:40",45,2,"Take the roles left from the brief. Not enough? Open Gmail > JobAlerts."),{core:false})),
-  meal("lunch","12:30",75,"Lunch and rest"),
-  B({id:"pending",t:"13:45",d:90,core:false,title:"Pending work",why:"Nishant's project, Shiv's handbook, the translation: nearest deadline first.",finish:"One concrete step done and saved.",line:LINES.pending,
-    steps:[S("One step on pending work",["Open the work someone is waiting on: Nishant's project, Shiv's handbook, or the translation.","Pick one clear step. Set a 90-minute timer.","When it rings, save and close. Unfinished is fine."])],minimum:"30 minutes, one small step."}),
-  walk("walk","15:15",30),
-  B({id:"learn",t:"15:45",d:60,core:false,title:"Interview prep or skill practice",why:"If an interview is scheduled, prepare for it. If not, learn by doing, not by reading.",finish:"Interview: research + 3 stories ready. No interview: 5 hiring managers found.",line:"Learning sticks when it's tied to real work.",
-    steps:[S("Interview coming up?",["Yes: open the Interview Handbook. Prepare only for that company. Research them and write 3 stories from your work.","No: go to the next slide."]),
-      S("Practice on Apollo",["Go to apollo.io. Sign up free with Google.","Search one company from your target list.","Find the founder or head of growth. Copy their name and email.","Add them to that company's row in Notion. Do this for 5 companies."])],minimum:"20 minutes, 2 companies."}),
-  brk("tea","16:45",20,"Tea break"),
-  B({id:"deep",t:"17:05",d:45,counter:"msgs",core:false,title:"Hiring manager notes",why:"Reaching the decision maker directly is the biggest lever on priority roles.",finish:"2-3 notes sent to hiring managers or founders.",line:LINES.people,
+/* Day 3 and after: regular job day */
+function dayRegular(){ return {label:"Job day", start:"09:30", end:"19:00", reminders:"Target: 6 applications, 5+ messages. On a bad day, the floor is 2 applications + 2 messages.", blocks:[
+  prepBlock("09:30"),
+  scoutBlock("09:45",20),
+  applyBlock("apply1","10:10",60,4,"Open today's Daily Scout brief in Claude. Start with roles marked Priority."),
+  outreachBlock("outreach","11:20",45,"3-5"),
+  B(Object.assign(applyBlock("apply2","12:15",45,2,"Take the roles left from the brief. Not enough? Open Gmail > JobAlerts."),{core:false})),
+  B({id:"deep",t:"14:00",d:45,counter:"msgs",core:false,title:"Hiring manager notes",why:"Reaching the decision maker directly is the biggest lever on priority roles.",finish:"2-3 notes sent to hiring managers or founders.",line:LINES.people,
     steps:[S("Get the drafts",["Tap 'Copy' on the box below.","Paste it in Claude chat. Replace [paste links] with the links of today's Priority roles. Send."],["claude"]),
       S("Send 2 or 3 notes",["Change the first line: write one real thing you noticed about their product.","Send by email or LinkedIn message.","Tap + on the counter. In Notion, set Status to 'Messaged'."])],claude:P_PRIORITY,minimum:"One note."}),
-  exerciseBlock(),
-  free("personal","19:00",60,"Personal time"),
-  meal("dinner","20:00",45,"Dinner"),
-  closeBlock("close","20:45",25,"Daily Scout at 9:20 AM."),
-  free("free","21:10",110)
-]};}
-
-function dayWeekend(dateObj){ const sat=dateObj.getDay()===6; return {label: sat?"Saturday, review day":"Sunday, light day", start:"10:00", end:"23:00",
-  reminders: sat?"Weekly review today. Look at the numbers, don't judge yourself.":"Light day. 3 applications, then rest.", blocks:[
-  wake("10:00"), breakfast("10:20"),
-  applyBlock("apply","11:00",60,3,"Open Gmail. Click 'JobAlerts' on the left. Pick from the newest job emails."),
-  sat ? B({id:"review",t:"12:00",d:20,kind:"claude",title:"Saturday Review",why:"What worked and what didn't: from data, not feelings.",finish:"Read the review and chose one change for next week.",line:"Numbers show direction, not your worth.",
-      steps:[S("Weekly review",["Tap 'Copy' on the box below. Paste it in Claude chat. Send.","Read Claude's 5 lines.","Pick one change for next week. Write it in your notebook."],["claude"])],claude:P_REVIEW,minimum:"Send the prompt and read it."})
-    : B({id:"plan",t:"12:00",d:20,kind:"close",title:"Get ready for the week",why:"Keep WhatsApp exports ready for the Monday sweep.",finish:"Exports saved, alarm set.",line:LINES.close,
-      steps:[S("Ready for the week",["Export each WhatsApp job group: open group > tap its name > Export chat > Without media. Save the file.","Set your Monday alarm for 8:30 AM."])],minimum:"Just the alarm."}),
-  meal("lunch","12:30",60,"Lunch"),
-  free("off","13:30",240,"Time off"),
-  B({id:"pending",t:"17:30",d:60,core:false,title:"Pending work",why:"One hour, so nothing hangs over the week.",finish:"One step done.",line:LINES.pending,
-    steps:[S("One step on pending work",["Open the oldest pending work.","Set a 1-hour timer. Do one step. Save and close."])],minimum:"20 minutes."}),
-  walk("walk","18:30",30),
-  free("eve","19:00",60,"Family and personal time"),
-  meal("dinner","20:00",45,"Dinner"),
-  closeBlock("close","20:45",20,"check the first block and its time in 'Full day'."),
-  free("free","21:05",115)
+  B({id:"learn",t:"15:00",d:60,core:false,title:"Interview prep or Apollo practice",why:"If an interview is scheduled, prepare for it. If not, learn by doing.",finish:"Interview: research + 3 stories ready. No interview: 5 hiring managers found.",line:"Learning sticks when it's tied to real work.",
+    steps:[S("Interview coming up?",["Yes: open the Interview Handbook. Prepare only for that company. Research them and write 3 stories from your work.","No: go to the next slide."]),
+      S("Practice on Apollo",["Go to apollo.io. Sign up free with Google.","Search one company from your target list.","Find the founder or head of growth. Copy their name and email.","Add them to that company's row in Notion. Do this for 5 companies."])],minimum:"20 minutes, 2 companies."}),
+  closeBlock("close","16:15",20,"Daily Scout at 9:45 AM.")
 ]};}
 
 /* ---------- dates ---------- */
 const pad=n=>String(n).padStart(2,"0");
 const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const START=new Date(2026,8,26);
-function planFor(key){
-  const [y,m,dd]=key.split("-").map(Number); const d=new Date(y,m-1,dd);
-  if(key==="2026-09-26") return daySat26();
-  if(key==="2026-09-27") return daySun27();
-  if(key==="2026-09-28") return dayMon28();
-  const dow=d.getDay(); return (dow===0||dow===6)? dayWeekend(d) : dayWeekday(d);
+const PLAN_START="2026-09-27";
+function addDays(key,n){ const [y,m,dd]=key.split("-").map(Number); return keyOf(new Date(y,m-1,dd+n)); }
+function skipList(){ return (typeof state!=="undefined"&&state&&state.skip)||[]; }
+/* which plan day a date gets: skipped dates push every later day forward by one */
+function planIndex(key){
+  if(key<PLAN_START) return -1;
+  const sk=skipList(); if(sk.indexOf(key)>=0) return -2;
+  let i=0; for(let k=PLAN_START;k<key;k=addDays(k,1)){ if(sk.indexOf(k)<0) i++; }
+  return i;
 }
+function planFor(key){
+  const i=planIndex(key);
+  if(i===-1) return {label:"No plan today",start:"09:30",end:"19:00",reminders:"Your plan starts on "+niceDate(PLAN_START)+".",blocks:[],none:"before"};
+  if(i===-2) return {label:"Moved to tomorrow",start:"09:30",end:"19:00",reminders:"You moved this day's plan to the next day.",blocks:[],none:"skipped"};
+  return i===0?dayOne():i===1?dayTwo():dayRegular();
+}
+function niceDate(key){ const [y,m,dd]=key.split("-").map(Number); const d=new Date(y,m-1,dd); return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+dd+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]; }
 const toMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m;};
 const fmt=m=>{m=((m%1440)+1440)%1440;let h=Math.floor(m/60),mi=m%60;const ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+pad(mi)+" "+ap;};
 const DAYN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1020,8 +979,10 @@ function timerInfo(){
     if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title,mini:"left in this block",line:"One task. Just this one, right now."};
     return {t:hms((n-en)/1000),cap:"late for "+cur.title,mini:"late",line:"It's okay. Start now and the schedule will adjust."};
   }
-  const tm=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1), nb=timeline(keyOf(tm)).blocks[0], st=atMin(tm,nb.s);
-  return {t:hms((st-n)/1000),cap:"until tomorrow, "+fmt(nb.s),mini:"until tomorrow",line:"Today's work is done. Rest now."};
+  const nk=nextPlanDay(tk); if(!nk) return {t:"00:00:00",cap:"",mini:"",line:"No plan ahead."};
+  const [yy,mm,dd]=nk.split("-").map(Number), tm=new Date(yy,mm-1,dd), nb=timeline(nk).blocks[0], st=atMin(tm,nb.s);
+  const tomorrow=nk===addDays(tk,1);
+  return {t:hms((st-n)/1000),cap:"until "+(tomorrow?"tomorrow, ":niceDate(nk)+", ")+fmt(nb.s),mini:tomorrow?"until tomorrow":"until next plan",line:bl.length?"Today's work is done. Rest now.":"Rest today. Your plan starts "+(tomorrow?"tomorrow.":"on "+niceDate(nk)+".")};
 }
 function phaseOf(x){ return x>=5&&x<11?"morning":x>=11&&x<16?"afternoon":x>=16&&x<19.5?"evening":"night"; }
 const LOOK_SHORT={auto:"Auto",morning:"Morning",afternoon:"Day",evening:"Evening",night:"Night"};
@@ -1055,8 +1016,16 @@ const DONE_MARK='<div class="done-mark" aria-hidden="true"><svg viewBox="0 0 120
 
 function calcStreak(){ let n=0; const d=new Date(); if(progress(keyOf(d))<70) d.setDate(d.getDate()-1); while(state.days[keyOf(d)]&&progress(keyOf(d))>=70){ n++; d.setDate(d.getDate()-1); } return n; }
 
+function nextPlanDay(from){ for(let i=1;i<=14;i++){ const k=addDays(from,i); if(planFor(k).blocks.length) return k; } return null; }
 function cardInner(v){
   const ds=dayState(selKey);
+  if(!v.blocks.length){
+    const nk=nextPlanDay(selKey), np=nk?planFor(nk):null, skipped=v.plan.none==="skipped";
+    return {state:"idle",html:'<div class="focus scroll"><div class="stepzone"><div class="step-card" id="stepCard"><div class="s-body" id="sBody">'+
+      '<h2 class="s-head">'+(skipped?"Today's plan moved to tomorrow.":"No plan today.")+'</h2>'+
+      '<ol class="s-pts">'+(nk?'<li>Next: <strong>'+esc(np.label)+'</strong> on '+niceDate(nk)+' at '+fmt(toMin(np.blocks[0].t))+'.</li>':'')+'<li>Rest, or look at the plan in Full day.</li></ol></div></div>'+
+      '<div class="s-actions">'+(skipped?'<button class="primary" data-unshift="'+selKey+'">Undo, start today</button>':'<button class="primary" data-open-drawer>See the plan</button>')+'</div></div></div>'};
+  }
   if(!v.cur){
     const counted=v.blocks.filter(b=>b.kind!=="free"); const done=counted.filter(b=>b.done).length; const all=done===counted.length;
     return {state:"idle",html:'<div class="c-grid is-sum"><section class="c-left scroll"><div class="c-kind"><span class="pulse"></span>Day summary</div><h1 class="c-title">'+(all?"Full day done.":"Today is closed.")+'</h1><p class="c-time">'+(all?"Every block checked. This is the routine.":"What you did counts. Tomorrow starts from here.")+'</p>'+
@@ -1256,6 +1225,11 @@ document.addEventListener("click",e=>{
   if(t.dataset.cnt){ const ds=dayState(selKey); ds[t.dataset.cnt]=Math.max(0,ds[t.dataset.cnt]+Number(t.dataset.by)); save(); renderCard(false); if(+t.dataset.by>0){ pluck(); toast(t.dataset.cnt==="apps"?"One more application sent":"One more message sent"); } return; }
   if(t.id==="helpBtn"){ const o=!$("helpMenu").classList.contains("open"); $("helpMenu").classList.toggle("open",o); t.setAttribute("aria-expanded",String(o)); return; }
   if(t.dataset.r){ $("helpMenu").classList.remove("open"); $("helpBtn").setAttribute("aria-expanded","false"); }
+  if(t.dataset.r==="shiftday"){ const tk=keyOf(new Date()); if(planIndex(tk)<0){ toast(planIndex(tk)===-2?"Today is already moved":"There is no plan today"); return; }
+    modal('<h3>Move today to tomorrow?</h3><p>Today becomes a rest day. Today&#39;s plan starts tomorrow, and every day after moves forward by one day. Nothing is lost.</p><div class="actions"><button class="primary" data-confirmshift>Yes, move my plan</button></div>',"Cancel"); return; }
+  if(t.hasAttribute("data-confirmshift")){ const tk=keyOf(new Date()); state.skip=(state.skip||[]).filter(k=>k!==tk).concat([tk]); selKey=tk; save(); closeModal(); setDrawer(false); render(true); toast("Plan moved. It starts tomorrow."); return; }
+  if(t.dataset.unshift){ state.skip=(state.skip||[]).filter(k=>k!==t.dataset.unshift); save(); render(true); toast("Back on. Today's plan is active."); return; }
+  if(t.hasAttribute("data-open-drawer")){ setDrawer(true); return; }
   if(t.dataset.r==="distract") return openDistract();
   if(t.dataset.r==="mood") return openMood();
   if(t.dataset.r==="late") return openLate();
