@@ -829,8 +829,10 @@ function save(){
 const FS={id:null,t:null,busy:false};
 try{
   const m=location.hash.match(/sync=([a-f0-9]{32,64})/i);
-  if(m){ localStorage.setItem(LS+"-sync",m[1]); history.replaceState(null,"",location.pathname+location.search); }
-  FS.id=localStorage.getItem(LS+"-sync");
+  if(m) localStorage.setItem(LS+"-sync",m[1]);
+  FS.id=(m&&m[1])||localStorage.getItem(LS+"-sync");
+  /* keep the code in the address, so bookmarks and "Add to Home Screen" always carry it */
+  if(FS.id&&!m) history.replaceState(null,"",location.pathname+location.search+"#sync="+FS.id);
 }catch(e){}
 const fsURL=()=>"https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+FS.id;
 async function fsPush(){
