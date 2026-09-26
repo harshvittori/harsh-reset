@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Harsh Reset</title>
+<meta name="build" content="1790433824">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -493,6 +494,12 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 }
 @media (max-width:900px){ #modal .actions .primary,#modal .actions .secondary{flex:0 0 auto;width:100%} }
 .s-note{font-family:var(--body);font-size:.5em;color:var(--muted);margin:.9em 0 0}
+
+.latebar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.latebar button{flex:1 1 auto;border-radius:999px;padding:9px 14px;font-size:14px;font-weight:700;background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);color:var(--ink)}
+.days{scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.drawer{scrollbar-width:thin;scrollbar-color:var(--glass-border) transparent}
 </style>
 </head>
 <body>
@@ -825,6 +832,16 @@ function save(){
   if(dbRef){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ dbRef.set(JSON.parse(JSON.stringify(state))).catch(()=>setSync(false)); },700); }
   if(FS.id){ clearTimeout(FS.t); FS.t=setTimeout(fsPush,800); }
 }
+/* ---------- always run the newest version on the public site ---------- */
+(async()=>{
+  try{
+    if(window.claude||!/github\.io$/.test(location.hostname)) return;
+    const mine=(document.querySelector('meta[name="build"]')||{}).content;
+    const txt=await (await fetch(location.pathname+"?nocache="+Date.now(),{cache:"no-store"})).text();
+    const live=(txt.match(/name="build" content="(\d+)"/)||[])[1];
+    if(live&&mine&&live!==mine&&sessionStorage.getItem("hr-upd")!==live){ sessionStorage.setItem("hr-upd",live); location.replace(location.pathname+"?b="+live); }
+  }catch(e){}
+})();
 /* ---------- sync on the public site (Firebase Firestore, private sync code) ---------- */
 const FS={id:null,t:null,busy:false};
 try{
@@ -1052,7 +1069,7 @@ function cardInner(v){
   else if(v.nm<cur.s){ st="idle"; timeTxt='Starts in <span class="count" data-cd="start" data-t="'+cur.s+'"></span>. You can start now.'; }
   else if(v.nm<=cur.e){ timeTxt='<span class="count" data-cd="end" data-t="'+cur.e+'"></span> left, until '+fmt(cur.e); }
   else { st="late"; timeTxt=Math.round(v.nm-cur.e)+" minutes late. Was due by "+fmt(cur.e)+".";
-    lateHTML='<div class="lateopts"><button data-late="shift"><b>Shift the rest of the day from now</b>This block gets its full time starting now.</button><button data-late="min"><b>Do the minimum version and move on</b>'+esc(cur.minimum||"Do the smallest version.")+'</button>'+(!cur.core?'<button data-late="skip"><b>Move to tomorrow</b>This is a flexible block.</button>':'')+'</div>'; }
+    lateHTML='<div class="latebar"><button data-late="shift">Start now, shift my day</button><button data-late="min">Minimum version</button>'+(!cur.core?'<button data-late="skip">Move to tomorrow</button>':'')+'</div>'; }
   const n=cur.steps.length, doneIdx=cur.steps.map((s,j)=>!!ds.steps[cur.id+":"+j]);
   const j=doneIdx.indexOf(false), anim=stepAnim; stepAnim="";
   const next=v.blocks.find(b=>b.i>cur.i&&!b.done&&!b.skipped);
@@ -1095,7 +1112,7 @@ function cardInner(v){
 function fitStep(){
   const card=(liveCard()&&liveCard().querySelector("#stepCard")); if(!card) return; const t=card.querySelector(".s-body"); if(!t) return;
   t.style.fontSize=""; let size=parseFloat(getComputedStyle(t).fontSize)||30;
-  while(t.scrollHeight>card.clientHeight-8&&size>15){ size-=1.5; t.style.fontSize=size+"px"; }
+  while(t.scrollHeight>card.clientHeight-8&&size>26){ size-=1.5; t.style.fontSize=size+"px"; }
 }
 window.addEventListener("resize",()=>{ clearTimeout(fitStep._t); fitStep._t=setTimeout(fitStep,120); });
 function liveCard(){ return $("stage").querySelector(".card:not(.exit)"); }
