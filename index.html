@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Harsh Reset</title>
-<meta name="build" content="1790506543">
+<meta name="build" content="1790508542">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -620,6 +620,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 <script src="./firebase-config.js"></script>
 <script src="../hv-vault-web/shared/apply-rule.js"></script>
 <script src="../hv-vault-web/hv-cloud.js"></script>
+<script src="../hv-vault-web/shared/hv-ai.js"></script>
 <script>
 (function(){
 "use strict";
@@ -798,7 +799,18 @@ function planIndex(key){
   let i=0; for(let k=PLAN_START;k<key;k=addDays(k,1)){ if(sk.indexOf(k)<0) i++; }
   return i;
 }
+/* HV AI day plans: state.custom[date] = {blocks:[{id,t,d,title,kind,core}]}; kinds map onto Reset's blocks */
+function customPlan(key){
+  const c=typeof state!=="undefined"&&state&&state.custom&&state.custom[key]; if(!c||!c.blocks||!c.blocks.length) return null;
+  const blocks=c.blocks.map(x=>{ const kind=x.kind==="apply"||x.kind==="outreach"||x.kind==="prep"||x.kind==="work"?"work":x.kind;
+    return B({id:x.id,t:x.t,d:x.d,title:x.title,kind,core:!!x.core,counter:x.kind==="apply"?"apps":x.kind==="outreach"?"msgs":undefined,aiKind:x.kind,
+      why:"Planned with HV AI. One block, one task.",finish:x.title+": done.",line:"One block, one task.",
+      steps:kind==="work"?[S(x.title,["Do only this until the block ends.","Everything else can wait."])]:[],minimum:x.core?"A shorter version, but do it.":undefined}); });
+  return {label:"Your plan (HV AI)",start:blocks[0].t,end:hhmmOf(toMin(blocks[blocks.length-1].t)+blocks[blocks.length-1].d),reminders:"Made with HV AI. Core blocks can shrink, never drop. Never skip a meal.",blocks,custom:true};
+}
+const hhmmOf=m=>pad(Math.floor(((m%1440)+1440)%1440/60))+":"+pad(((m%60)+60)%60);
 function planFor(key){
+  const cp=customPlan(key); if(cp) return cp;
   const i=planIndex(key);
   if(i===-1) return {label:"No plan today",start:"09:30",end:"19:00",reminders:"Your plan starts on "+niceDate(PLAN_START)+".",blocks:[],none:"before"};
   if(i===-2) return {label:"Moved to tomorrow",start:"09:30",end:"19:00",reminders:"You moved this day's plan to the next day.",blocks:[],none:"skipped"};
@@ -941,6 +953,7 @@ function hvPendingApplied(key){
   const seen=new Set(); let n=0;
   HV.pending.forEach(a=>{ if(a.date!==key) return;
     if(a.type==="log") n++;
+    else if(a.type==="ai") (a.actions||[]).forEach(x=>{ if(x.type==="moveStage"&&x.args&&x.args.stage==="Applied"&&!seen.has(x.args.job_id)){ const j=HV.data&&HV.data.jobs.find(y=>y.id===x.args.job_id); if(j&&j.date_applied) return; seen.add(x.args.job_id); n++; } });
     else if(a.type==="applied"&&!seen.has(a.jobId)){ const j=HV.data&&HV.data.jobs.find(x=>x.id===a.jobId); if(j&&j.date_applied) return; seen.add(a.jobId); n++; } });
   return n;
 }
@@ -1027,6 +1040,53 @@ async function hvClick(t){
   if(k==="applied"){ const ok=await hvSend({type:"applied",jobId:t.dataset.id}); if(ok){ pluck(); toast("Marked applied. HV Vault will record it."); } hvAfter(); return; }
   if(k==="fudone"){ const ok=await hvSend({type:"fu_done",followupId:t.dataset.id}); if(ok) toast("Follow-up done. HV Vault will record it."); hvAfter(); return; }
 }
+/* ---------- HV AI (shared assistant) ----------
+   HV Vault changes go through the inbox as one batch; day plans are written to Reset's own state. */
+const HVAIX=window.HVAI||null; let hvai=null;
+function aiKindOf(b){ if(b.aiKind) return b.aiKind; if(b.counter==="apps") return "apply"; if(b.counter==="msgs") return "outreach"; if(["meal","rest","free","close"].indexOf(b.kind)>=0) return b.kind; return /prep|interview/i.test(b.title)?"prep":"work"; }
+function hvaiPlan(key){
+  const k=key||keyOf(new Date()), bl=timeline(k).blocks; if(!bl.length) return null;
+  return {date:k,blocks:bl.map(b=>({id:b.id,start:hhmmOf(b.s),duration_min:b.d,title:b.title,kind:aiKindOf(b),core:!!b.core&&b.kind!=="free",done:!!b.done}))};
+}
+function hvaiApplyPlan(a){
+  state.custom=state.custom||{}; const prev=state.custom[a.date]?JSON.parse(JSON.stringify(state.custom[a.date])):null;
+  let n=0; state.custom[a.date]={blocks:a.blocks.map(b=>({id:b.block_id||("ai"+Date.now().toString(36)+(n++)),t:b.start,d:b.duration_min,title:b.title,kind:b.kind,core:!!b.core}))};
+  if(a.date===keyOf(new Date())){ const ds=dayState(a.date); ds.shifts=[]; }         // a fresh plan starts on its own times
+  save(); selKey=a.date; render(false);
+  return ()=>{ if(prev) state.custom[a.date]=prev; else delete state.custom[a.date]; save(); render(false); };
+}
+async function hvaiExecute(actions){
+  const msgs=[], undos=[];
+  const plans=actions.filter(a=>a.type==="buildDayPlan"||a.type==="editDayPlan"), hv=actions.filter(a=>plans.indexOf(a)<0);
+  plans.forEach(a=>{ undos.push(hvaiApplyPlan(a.args)); msgs.push("Saved your plan for "+niceDate(a.args.date)+": "+a.args.blocks.length+" blocks."); });
+  if(hv.length){
+    const batch="ai"+Date.now().toString(36);
+    const ok=await hvSend({type:"ai",batch,actions:hv.map(a=>({type:a.type,args:a.args}))});
+    if(!ok) throw new Error("couldn't reach HV Vault's inbox");
+    msgs.push("Sent "+hv.length+" change"+(hv.length>1?"s":"")+" to HV Vault. "+(HV.via==="cloud"?"It applies them as soon as HV Vault is open on any device.":"It applies them when you open HV Vault in this browser."));
+    undos.push(async()=>{ await hvSend({type:"ai_undo",batch}); });
+  }
+  hvRerender();
+  return {messages:msgs,undo:async()=>{ for(const u of undos.reverse()) await u(); return "Undone."+(hv.length?" HV Vault reverts its part when it syncs.":""); }};
+}
+function hvaiMount(){
+  if(!HVAIX||hvai) return;
+  hvai=HVAIX.mount({app:"reset",canPlan:true,
+    logoSVG:'<svg viewBox="0 0 1024 1024" aria-hidden="true"><defs><linearGradient id="hvaimk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B3157"/><stop offset=".5" stop-color="#152647"/><stop offset="1" stop-color="#0C1830"/></linearGradient></defs><rect width="1024" height="1024" rx="230" fill="url(#hvaimk)"/><path d="M 608.00 360.68 A 179.2 179.2 0 1 1 416.00 360.68" fill="none" stroke="#DFC18A" stroke-width="96" stroke-linecap="round"/><path d="M 608.00 206.74 A 320 320 0 1 1 416.00 206.74" fill="none" stroke="#C9A45E" stroke-width="83.2" stroke-linecap="round"/><circle cx="512" cy="512" r="96" fill="#EAD9B0"/></svg>',
+    get keyHelp(){ return "HV AI uses the AI key saved in HV Vault. "+(HV.data?"Open HV Vault > Settings > AI, choose Gemini, paste your key (free: aistudio.google.com > Get API key) and save.":"First connect HV Vault (open it and sign in), then add your key in HV Vault > Settings > AI."); },
+    getData:()=>HV.data||{jobs:[],companies:[],followups:[],calendarEvents:[]},
+    getSettings:()=>{ const s=HV.data&&HV.data.settings||{}; return {provider:s.aiProvider,key:s.aiKey,model:s.aiModel}; },
+    getPlan:()=>hvaiPlan(keyOf(new Date())),
+    getContext:()=>HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date()))),
+    userName:()=>(HV.data&&HV.data.settings&&HV.data.settings.myName)||"Harsh",
+    isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
+    fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
+    execute:hvaiExecute});
+  /* a plan handed over from HV Vault (#hvplan=...) opens ready to confirm */
+  const m=location.hash.match(/hvplan=([^&]+)/);
+  if(m){ try{ const a=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); history.replaceState(null,"",location.pathname+location.search); if(a&&(a.type==="buildDayPlan"||a.type==="editDayPlan")) hvai.showActions([{type:a.type,args:{date:a.args.date,blocks:a.args.blocks}}],"Plan from HV Vault. Check it, then confirm to use it here."); }catch(e){} }
+}
+
 function hvDrawerHTML(){
   return '<h3>HV Vault</h3>'+(HV.data?(function(){ const w=hvWeek(), f=hvDueFollowups();
     return '<p class="hv-src">Applied today: <b>'+hvAppliedOn(keyOf(new Date()))+'</b> · This week: '+w.apps+' applications, '+w.responses+' responses, '+w.interviews+' interviews</p>'+
@@ -1455,7 +1515,7 @@ document.addEventListener("input",e=>{ const n=e.target.dataset&&e.target.datase
 $("stage").addEventListener("pointermove",e=>{ const c=e.target.closest(".card"); if(!c) return; const r=c.getBoundingClientRect(); c.style.setProperty("--mx",(e.clientX-r.left)+"px"); c.style.setProperty("--my",(e.clientY-r.top)+"px"); });
 
 if(AR){ $("ruleList").innerHTML=AR.summary.map(x=>"<li>"+esc(x)+"</li>").join(""); }
-hvRefresh(); setInterval(()=>{ if(!document.hidden) hvRefresh(); },20000);
+hvRefresh().then(hvaiMount); setInterval(()=>{ if(!document.hidden) hvRefresh(); },20000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) hvRefresh(); });
 window.addEventListener("focus",()=>hvRefresh());
 window.addEventListener("storage",e=>{ if(e.key===HV_LINBOX) hvRefresh(); });
