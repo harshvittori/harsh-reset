@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Harsh Reset</title>
-<meta name="build" content="1790434883">
+<meta name="build" content="1790506543">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -253,6 +253,29 @@ textarea{width:100%;min-height:80px;border-radius:16px;border:1px solid var(--gl
 .tb-detail p{margin:0 0 6px}
 .tb-detail .steps li{padding:6px 4px}
 .tb-detail .chk{flex-basis:22px;height:22px}
+.hv{margin-top:14px;border-radius:20px;padding:12px 16px;background:var(--glass2);border:1px solid var(--glass-border);text-align:left;font-family:var(--body);font-size:15px;width:100%}
+.hv-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hv-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--glass-border)}
+.hv-head+.hv-row{border-top:0}
+.hv-t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35}
+.hv-t small,.hv-src,.hv-empty{color:var(--muted)}
+.hv-src,.hv-empty{font-size:13.5px;margin:6px 0 2px}
+.hv-v{flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
+.hv-v.pass{color:var(--done);background:var(--done-soft)}
+.hv-v.warn{color:var(--warn);background:var(--warn-soft)}
+.hv button,.hvbox button{flex:none;border-radius:999px;border:1px solid var(--glass-border);background:var(--glass);padding:6px 13px;font-size:14px;text-transform:none;letter-spacing:0}
+.hv .hv-log,.hv-bar .hv-log{background:var(--accent);color:#fff;border-color:transparent}
+.hv-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:10px;width:100%}
+.hv-bar button{border-radius:999px;border:1px solid var(--glass-border);background:var(--glass);padding:8px 16px;font-size:15px}
+.modal .hv{margin-top:0;border:0;background:none;padding:0}
+.hv a{flex:none;font-size:14px;color:var(--accent)}
+.hv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.hv-stats div{border-radius:14px;padding:10px 6px;background:var(--glass);text-align:center}
+.hv-stats b{display:block;font-family:var(--display);font-weight:300;font-size:28px;line-height:1.1}
+.hv-stats span{font-size:12.5px;color:var(--muted)}
+.counter small{font-size:12.5px;color:var(--faint)}
+.hvform label{display:block;margin:12px 0 4px;font-size:14px;color:var(--muted)}
+.hvform input,.hvform select{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--glass-border);background:var(--glass);color:var(--ink)}
 .rules{margin-top:18px;border-radius:20px;padding:14px 18px;background:var(--glass2);border:1px solid var(--glass-border)}
 .rules h3{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:17px}
 .rules ul{margin:0;padding-left:18px;font-size:14px}
@@ -564,6 +587,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
   <p class="dr-sub" id="dateline"></p>
   <nav class="days" id="days" aria-label="Choose a day"></nav>
   <ol class="track" id="track"></ol>
+  <div class="rules hvbox" id="hvDrawer"></div>
   <div class="rules">
     <h3>Today's rules</h3>
     <ul>
@@ -576,7 +600,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
   </div>
   <div class="rules">
     <h3>2-minute apply rule</h3>
-    <ul>
+    <ul id="ruleList">
       <li>Role family: GTM, growth, founder's office, BD, partnerships, rev ops.</li>
       <li>Minimum experience 3 years or less. Skip if it's 4+.</li>
       <li>Delhi NCR, Jaipur, Agra, remote. Bengaluru or Pune only for a strong fit. No Mumbai.</li>
@@ -593,10 +617,17 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 <div class="scrim" id="scrim" role="dialog" aria-modal="true"><div class="modal glass" id="modal"></div></div>
 <div class="toast glass" id="toast" role="status" aria-live="polite"></div>
 
+<script src="./firebase-config.js"></script>
+<script src="../hv-vault-web/shared/apply-rule.js"></script>
+<script src="../hv-vault-web/hv-cloud.js"></script>
 <script>
 (function(){
 "use strict";
 /* ---------- shared text ---------- */
+/* The apply rule is defined once in HV Vault (shared/apply-rule.js); these fallbacks are used only if it can't load. */
+const AR=window.HVApplyRule||null;
+const RULE_STEPS=AR?AR.checkSteps:["Is the title about Growth, GTM, Go-to-market, Founder's Office, Business Development, Partnerships or Revenue Operations?","Does it ask for 3 years or less? '0-2', '1-3' and '2-4 years' are all fine.","Is it in Delhi, Gurgaon, Noida, Jaipur, Agra, or remote? Bengaluru or Pune only if it fits very well. Never Mumbai."];
+const RULE_SKIP=AR?AR.skipLine:"Asks for 4+ years, or it's in Mumbai: skip it and open the next job.";
 const BOOL = `("growth associate" OR "go-to-market" OR GTM OR "founder's office" OR "founders office" OR "business development associate" OR "partnerships associate" OR "revenue operations") NOT (senior OR head OR director OR "sales manager")`;
 const GMAILQ = `from:(linkedin.com OR wellfound.com OR instahyre.com OR cutshort.io OR naukri.com) subject:(job OR jobs OR hiring OR role)`;
 const MSG_FRIEND = `Hi [Name], hope you're doing well! I'm actively looking for GTM / growth roles, especially at SaaS and AI startups, in Delhi NCR or remote. If there's an opening on the growth or business side at [Company], now or coming up, could you let me know or refer me? Happy to send my resume. Thanks!`;
@@ -651,12 +682,12 @@ const free = (id,t,d,title)=>B({id,t,d,kind:"free",core:false,title:title||"Your
 
 const applyBlock = (id,t,d,n,src)=>B({id,t,d,counter:"apps",title:"Send "+n+" applications",why:"Every application opens a door. More doors, more chances.",finish:n+" applications submitted. Not researched. Submitted.",line:LINES.apply,
   steps:[S("Get ready",["On your laptop, open the folder where your resumes are saved.","Keep all three ready: GTM/Demand Gen, BD/SDR, Growth."].concat(src?[src]:["Go to linkedin.com/jobs. Click the search box at the top. Your saved searches appear below it. Click the Delhi one.","If fewer than "+n+" jobs look right, click the Remote search instead."])),
-    S("Check each job (2 minutes)",["Open one job. Read only the title and the first part of the description.","Is the title about Growth, GTM, Go-to-market, Founder's Office, Business Development, Partnerships or Revenue Operations?","Does it ask for 3 years or less? '0-2', '1-3' and '2-4 years' are all fine.","Is it in Delhi, Gurgaon, Noida, Jaipur, Agra, or remote? Bengaluru or Pune only if it fits very well. Never Mumbai."]),
-    S("Decide",["All yes: apply.","One doubt: **still apply.**","Unsure after 2 minutes: **apply.**","Asks for 4+ years, or it's in Mumbai: skip it and open the next job.","Don't read the 'nice to have' section at all."]),
+    S("Check each job (2 minutes)",["Open one job. Read only the title and the first part of the description."].concat(RULE_STEPS)),
+    S("Decide",["All yes: apply.","One doubt: **still apply.**","Unsure after 2 minutes: **apply.**",RULE_SKIP,"Don't read the 'nice to have' section at all."]),
     S("Pick the resume",["Job talks about marketing, campaigns or leads: send the GTM/Demand Gen resume.","Job talks about sales, calls or outbound: send the BD/SDR resume.","Job talks about growth, experiments or founder's office: send the Growth resume.","Don't edit the resume."]),
     S("Easy Apply",["Click the 'Easy Apply' button.","Check your phone number and email.","Upload the resume you picked.","Answer each question truthfully. For experience, give your real years.","Click 'Next' until you see 'Submit'. Click 'Submit'."]),
     S("No Easy Apply?",["If the button says 'Apply' and opens the company website, fill their form.","If the form takes more than 15 minutes, close it and take the next job.","Asked for a cover letter? Copy the job link. Send it to Claude with: 'Write a short cover letter for this job.'"]),
-    S("Count it, then repeat",["Tap + on the counter below.","In Notion or your notebook, write: company, role, job link, which resume.","Go back to your job list and open the next job.","Keep going until the counter shows "+n+". Then tap Done."])],
+    S("Count it, then repeat",["Tap 'Log application' below: role, company, link. HV Vault records it and counts it. (Or tap + on the counter.)","Applied to one from the HV Vault queue? Tap 'Applied' next to it.","Go back to your job list and open the next job.","Keep going until the counter shows "+n+". Then tap Done."])],
   minimum:"Just 2 applications, both Easy Apply. But do 2.",next:"Check the counter. If the target isn't met, the block isn't done."});
 
 const outreachBlock = (id,t,d,sent)=>B({id,t,d,counter:"msgs",title:"Messages and follow-ups",why:"Someone inside the company can move your application forward. A warm path beats a cold one many times over.",finish:sent+" messages sent, all of today's follow-ups cleared.",line:LINES.people,
@@ -845,6 +876,163 @@ async function fsPull(first){
 }
 function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Synced on phone and laptop":(FS&&FS.id?"Sync paused, will retry":"Saved on this device only"); }
 
+/* ---------- HV Vault link ----------
+   HV Vault is the record; Reset reads it and never writes it. What Reset does (log an application,
+   mark a queued job applied, finish a follow-up) goes to an inbox that HV Vault applies and clears:
+   users/{uid}/apps/inbox when signed in (one field per action, so concurrent writes never collide),
+   or localStorage "hv-inbox" in this browser when signed out. */
+const HV={data:null,via:"",pending:[],loading:false};
+const HV_MAIN="jobhunthub-data-v1", HV_LINBOX="hv-inbox";
+const HV_APPLIED=["Applied","Follow-up Needed","Recruiter Responded","Interview","Assignment","Final Round","Offer","Rejected","Closed"];
+const HVC=()=>(window.HVCloud&&window.HVCloud.configured?window.HVCloud:null);
+function hvLocalInbox(){ try{ const a=JSON.parse(localStorage.getItem(HV_LINBOX)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+/* HV Vault's copy in this browser. Opening must never create its database (HV Vault would then miss its setup). */
+function hvIDB(){ return new Promise(res=>{ try{
+  const r=indexedDB.open("hv-vault",1);
+  r.onupgradeneeded=()=>{ try{ r.transaction.abort(); }catch(e){} };
+  r.onerror=()=>res(null); r.onblocked=()=>res(null);
+  r.onsuccess=()=>{ const db=r.result; try{
+    if(!db.objectStoreNames.contains("kv")){ db.close(); return res(null); }
+    const g=db.transaction("kv","readonly").objectStore("kv").get(HV_MAIN);
+    g.onsuccess=()=>{ db.close(); res(g.result||null); }; g.onerror=()=>{ db.close(); res(null); };
+  }catch(e){ try{db.close();}catch(e2){} res(null); } };
+}catch(e){ res(null); } }); }
+async function hvRefresh(){
+  if(HV.loading) return; HV.loading=true;
+  try{
+    const c=HVC(); let raw=null, via="", pend=[];
+    if(c){ try{ await c.ready; }catch(e){} }
+    if(c&&c.user){
+      try{
+        const g=await c.getValue("hv/"+encodeURIComponent(HV_MAIN)); raw=g&&g.value; via="cloud";
+        const doc=await c.req("GET","apps/inbox");
+        Object.entries((doc&&doc.fields)||{}).forEach(([k,v])=>{ if(/^a_/.test(k)){ try{ pend.push(JSON.parse(v.stringValue)); }catch(e){} } });
+      }catch(e){ raw=null; }
+    }
+    if(!raw){ raw=await hvIDB(); via=raw?"local":""; }
+    pend=pend.concat(hvLocalInbox());
+    const data=raw?JSON.parse(raw):null;
+    const done=new Set((data&&data.settings&&data.settings.inboxDone)||[]);
+    HV.data=data&&Array.isArray(data.jobs)?data:null; HV.via=HV.data?via:"";
+    HV.pending=pend.filter(a=>a&&a.id&&!done.has(a.id));
+  }catch(e){} finally{ HV.loading=false; }
+  hvRerender();
+}
+function hvAfter(){ if(modalKind==="hv"&&$("scrim").classList.contains("open")) hvShow(hvOpen); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); }
+function hvRerender(){
+  if(started&&!busy&&!document.querySelector("textarea:focus,input:focus")&&!$("scrim").classList.contains("open")) renderCard(false);
+  if($("drawer").classList.contains("open")) renderDrawer();
+}
+async function hvSend(a){
+  a.id="r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8); a.t=Date.now(); a.date=keyOf(new Date()); a.from="reset";
+  HV.pending.push(a);
+  const local=()=>{ const q=hvLocalInbox(); q.push(a); localStorage.setItem(HV_LINBOX,JSON.stringify(q)); };
+  try{
+    const c=HVC();
+    if(c&&c.user){ const f="a_"+a.id; await c.req("PATCH","apps/inbox?updateMask.fieldPaths="+f,{fields:{[f]:{stringValue:JSON.stringify(a)}}}); }
+    else local();
+    return true;
+  }catch(e){
+    try{ local(); return true; }catch(e2){ HV.pending=HV.pending.filter(x=>x!==a); return false; }
+  }
+}
+const hvCompany=id=>(((HV.data&&HV.data.companies)||[]).find(c=>c.id===id)||{}).name||"";
+function hvPendingApplied(key){
+  const seen=new Set(); let n=0;
+  HV.pending.forEach(a=>{ if(a.date!==key) return;
+    if(a.type==="log") n++;
+    else if(a.type==="applied"&&!seen.has(a.jobId)){ const j=HV.data&&HV.data.jobs.find(x=>x.id===a.jobId); if(j&&j.date_applied) return; seen.add(a.jobId); n++; } });
+  return n;
+}
+/* applications on a date according to HV Vault (plus actions it hasn't applied yet); null when not connected */
+function hvAppliedOn(key){ if(!HV.data) return null; return HV.data.jobs.filter(j=>j.date_applied===key).length+hvPendingApplied(key); }
+function appsCount(key){ const ds=dayState(key), auto=hvAppliedOn(key); return auto===null?ds.apps:Math.max(0,auto+(ds.appsAdj||0)); }
+function hvQueue(){
+  if(!HV.data) return [];
+  const pend=new Set(HV.pending.filter(a=>a.type==="applied").map(a=>a.jobId)), rank=["Preparing","Saved","Wishlist"];
+  return HV.data.jobs.filter(j=>rank.indexOf(j.status)>=0&&!pend.has(j.id))
+    .map(j=>({j,company:hvCompany(j.company_id),v:AR?AR.check(j).verdict:"warn"}))
+    .filter(x=>x.v!=="fail")
+    .sort((a,b)=>(a.v==="pass"?0:1)-(b.v==="pass"?0:1)||rank.indexOf(a.j.status)-rank.indexOf(b.j.status));
+}
+function hvDueFollowups(){
+  if(!HV.data) return []; const today=keyOf(new Date()), pend=new Set(HV.pending.filter(a=>a.type==="fu_done").map(a=>a.followupId));
+  return (HV.data.followups||[]).filter(f=>f.status==="Pending"&&f.due_date&&f.due_date<=today&&!pend.has(f.id)).sort((a,b)=>a.due_date<b.due_date?-1:1);
+}
+function hvWeek(){
+  const d=new Date(); d.setDate(d.getDate()-((d.getDay()+6)%7)); const mon=keyOf(d), today=keyOf(new Date()), inW=k=>k&&k>=mon&&k<=today;
+  if(!HV.data) return null; const jobs=HV.data.jobs;
+  let pendW=0; for(let k=mon;k<=today;k=addDays(k,1)) pendW+=hvPendingApplied(k);
+  return { apps:jobs.filter(j=>inW(j.date_applied)).length+pendW,
+    responses:jobs.filter(j=>inW(j.response_date)).length,
+    interviews:jobs.filter(j=>inW(j.interview_date)||(j.timeline||[]).some(e=>inW(e.date)&&/Moved to Interview/.test(e.event||""))).length };
+}
+function hvStatusLine(){
+  if(HV.data) return '<p class="hv-src">'+(HV.via==="cloud"?"Synced with HV Vault":"From HV Vault in this browser")+(HV.pending.length?" · "+HV.pending.length+" waiting for HV Vault to record":"")+'</p>';
+  return '<p class="hv-empty">'+(HVC()?'Connect HV Vault to see your queue and follow-ups. <button data-hv="signin">Sign in with Google</button>':"Open HV Vault once in this browser to connect it.")+'</p>';
+}
+function hvQueueHTML(){
+  const q=hvQueue(), top=q.slice(0,5);
+  return '<div class="hv"><div class="hv-head"><span>Apply queue · HV Vault</span><button class="hv-log" data-hv="log">Log application</button></div>'+
+    (HV.data?(top.length?top.map(x=>'<div class="hv-row"><span class="hv-v '+x.v+'">'+(x.v==="pass"?"Fits":"Check")+'</span><span class="hv-t"><b>'+esc(x.j.title||"Role")+'</b> <small>'+esc(x.company)+'</small></span>'+
+      (x.j.job_link&&/^https?:\/\//i.test(x.j.job_link)?'<a href="'+esc(x.j.job_link)+'" target="_blank" rel="noopener">Open</a>':'')+'<button data-hv="applied" data-id="'+esc(x.j.id)+'">Applied</button></div>').join("")+
+      (q.length>top.length?'<p class="hv-empty">+'+(q.length-top.length)+' more waiting in HV Vault</p>':'')
+      :'<p class="hv-empty">No saved jobs waiting. Save some in HV Vault, or log one you applied to.</p>'):"")+hvStatusLine()+'</div>';
+}
+function hvFollowupsHTML(){
+  const f=hvDueFollowups();
+  return '<div class="hv"><div class="hv-head"><span>From HV Vault · follow-ups due</span></div>'+
+    (HV.data?(f.length?f.slice(0,6).map(x=>'<div class="hv-row"><span class="hv-t"><b>'+esc(x.title||"Follow-up")+'</b> <small>'+esc(hvCompany(x.company_id))+' · due '+esc(niceDate(x.due_date))+'</small></span><button data-hv="fudone" data-id="'+esc(x.id)+'">Done</button></div>').join(""):'<p class="hv-empty">No follow-ups due. Nice.</p>'):"")+hvStatusLine()+'</div>';
+}
+function hvReviewHTML(){
+  const w=hvWeek();
+  return '<div class="hv"><div class="hv-head"><span>This week · HV Vault</span></div>'+
+    (w?'<div class="hv-stats"><div><b>'+w.apps+'</b><span>applications</span></div><div><b>'+w.responses+'</b><span>responses</span></div><div><b>'+w.interviews+'</b><span>interviews</span></div></div>':"")+hvStatusLine()+'</div>';
+}
+function hvBarHTML(b,key){
+  if(!isToday(key)) return "";
+  let h="";
+  if(b.counter==="apps"){ const n=hvQueue().length; h=(HV.data?'<button data-hv="queue">Apply queue · '+n+'</button>':'')+'<button class="hv-log" data-hv="log">Log application</button>'; }
+  else if(b.counter==="msgs"&&HV.data){ h='<button data-hv="fus">Follow-ups due · '+hvDueFollowups().length+'</button>'; }
+  else if(b.kind==="close"&&HV.data){ h='<button data-hv="week">This week in HV Vault</button>'; }
+  return h?'<div class="hv-bar">'+h+'</div>':"";
+}
+let hvOpen="";   /* which HV list is open in the modal, so it refreshes after Applied / Done */
+function hvShow(which){
+  const html=which==="queue"?hvQueueHTML():which==="fus"?hvFollowupsHTML():hvReviewHTML();
+  const sc=$("modal").scrollTop; modal(html); hvOpen=which; modalKind="hv"; $("modal").scrollTop=sc;
+}
+function hvLogModal(){
+  const src=["LinkedIn","Naukri","Company site","Wellfound","Referral","Instahyre","Other"];
+  modal('<h3>Log an application</h3><div class="hvform"><label for="hvRole">Role</label><input id="hvRole" autocomplete="off" placeholder="e.g. Growth Associate">'+
+    '<label for="hvCompany">Company</label><input id="hvCompany" autocomplete="off" placeholder="e.g. Acme">'+
+    '<label for="hvLink">Job link</label><input id="hvLink" type="url" autocomplete="off" placeholder="https://…">'+
+    '<label for="hvSource">Source</label><select id="hvSource">'+src.map(x=>'<option>'+x+'</option>').join("")+'</select>'+
+    '<p class="hv-empty">HV Vault adds it as Applied today and sets the first follow-up. Same link or same company + role updates the existing job.</p></div>'+
+    '<div class="actions"><button class="primary" data-hv="logsave">Log it</button></div>',"Cancel");
+  setTimeout(()=>{ const r=$("hvRole"); if(r) r.focus(); },50);
+}
+async function hvClick(t){
+  const k=t.dataset.hv;
+  if(k==="signin"){ const c=HVC(); if(c){ try{ await c.signIn(); }catch(e){ toast("Sign-in didn't finish"); } hvRefresh(); } return; }
+  if(k==="log"){ hvLogModal(); return; }
+  if(k==="queue"||k==="fus"||k==="week"){ hvShow(k); return; }
+  if(k==="logsave"){
+    const role=($("hvRole").value||"").trim(), company=($("hvCompany").value||"").trim(), link=($("hvLink").value||"").trim(), source=$("hvSource").value;
+    if(!role||!company){ toast("Add the role and the company"); return; }
+    const ok=await hvSend({type:"log",role,company,link,source}); closeModal();
+    if(ok){ pluck(); toast("Logged. HV Vault will record it."); } else toast("Couldn't save. Try again.");
+    hvRerender(); return;
+  }
+  if(k==="applied"){ const ok=await hvSend({type:"applied",jobId:t.dataset.id}); if(ok){ pluck(); toast("Marked applied. HV Vault will record it."); } hvAfter(); return; }
+  if(k==="fudone"){ const ok=await hvSend({type:"fu_done",followupId:t.dataset.id}); if(ok) toast("Follow-up done. HV Vault will record it."); hvAfter(); return; }
+}
+function hvDrawerHTML(){
+  return '<h3>HV Vault</h3>'+(HV.data?(function(){ const w=hvWeek(), f=hvDueFollowups();
+    return '<p class="hv-src">Applied today: <b>'+hvAppliedOn(keyOf(new Date()))+'</b> · This week: '+w.apps+' applications, '+w.responses+' responses, '+w.interviews+' interviews</p>'+
+      (f.length?'<p class="hv-src">Follow-ups due: '+f.slice(0,3).map(x=>esc(x.title||"Follow-up")+' ('+esc(hvCompany(x.company_id))+')').join(", ")+(f.length>3?" …":"")+'</p>':''); })():"")+hvStatusLine();
+}
+
 /* ---------- derived ---------- */
 let selKey = keyOf(new Date());
 if(new Date() < START) selKey="2026-09-26";
@@ -900,8 +1088,10 @@ function snipsHTML(b){
   return h;
 }
 function counterHTML(b,key){
-  if(!b.counter) return ""; const ds=dayState(key); const v=ds[b.counter];
-  return '<div class="counter"><span>'+(b.counter==="apps"?"Applications today":"Messages today")+'</span><button data-cnt="'+b.counter+'" data-by="-1" aria-label="Decrease">-</button><b>'+v+'</b><button data-cnt="'+b.counter+'" data-by="1" aria-label="Increase">+</button></div>';
+  const bar=hvBarHTML(b,key);
+  if(!b.counter) return bar; const ds=dayState(key);
+  const auto=b.counter==="apps"&&hvAppliedOn(key)!==null, v=b.counter==="apps"?appsCount(key):ds[b.counter];
+  return '<div class="counter"><span>'+(b.counter==="apps"?"Applications today"+(auto?' <small>· from HV Vault'+(ds.appsAdj?" ("+(ds.appsAdj>0?"+":"")+ds.appsAdj+" by hand)":"")+'</small>':""):"Messages today")+'</span><button data-cnt="'+b.counter+'" data-by="-1" aria-label="Decrease">-</button><b>'+v+'</b><button data-cnt="'+b.counter+'" data-by="1" aria-label="Increase">+</button></div>'+bar;
 }
 
 
@@ -1037,7 +1227,8 @@ function cardInner(v){
   if(!v.cur){
     const counted=v.blocks.filter(b=>b.kind!=="free"); const done=counted.filter(b=>b.done).length; const all=done===counted.length;
     return {state:"idle",html:'<div class="c-grid is-sum"><section class="c-left scroll"><div class="c-kind"><span class="pulse"></span>Day summary</div><h1 class="c-title">'+(all?"Full day done.":"Today is closed.")+'</h1><p class="c-time">'+(all?"Every block checked. This is the routine.":"What you did counts. Tomorrow starts from here.")+'</p>'+
-      '<div class="stats"><div class="stat"><b>'+done+'/'+counted.length+'</b><span>blocks</span></div><div class="stat"><b>'+ds.apps+'</b><span>applications</span></div><div class="stat"><b>'+ds.msgs+'</b><span>messages</span></div><div class="stat"><b>'+calcStreak()+'</b><span>day streak</span></div></div>'+
+      '<div class="stats"><div class="stat"><b>'+done+'/'+counted.length+'</b><span>blocks</span></div><div class="stat"><b>'+appsCount(selKey)+'</b><span>applications</span></div><div class="stat"><b>'+ds.msgs+'</b><span>messages</span></div><div class="stat"><b>'+calcStreak()+'</b><span>day streak</span></div></div>'+
+      (isToday(selKey)?hvReviewHTML():"")+
       '<p class="c-line">Your streak grows on days you finish 70% of blocks. Not perfect days, consistent days.</p></section>'+
       '<section class="c-right scroll"><div class="lbl">One good thing from today</div><textarea data-note="good" placeholder="One line. Short is fine.">'+esc(ds.good)+'</textarea><div class="lbl">Tomorrow&#39;s first step</div><textarea data-note="tomorrow" placeholder="What will you do first when you wake up?">'+esc(ds.tomorrow)+'</textarea></section></div>'};
   }
@@ -1125,6 +1316,7 @@ function renderDrawer(){
   let tabs=""; for(let i=0;i<7;i++){ const dd=new Date(first.getFullYear(),first.getMonth(),first.getDate()+i); const k=keyOf(dd); const p=state.days[k]?progress(k):0;
     tabs+='<button class="'+(k===selKey?"sel":"")+'" data-day="'+k+'"><small>'+(isToday(k)?"Today":DAYN[dd.getDay()])+'</small><b>'+dd.getDate()+' '+MON[dd.getMonth()]+'</b><span class="dot '+(p>=80?"full":p>0?"part":"")+'"></span></button>'; }
   $("days").innerHTML=tabs;
+  $("hvDrawer").innerHTML=hvDrawerHTML();
   const v=cardView(), ds=dayState(selKey);
   $("track").innerHTML=v.blocks.map(b=>{
     const st=b.done?"done":b.skipped?"skipped":(v.cur&&b.id===v.cur.id?((v.today&&v.nm>b.e)?"late":"current"):"");
@@ -1230,7 +1422,10 @@ document.addEventListener("click",e=>{
   if(t.dataset.undo){ const ds=dayState(selKey); delete ds.done[t.dataset.undo]; delete ds.skipped[t.dataset.undo]; if(ds.min) delete ds.min[t.dataset.undo]; save(); render(true); return; }
   if(t.dataset.open){ openTrack=openTrack===t.dataset.open?null:t.dataset.open; renderDrawer(); return; }
   if(t.dataset.copy){ const [bid,j]=t.dataset.copy.split(":"); const b=timeline(selKey).blocks.find(x=>x.id===bid); if(b) copyText(j==="claude"?b.claude:b.snips[+j].text); return; }
-  if(t.dataset.cnt){ const ds=dayState(selKey); ds[t.dataset.cnt]=Math.max(0,ds[t.dataset.cnt]+Number(t.dataset.by)); save(); renderCard(false); if(+t.dataset.by>0){ pluck(); toast(t.dataset.cnt==="apps"?"One more application sent":"One more message sent"); } return; }
+  if(t.dataset.hv){ hvClick(t); return; }
+  if(t.dataset.cnt){ const ds=dayState(selKey), by=Number(t.dataset.by), auto=t.dataset.cnt==="apps"?hvAppliedOn(selKey):null;
+    if(auto!==null) ds.appsAdj=Math.max(-auto,(ds.appsAdj||0)+by);     // HV Vault counts; +/- is only an override
+    else ds[t.dataset.cnt]=Math.max(0,ds[t.dataset.cnt]+by); save(); renderCard(false); if(+t.dataset.by>0){ pluck(); toast(t.dataset.cnt==="apps"?"One more application sent":"One more message sent"); } return; }
   if(t.id==="helpBtn"){ const o=!$("helpMenu").classList.contains("open"); $("helpMenu").classList.toggle("open",o); t.setAttribute("aria-expanded",String(o)); return; }
   if(t.dataset.r){ $("helpMenu").classList.remove("open"); $("helpBtn").setAttribute("aria-expanded","false"); }
   if(t.dataset.r==="shiftday"){ const tk=keyOf(new Date()); if(planIndex(tk)<0){ toast(planIndex(tk)===-2?"Today is already moved":"There is no plan today"); return; }
@@ -1259,6 +1454,12 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("input",e=>{ const n=e.target.dataset&&e.target.dataset.note; if(n){ dayState(selKey)[n]=e.target.value; save(); } });
 $("stage").addEventListener("pointermove",e=>{ const c=e.target.closest(".card"); if(!c) return; const r=c.getBoundingClientRect(); c.style.setProperty("--mx",(e.clientX-r.left)+"px"); c.style.setProperty("--my",(e.clientY-r.top)+"px"); });
 
+if(AR){ $("ruleList").innerHTML=AR.summary.map(x=>"<li>"+esc(x)+"</li>").join(""); }
+hvRefresh(); setInterval(()=>{ if(!document.hidden) hvRefresh(); },20000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) hvRefresh(); });
+window.addEventListener("focus",()=>hvRefresh());
+window.addEventListener("storage",e=>{ if(e.key===HV_LINBOX) hvRefresh(); });
+if(HVC()) HVC().onChange(()=>hvRefresh());
 applyPhase(); setInterval(applyPhase,60000);
 soundLabel(); rollTo($("bigTime"),timerInfo().t); render(false); tickTimers();
 setInterval(tickTimers,1000);
