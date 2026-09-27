@@ -3,8 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Harsh Reset</title>
-<meta name="build" content="1790510690">
+<title>HV Reset</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="HV Reset">
+<meta name="application-name" content="HV Reset">
+<meta name="build" content="1790513346">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -523,6 +527,19 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .days{scrollbar-width:none}
 .days::-webkit-scrollbar{display:none}
 .drawer{scrollbar-width:thin;scrollbar-color:var(--glass-border) transparent}
+
+/* ---------- HV AI in HV Reset's own look: glass pill, sky panel, green primary (follows the day/night theme) ---------- */
+body .hvai-fab{background:var(--glass);color:var(--ink);border:1px solid var(--glass-border);font-family:var(--display);font-weight:600;letter-spacing:0;
+  -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi)}
+body .hvai-fab:hover{background:var(--glass-hi)}
+body .hvai,body .hvai.dark{--hvai-ink:var(--ink);--hvai-muted:var(--muted);--hvai-card:var(--glass);--hvai-line:var(--glass-border);--hvai-accent:var(--accent);--hvai-hi:var(--glass-hi);
+  --hvai-field:var(--glass2);--hvai-grad:linear-gradient(180deg,color-mix(in srgb,var(--done) 92%,#fff 8%),color-mix(in srgb,var(--done) 82%,#000 18%));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--sky1) 86%,transparent) 0%,color-mix(in srgb,var(--sky2) 88%,transparent) 60%,color-mix(in srgb,var(--sky3) 90%,transparent) 100%);
+  border-color:var(--glass-border);box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi);font-family:var(--body)}
+body .hvai .hvai-msg.me{background:color-mix(in srgb,var(--accent) 20%,var(--glass));color:var(--ink);border:1px solid var(--glass-border);box-shadow:none}
+body .hvai .hvai-send,body .hvai button.b.p,body .hvai a.b.p{box-shadow:0 10px 24px -12px color-mix(in srgb,var(--done) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+body .hvai .hvai-x{background:var(--glass);border-color:var(--glass-border)}
+body .hvai .hvai-ttl b{font-family:var(--display)}
 </style>
 </head>
 <body>
@@ -1055,24 +1072,18 @@ function hvaiApplyPlan(a){
   save(); selKey=a.date; render(false);
   return ()=>{ if(prev) state.custom[a.date]=prev; else delete state.custom[a.date]; save(); render(false); };
 }
-async function hvaiExecute(actions){
+async function hvaiExecute(actions){              // HV Reset's HV AI changes only HV Reset (day plans); HV Vault data is changed only in HV Vault
   const msgs=[], undos=[];
-  const plans=actions.filter(a=>a.type==="buildDayPlan"||a.type==="editDayPlan"), hv=actions.filter(a=>plans.indexOf(a)<0);
-  plans.forEach(a=>{ undos.push(hvaiApplyPlan(a.args)); msgs.push("Saved your plan for "+niceDate(a.args.date)+": "+a.args.blocks.length+" blocks."); });
-  if(hv.length){
-    const batch="ai"+Date.now().toString(36);
-    const ok=await hvSend({type:"ai",batch,actions:hv.map(a=>({type:a.type,args:a.args}))});
-    if(!ok) throw new Error("couldn't reach HV Vault's inbox");
-    msgs.push("Sent "+hv.length+" change"+(hv.length>1?"s":"")+" to HV Vault. "+(HV.via==="cloud"?"It applies them as soon as HV Vault is open on any device.":"It applies them when you open HV Vault in this browser."));
-    undos.push(async()=>{ await hvSend({type:"ai_undo",batch}); });
-  }
+  actions.filter(a=>a.type==="buildDayPlan"||a.type==="editDayPlan").forEach(a=>{ undos.push(hvaiApplyPlan(a.args)); msgs.push("Saved your plan for "+niceDate(a.args.date)+": "+a.args.blocks.length+" blocks."); });
   hvRerender();
-  return {messages:msgs,undo:async()=>{ for(const u of undos.reverse()) await u(); return "Undone."+(hv.length?" HV Vault reverts its part when it syncs.":""); }};
+  return {messages:msgs,undo:async()=>{ for(const u of undos.reverse()) await u(); return "Undone."; }};
 }
+/* HV Reset logo: a sunrise inside a reset arrow (same art as icon.svg) */
+const HVR_LOGO_SVG='<svg viewBox="0 0 1024 1024" aria-hidden="true"><defs><linearGradient id="hvrbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B86D6"/><stop offset=".55" stop-color="#9C8BDA"/><stop offset="1" stop-color="#F2A77E"/></linearGradient><radialGradient id="hvrsun" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#FFF6DA"/><stop offset=".6" stop-color="#FFD58F"/><stop offset="1" stop-color="#FFB066"/></radialGradient><radialGradient id="hvrglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE9B8" stop-opacity=".75"/><stop offset="1" stop-color="#FFE9B8" stop-opacity="0"/></radialGradient></defs><rect width="1024" height="1024" rx="232" fill="url(#hvrbg)"/><circle cx="512" cy="530" r="300" fill="url(#hvrglow)"/><circle cx="512" cy="530" r="138" fill="url(#hvrsun)"/><path d="M704 318A292 292 0 1 1 452 244" fill="none" stroke="#fff" stroke-width="62" stroke-linecap="round"/><path d="M548 225L454 318L424 176Z" fill="#fff" stroke="#fff" stroke-width="30" stroke-linejoin="round"/></svg>';
 function hvaiMount(){
   if(!HVAIX||hvai) return;
   hvai=HVAIX.mount({app:"reset",canPlan:true,
-    logoSVG:'<svg viewBox="0 0 1024 1024" aria-hidden="true"><defs><linearGradient id="hvaimk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B3157"/><stop offset=".5" stop-color="#152647"/><stop offset="1" stop-color="#0C1830"/></linearGradient></defs><rect width="1024" height="1024" rx="230" fill="url(#hvaimk)"/><path d="M 608.00 360.68 A 179.2 179.2 0 1 1 416.00 360.68" fill="none" stroke="#DFC18A" stroke-width="96" stroke-linecap="round"/><path d="M 608.00 206.74 A 320 320 0 1 1 416.00 206.74" fill="none" stroke="#C9A45E" stroke-width="83.2" stroke-linecap="round"/><circle cx="512" cy="512" r="96" fill="#EAD9B0"/></svg>',
+    logoSVG:HVR_LOGO_SVG,
     get keyHelp(){ return "HV AI uses the AI key saved in HV Vault. "+(HV.data?"Open HV Vault > Settings > AI, choose Gemini, paste your key (free: aistudio.google.com > Get API key) and save.":"First connect HV Vault (open it and sign in), then add your key in HV Vault > Settings > AI."); },
     getData:()=>HV.data||{jobs:[],companies:[],followups:[],calendarEvents:[]},
     getSettings:()=>{ const s=HV.data&&HV.data.settings||{}; return {provider:s.aiProvider,key:s.aiKey,model:s.aiModel}; },
@@ -1082,9 +1093,6 @@ function hvaiMount(){
     isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
     fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
     execute:hvaiExecute});
-  /* a plan handed over from HV Vault (#hvplan=...) opens ready to confirm */
-  const m=location.hash.match(/hvplan=([^&]+)/);
-  if(m){ try{ const a=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); history.replaceState(null,"",location.pathname+location.search); if(a&&(a.type==="buildDayPlan"||a.type==="editDayPlan")) hvai.showActions([{type:a.type,args:{date:a.args.date,blocks:a.args.blocks}}],"Plan from HV Vault. Check it, then confirm to use it here."); }catch(e){} }
 }
 
 function hvDrawerHTML(){
