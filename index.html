@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790517485">
+<meta name="build" content="1790610000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -93,6 +93,24 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pill svg{width:18px;height:18px}
 
 /* ---------- intro ---------- */
+.gate{position:fixed;inset:0;z-index:2147483000;display:none;place-items:center;padding:24px 16px;overflow:auto}
+body.gated .gate{display:grid}
+body.gated .intro,body.gated .room,body.gated .hvai-fab,body.gated .hvai{visibility:hidden}
+.gate-card{width:100%;max-width:420px;border-radius:30px;padding:38px 30px;text-align:center}
+.gate-card img{width:60px;height:60px;border-radius:16px;box-shadow:0 12px 28px -12px rgba(40,50,90,.6)}
+.gate-card h1{font-family:var(--display);font-weight:300;font-size:34px;letter-spacing:-.03em;margin:14px 0 6px}
+.gate-card p{margin:0 0 18px;color:var(--muted)}
+.gate-card b{color:var(--ink)}
+.gate-tag{font-family:var(--display);font-weight:300;font-size:17px;color:var(--ink)!important}
+.gate-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;border-radius:999px;border:0;background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:0 12px 28px -10px rgba(79,102,224,.85),inset 0 1px 0 rgba(255,255,255,.25)}
+.gate-btn svg{background:#fff;border-radius:50%;padding:2px;width:22px;height:22px}
+.gate-btn:disabled{opacity:.6;cursor:default}
+.gate-link{margin-top:14px;background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline;cursor:pointer}
+.gate-err{color:#B4443A!important;font-size:14px}
+.gate-small{font-size:13px;margin:16px 0 0!important}
+.acct{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px;color:var(--muted);margin-top:6px}
+.acct:empty{display:none}
+.acct span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;transition:opacity .6s cubic-bezier(.22,1,.36,1),filter .6s,transform .6s cubic-bezier(.22,1,.36,1)}
 body.in-room .intro{opacity:0;filter:blur(18px);transform:scale(1.05);pointer-events:none}
 .halo{position:absolute;width:min(62vw,760px);aspect-ratio:1;border-radius:50%;left:50%;top:50%;translate:-50% -50%;
@@ -543,6 +561,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 </style>
 </head>
 <body>
+<script>if(!window.claude&&/github\.io$/.test(location.hostname)) document.body.classList.add("gated");</script>
 <div class="sky" aria-hidden="true">
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="sun"></div><div class="stars"></div><div class="moon"></div>
@@ -556,6 +575,14 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 </div>
 
 <div class="hair" aria-hidden="true"><i id="prog"></i></div>
+
+<section class="gate" id="gate" aria-label="Sign in">
+  <div class="gate-card glass">
+    <img src="icon.svg" alt="" width="60" height="60">
+    <h1>HV Reset</h1>
+    <div id="gateBody"><p>Loading…</p></div>
+  </div>
+</section>
 
 <section class="intro" id="intro" aria-label="Start">
   <div class="halo2"></div><div class="halo"></div>
@@ -628,6 +655,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <button class="pill" data-look aria-label="Change look"></button>
     <button class="pill" data-r="shiftday">Move today to tomorrow</button>
     <button class="pill" id="resetDay">Reset this day</button>
+    <div class="acct" id="acct"></div>
   </div>
 </aside>
 
@@ -849,15 +877,19 @@ const DAYN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","
 /* ---------- state ---------- */
 const LS="harsh-reset-v1";
 let state={days:{},updatedAt:0};
-try{const s=localStorage.getItem(LS); if(s) state=JSON.parse(s)||state;}catch(e){}
+/* On the public site HV Reset opens after Google sign-in (the same account as HV Vault) and keeps
+   your plan in your account: users/{uid}/reset/state. Only you can read it. */
+const ACC=!window.claude&&!!(window.HVCloud&&window.HVCloud.configured);
+if(!ACC) document.body.classList.remove("gated");
+if(!ACC){ try{const s=localStorage.getItem(LS); if(s) state=JSON.parse(s)||state;}catch(e){} }
 if(!state.days) state.days={};
 function dayState(key){ if(!state.days[key]) state.days[key]={done:{},skipped:{},steps:{},shifts:[],apps:0,msgs:0,good:"",tomorrow:""}; return state.days[key]; }
 let dbRef=null, saveTimer=null;
 function save(){
   state.updatedAt=Date.now();
+  if(ACC){ if(!AC.uid) return; try{localStorage.setItem(acKey(),JSON.stringify(state));}catch(e){} clearTimeout(AC.t); AC.t=setTimeout(acPush,700); return; }
   try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
   if(dbRef){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ dbRef.set(JSON.parse(JSON.stringify(state))).catch(()=>setSync(false)); },700); }
-  if(FS.id){ clearTimeout(FS.t); FS.t=setTimeout(fsPush,800); }
 }
 /* ---------- always run the newest version on the public site ---------- */
 (async()=>{
@@ -870,40 +902,87 @@ function save(){
     if(live&&mine&&live!==mine&&sessionStorage.getItem("hr-upd")!==live){ sessionStorage.setItem("hr-upd",live); location.replace(location.pathname+"?b="+live); }
   }catch(e){}
 })();
-/* ---------- sync on the public site (Firebase Firestore, private sync code) ---------- */
-const FS={id:null,t:null,busy:false};
-try{
-  const m=location.hash.match(/sync=([a-f0-9]{32,64})/i);
-  if(m) localStorage.setItem(LS+"-sync",m[1]);
-  /* the main address syncs by itself: every browser and device uses the same progress */
-  FS.id=(m&&m[1])||localStorage.getItem(LS+"-sync")||"ffe5a55d2c34804c295003af2d6f0a7974d5fcee";
-  if(m) history.replaceState(null,"",location.pathname+location.search);
-}catch(e){}
-const fsURL=()=>"https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+FS.id;
-async function fsPush(){
-  if(!FS.id) return;
-  try{
-    const body={fields:{json:{stringValue:JSON.stringify(state)},updatedAt:{integerValue:String(state.updatedAt||0)}}};
-    const r=await fetch(fsURL(),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    setSync(r.ok);
-  }catch(e){ setSync(false); }
+/* ---------- your account (Google sign-in, shared with HV Vault) ---------- */
+const AC={uid:null,email:"",t:null,pushing:false,again:false,pulling:false,t0:0};
+const AC_PATH="reset/state";
+const acKey=()=>LS+"@"+AC.uid;                      // this browser's working copy, one per account
+/* Before accounts, HV Reset kept one shared plan in a public document. It belongs to the site's owner,
+   so it moves into the owner's account once, and nobody else's. It is copied, never deleted. */
+const LEGACY_ID="ffe5a55d2c34804c295003af2d6f0a7974d5fcee";
+const OWNER_SHA="a12e151dbc54e9669ffdf5fc814ac7413e7353541e25e934ba6cb9e8df8ae757";   // SHA-256 of the owner's sign-in email
+async function sha256(t){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join(""); }
+const newer=(a,b)=>(a&&a.days&&(a.updatedAt||0)>((b&&b.updatedAt)||0))?a:b;
+async function acLegacy(){
+  let best=null;
+  try{ const l=JSON.parse(localStorage.getItem(LS)||"null"); if(l&&l.days) best=l; }catch(e){}
+  const ids=[LEGACY_ID]; try{ const x=localStorage.getItem(LS+"-sync"); if(x&&x!==LEGACY_ID) ids.push(x); }catch(e){}
+  for(const id of ids){ try{
+    const r=await fetch("https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+id,{cache:"no-store"});
+    if(r.ok){ const d=await r.json(); best=newer(JSON.parse(d.fields.json.stringValue),best); }
+  }catch(e){} }
+  return best;
 }
-async function fsPull(first){
-  if(!FS.id||FS.busy) return; FS.busy=true;
+async function acPull(first){
+  const c=HVC(); if(!c||!AC.uid||AC.pulling) return; AC.pulling=true;
   try{
-    const r=await fetch(fsURL(),{cache:"no-store"});
-    if(r.status===404){ if(state.updatedAt) await fsPush(); else setSync(true); return; }
-    if(!r.ok){ setSync(false); return; }
-    const d=await r.json(); const remote=JSON.parse(d.fields.json.stringValue);
+    const g=await c.getValue(AC_PATH), remote=g&&g.value?JSON.parse(g.value):null;
     setSync(true);
-    if(remote&&remote.days&&(remote.updatedAt||0)>(state.updatedAt||0)){
-      state=remote; try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
-      if(!busy&&!document.querySelector("textarea:focus")&&!$("scrim").classList.contains("open")) render(false);
-    } else if(first&&(state.updatedAt||0)>(remote.updatedAt||0)){ await fsPush(); }
-  }catch(e){ setSync(false); }
-  finally{ FS.busy=false; }
+    if(newer(remote,state)===remote&&remote!==state&&(remote.updatedAt||0)>(state.updatedAt||0)){
+      state=remote; if(!state.days) state.days={}; try{localStorage.setItem(acKey(),JSON.stringify(state));}catch(e){}
+      if(!first&&!busy&&!document.querySelector("textarea:focus")&&!$("scrim").classList.contains("open")) render(false);
+    } else if((state.updatedAt||0)>((remote&&remote.updatedAt)||0)) await acPush();
+  }catch(e){ setSync(false); if(first) throw e; }
+  finally{ AC.pulling=false; }
 }
-function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Synced on phone and laptop":(FS&&FS.id?"Sync paused, will retry":"Saved on this device only"); }
+async function acPush(){
+  const c=HVC(); if(!c||!AC.uid) return;
+  if(AC.pushing){ AC.again=true; return; } AC.pushing=true;
+  const uid=AC.uid;
+  try{ await c.putValue(AC_PATH,JSON.stringify(state),state.updatedAt||Date.now(),AC.parts||0); if(uid===AC.uid) setSync(true); }
+  catch(e){ setSync(false); clearTimeout(AC.t); AC.t=setTimeout(acPush,5000); }
+  finally{ AC.pushing=false; if(AC.again){ AC.again=false; acPush(); } }
+}
+function gateShow(mode,msg){
+  const g=$("gate"); if(!g) return; document.body.classList.toggle("gated",mode!=="off");
+  if(mode==="off") return;
+  $("gateBody").innerHTML=mode==="loading"?'<p>'+esc(msg||"Loading…")+'</p>'
+    :mode==="error"?'<p>Signed in as <b>'+esc(AC.email)+'</b>, but your plan couldn&#39;t be loaded.</p><p class="gate-err">'+esc(msg||"")+'</p><button class="gate-btn" data-gate="retry">Try again</button><button class="gate-link" data-gate="out">Use a different account</button>'
+    :'<p class="gate-tag">Your day, one calm plan.</p><p>Sign in with Google. One account works in HV Reset and HV Vault, and your plan stays the same on your phone and laptop.</p>'+(msg?'<p class="gate-err">'+esc(msg)+'</p>':'')+'<button class="gate-btn" data-gate="in">'+GOOGLE_G+'Continue with Google</button><p class="gate-small">Only you can see your plan.</p>';
+}
+const GOOGLE_G='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+function gateError(e){ const c=(e&&e.code)||"";
+  if(/popup-closed-by-user|cancelled-popup-request/.test(c)) return "";
+  if(/popup-blocked/.test(c)) return "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then try again.";
+  if(/popup-closed-by-browser|operation-not-supported/.test(c)) return "Google sign-in couldn't open here. Open this page in Safari or Chrome itself, then try again.";
+  if(/network-request-failed/.test(c)) return "No internet connection. Check it and try again.";
+  return "Sign-in failed: "+((e&&e.message)||e); }
+async function acOpen(u){
+  clearTimeout(AC.t); AC.parts=0;
+  if(!u){ AC.uid=null; AC.email=""; state={days:{},updatedAt:0}; $("acct").innerHTML=""; setSync(false); document.body.classList.remove("in-room"); gateShow("in"); return; }
+  AC.uid=u.uid; AC.email=u.email||u.name||"";
+  try{ localStorage.setItem("hv-reset-linked","1"); }catch(e){}
+  gateShow("loading","Loading your plan for "+AC.email+"…");
+  try{
+    let local=null; try{ local=JSON.parse(localStorage.getItem(acKey())||"null"); }catch(e){}
+    state=local&&local.days?local:{days:{},updatedAt:0};
+    const owner=(await sha256(String(u.email||"").trim().toLowerCase()))===OWNER_SHA;
+    const moved=localStorage.getItem(LS+"-moved@"+u.uid)==="1";
+    if(owner&&!moved){ const old=await acLegacy(); if(old&&(old.updatedAt||0)>(state.updatedAt||0)) state=old; }
+    if(!owner){ try{ localStorage.removeItem(LS); localStorage.removeItem(LS+"-sync"); }catch(e){} }   // the old shared plan isn't this account's
+    if(u.uid!==AC.uid) return;
+    await acPull(true);
+    if(owner&&!moved){ await acPush(); localStorage.setItem(LS+"-moved@"+u.uid,"1"); }
+    try{localStorage.setItem(acKey(),JSON.stringify(state));}catch(e){}
+    if(u.uid!==AC.uid) return;
+    $("acct").innerHTML='<span>Signed in as <b>'+esc(AC.email)+'</b></span><button class="pill" data-gate="out">Sign out</button>';
+    render(false); rollTo($("bigTime"),timerInfo().t); gateShow("off"); hvRefresh();
+  }catch(e){ if(u.uid===AC.uid) gateShow("error",(e&&e.message)||String(e)); }
+}
+async function acSignOut(){
+  const c=HVC(); try{ if(AC.uid) localStorage.removeItem(acKey()); }catch(e){}
+  setDrawer(false); if(c) await c.signOut();
+}
+function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Saved to your account":(AC.uid?"Sync paused, will retry":"Saved on this device only"); }
 
 /* ---------- HV Vault link ----------
    HV Vault is the record; Reset reads it and never writes it. What Reset does (log an application,
@@ -1459,7 +1538,7 @@ function setDrawer(open){ $("drawer").classList.toggle("open",open); $("dscrim")
 
 /* ---------- begin ---------- */
 function begin(){
-  if(document.body.classList.contains("in-room")) return;
+  if(document.body.classList.contains("in-room")||document.body.classList.contains("gated")) return;
   const first=!started; started=true;
   document.body.classList.add("in-room");
   if(first||!liveCard()) renderCard(true); else renderCard(false);
@@ -1471,6 +1550,10 @@ function begin(){
 document.addEventListener("click",e=>{
   if(!e.target.closest("#rescue")){ const hm=$("helpMenu"); if(hm) hm.classList.remove("open"); }
   const t=e.target.closest("button"); if(!t) return;
+  if(t.hasAttribute("data-gate")){ const k=t.getAttribute("data-gate"), c=HVC(); if(!c) return;
+    if(k==="in"){ t.disabled=true; t.lastChild.textContent="Signing in…"; c.signIn().catch(err=>gateShow("in",gateError(err))); }
+    else if(k==="retry") acOpen(c.user); else if(k==="out") acSignOut();
+    return; }
   if(t.classList.contains("primary")){ const r=t.getBoundingClientRect(), s=Math.max(r.width,r.height)*2; const sp=document.createElement("span"); sp.className="ripple"; sp.style.cssText="width:"+s+"px;height:"+s+"px;left:"+(e.clientX-r.left-s/2)+"px;top:"+(e.clientY-r.top-s/2)+"px"; t.appendChild(sp); setTimeout(()=>sp.remove(),800); }
   if(t.id==="beginBtn") return begin();
   if(t.id==="miniTime"){ document.body.classList.remove("in-room"); rollTo($("bigTime"),timerInfo().t); $("beginBtn").textContent="Continue"; return; }
@@ -1539,8 +1622,11 @@ setInterval(()=>{ const m=Math.floor(nowMin()); if(m===lastMin) return; lastMin=
 (async()=>{
   try{
     if(!window.claude||typeof window.claude.use!=="function"){
-      if(FS.id){ await fsPull(true); setInterval(()=>{ if(!document.hidden) fsPull(false); },15000);
-        document.addEventListener("visibilitychange",()=>{ if(!document.hidden) fsPull(false); }); window.addEventListener("focus",()=>fsPull(false)); }
+      if(!ACC) return;
+      const c=HVC(); gateShow("loading"); await c.ready; acOpen(c.user);
+      c.onChange(u=>{ if(((u&&u.uid)||null)!==AC.uid) acOpen(u); });
+      setInterval(()=>{ if(!document.hidden) acPull(false); },15000);
+      document.addEventListener("visibilitychange",()=>{ if(!document.hidden) acPull(false); }); window.addEventListener("focus",()=>acPull(false));
       return;
     }
     const db=await window.claude.use("db"), user=await window.claude.use("user");
