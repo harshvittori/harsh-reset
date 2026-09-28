@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790850000">
+<meta name="build" content="1790870000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -57,6 +57,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 ::selection{background:var(--accent);color:#fff}
 
 /* ---------- atmosphere ---------- */
+/* smooth scrolling: the moving sky holds still while anything scrolls (.still), and stops
+   drawing entirely while the dashboard covers it */
+.sky.still,.sky.still *,.halo.still,.halo2.still{animation-play-state:paused!important}
+body.dash-open .sky,body.dash-open .intro,body.dash-open .room,body.dash-open .halo,body.dash-open .halo2{visibility:hidden}
+body.dash-open .sky *,body.dash-open .intro *,body.dash-open .room *{animation-play-state:paused!important}
 .sky{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 58%,var(--sky3) 100%)}
 .orb{position:absolute;border-radius:50%;opacity:.75;will-change:transform}
 .o1{width:62vw;height:62vw;left:-18vw;top:-26vw;background:radial-gradient(circle,var(--orb1) 0%,transparent 68%);animation:drift1 80s ease-in-out infinite alternate}
@@ -1635,7 +1640,9 @@ function hvaiMount(){
     getData:()=>HV.data||{jobs:[],companies:[],followups:[],calendarEvents:[]},
     getSettings:()=>HVAIX.pickConfig(HV.data&&HV.data.settings||{}),   // the site's built-in AI: no key needed
     getPlan:()=>hvaiPlan(keyOf(new Date())),
-    getContext:()=>HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date())))+(AC.uid&&aboutName()?"\nABOUT THE USER: name "+aboutName()+(aboutOcc()?"; "+aboutOcc().toLowerCase():"")+". Use their first name now and then, and plan in a way that suits what they do.":""),
+    getContext:()=>{ const c=HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date())));   // an object: today's date, time and plan
+      if(AC.uid&&aboutName()) c.about_user={name:aboutName(),does:aboutOcc()||undefined,note:"Use their first name now and then, and plan in a way that suits what they do."};
+      return c; },
     userName:()=>(AC.uid&&(aboutFirst()||(HV.data&&HV.data.settings&&HV.data.settings.myName)))||"",
     isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
     fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
@@ -2396,6 +2403,9 @@ setInterval(()=>{ if(!document.hidden) showQuote(true); },90000);
 let lastMin=Math.floor(nowMin());
 setInterval(()=>{ const m=Math.floor(nowMin()); if(m===lastMin) return; lastMin=m; if(busy||document.querySelector("textarea:focus")) return; renderMeta(); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); },5000);
 
+/* smooth scrolling: while any part of the page scrolls, the moving background holds still */
+{ let t=0; const bg=()=>document.querySelectorAll(".sky,.halo,.halo2");   // only the moving background is flagged, so nothing else restyles
+  window.addEventListener("scroll",()=>{ if(!t) bg().forEach(e=>e.classList.add("still")); clearTimeout(t); t=setTimeout(()=>{ bg().forEach(e=>e.classList.remove("still")); t=0; },180); },{capture:true,passive:true}); }
 /* ---------- read-only data API for dashboard.js ---------- */
 window.HRApp={
   get state(){ return state; }, get today(){ return keyOf(new Date()); },
