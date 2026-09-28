@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790790000">
+<meta name="build" content="1790820000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -145,6 +145,7 @@ body.gated .accwrap{display:none}
 .accmenu .who small{display:block;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
 .accmenu p{margin:0 0 12px;color:var(--muted);font-size:13.5px;line-height:1.45}
 .accmenu .row{display:flex;gap:8px;flex-wrap:wrap}
+.acc-occ{margin:-4px 0 10px!important;font-size:13px;color:var(--muted)}
 .accmenu .row a,.accmenu .row button{border-radius:999px;border:1px solid var(--glass-border);background:var(--glass);padding:7px 13px;font-size:14px;color:var(--ink);text-decoration:none;cursor:pointer}
 @media (max-width:520px){.accbtn .nm{display:none}.accbtn{padding:6px}.accbtn.signed{padding:4px}}
 .acct{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px;color:var(--muted);margin-top:6px}
@@ -355,6 +356,19 @@ body.jobhunt .intro-links [data-qadd]{display:none}
 .linkbtn{background:none;border:0;padding:0;margin-left:4px;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer}
 .started-badge{align-self:flex-start;width:fit-content;display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 12px;border-radius:999px;font-size:13.5px;font-weight:700;background:color-mix(in srgb,var(--done) 22%,transparent);border:1px solid color-mix(in srgb,var(--done) 55%,transparent)}
 .started-badge i{width:8px;height:8px;border-radius:50%;background:var(--done);animation:pulse 1.6s ease-in-out infinite}
+.about{text-align:left}.about h3{margin:2px 0 4px}
+.ab-hi{margin:0;font-size:15px;color:var(--muted)}.ab-sub{margin:0 0 14px;color:var(--muted);font-size:15px}
+.ab-l{display:block;font-weight:700;font-size:14.5px;margin:12px 0 6px}
+.ab-in{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--glass2);border:1px solid var(--glass-border);border-radius:14px;padding:11px 14px;outline:none}
+.ab-in:focus{border-color:var(--accent)}#abOther{margin-top:8px}
+.ab-occ{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ab-occ button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;border-radius:14px;padding:10px 12px;border:1px solid var(--glass-border);background:var(--glass2);color:var(--ink)}
+.ab-occ button b{font-size:14.5px}.ab-occ button small{font-size:12.5px;color:var(--muted);line-height:1.35}
+.ab-occ button[aria-checked="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);box-shadow:inset 0 0 0 1px var(--accent)}
+.ab-ready{text-align:center}.ab-ready h3{font-size:26px}.ab-note{font-size:13.5px;color:var(--muted);margin:0 0 6px}
+.ab-badge{width:58px;height:58px;margin:4px auto 12px;border-radius:50%;display:grid;place-items:center;font-size:28px;color:#fff;background:linear-gradient(135deg,#4F66E0,#7C5CE0);box-shadow:0 14px 30px -12px rgba(79,102,224,.8)}
+@media (max-width:520px){.ab-occ{grid-template-columns:1fr}}
+.w-link{background:none;border:0;padding:0;font:inherit;color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .run-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.run-row .started-badge{margin-top:10px}
 .started-badge.paused{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}.started-badge.paused i{background:var(--warn);animation:none}
 .pausebtn{margin-top:10px;border-radius:999px;padding:5px 14px;font-size:13.5px;font-weight:700;border:1px solid var(--glass-border);background:var(--glass2);color:var(--ink)}
@@ -806,7 +820,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 
 <div class="savecard glass" id="saveCard" role="dialog" aria-label="Save your changes" hidden>
   <b>Want to keep this?</b>
-  <p>You can use HV Reset freely. To save your plan, sign in with Google. Only you can see it.</p>
+  <p>Sign in with Google to save your plan and get your own dashboard: your time, focus, streaks and progress, week after week. Only you can see it.</p>
   <div><button class="gate-btn" data-gate="in"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in to save</span></button><button class="gate-link" data-gate="later">Not now</button></div>
 </div>
 <button class="savepill glass" id="savePill" data-gate="in" hidden><i></i><span>Not saved · Sign in</span></button>
@@ -874,11 +888,11 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
       </div>
     </div>
     <div class="ob-slide" data-ob="5" hidden>
-      <p class="w-eyebrow">You're ready</p>
+      <p class="w-eyebrow" id="obReady">You're ready</p>
       <h1 class="w-title">Let's make your first plan</h1>
       <p class="w-lead">Start from a ready plan, or add your own tasks. You can change it any time.</p>
       <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or just tell HV AI your day</button></div>
-      <p class="w-note">Free to try, no account needed. Sign in only when you want to save.</p>
+      <p class="w-note" id="obSign">Free to try, no account needed. <button class="w-link" data-gate="in">Sign in with Google</button> to save your plan, unlock your own dashboard, and let HV AI know you by name.</p>
     </div>
     <div class="ob-nav" id="obNav">
       <button class="ob-back" data-ob-back>Back</button>
@@ -1313,7 +1327,7 @@ function gateError(e){ const c=(e&&e.code)||"";
 async function acOpen(u){
   clearTimeout(AC.t); AC.parts=0;
   if(!u){
-    const was=AC.uid; AC.uid=null; AC.email="";
+    const was=AC.uid; AC.uid=null; AC.email=""; ABOUT.uid=null; ABOUT.data=null; obShow(obStep,0);
     if(was){ state={days:{},updatedAt:0}; AC.guestDirty=false; document.body.classList.remove("in-room"); render(false); rollTo($("bigTime"),timerInfo().t); }
     acctRow(); setSync(false); gateShow("off"); guestNudge(); return;
   }
@@ -1345,19 +1359,64 @@ async function acOpen(u){
     try{localStorage.setItem(acKey(),JSON.stringify(state));}catch(e){}
     if(u.uid!==AC.uid) return;
     setSync(true); acctRow(); guestNudge();
-    render(false); rollTo($("bigTime"),timerInfo().t); gateShow("off"); hvRefresh();
+    render(false); rollTo($("bigTime"),timerInfo().t); gateShow("off"); hvRefresh(); aboutLoad(u);
   }catch(e){ AC.loading=false; if(u.uid===AC.uid) gateShow("error",(e&&e.message)||String(e)); }
+}
+/* ---------- about you: asked once after Google sign-in ----------
+   Name (Google's name filled in) and what you do. Nothing else: no age, no phone.
+   Saved to the account at users/{uid}/account/about, so HV Vault can use it too. */
+const ABOUT_PATH="account/about";
+const OCC=[["student","Student","Studying, exams, college or school"],["working","Working professional","A job, office or remote"],["jobseeker","Looking for a job","Applying and preparing"],["business","Business or freelance","Your own work or clients"],["other","Something else",""]];
+const ABOUT={uid:null,data:null};
+const aboutName=()=>{ const n=String((ABOUT.data&&ABOUT.data.name)||"").trim(); return n; };
+const aboutFirst=()=>{ const n=aboutName().split(/\s+/)[0]||""; return n?n.charAt(0).toUpperCase()+n.slice(1):""; };
+function aboutOcc(){ const d=ABOUT.data; if(!d||!d.occupation) return ""; const o=OCC.find(x=>x[0]===d.occupation); return d.occupation==="other"?(d.other||""):(o?o[1]:""); }
+async function aboutLoad(u){
+  ABOUT.uid=u.uid; ABOUT.data=null;
+  try{ const c=JSON.parse(localStorage.getItem("hr-about@"+u.uid)||"null"); if(c) ABOUT.data=c; }catch(e){}
+  try{ const g=await HVC().getValue(ABOUT_PATH); if(u.uid!==AC.uid) return; if(g&&g.value){ ABOUT.data=JSON.parse(g.value); try{ localStorage.setItem("hr-about@"+u.uid,g.value); }catch(e){} } }catch(e){}
+  obShow(obStep,0); accRender();
+  if(!ABOUT.data||!ABOUT.data.occupation){ let later=false; try{ later=sessionStorage.getItem("hr-about-later@"+u.uid)==="1"; }catch(e){} if(!later) setTimeout(()=>aboutAsk(u),350); }
+}
+async function aboutSave(d){ const u=HVC()&&HVC().user; if(!u) return; ABOUT.data=d; const v=JSON.stringify(d);
+  try{ localStorage.setItem("hr-about@"+u.uid,v); }catch(e){}
+  try{ await HVC().putValue(ABOUT_PATH,v,Date.now(),0); }catch(e){ toast("Saved on this device. It will sync when you're back online."); } }
+function aboutAsk(u){
+  if($("scrim").classList.contains("open")&&modalKind!=="about") return setTimeout(()=>aboutAsk(u),1200);   // don't cover something they're doing
+  const d=ABOUT.data||{}, gName=String((u&&u.name)||"").trim(), first=(gName.split(/\s+/)[0]||"");
+  modal('<div class="about"><p class="ab-hi">'+(first?"Hi "+esc(first)+" &#128075;":"Welcome &#128075;")+'</p><h3>Two quick things</h3><p class="ab-sub">So HV Reset and HV AI can talk to you the right way. That&#39;s all we ask.</p>'+
+    '<label class="ab-l" for="abName">What should we call you?</label><input id="abName" class="ab-in" maxlength="40" autocomplete="given-name" value="'+esc(d.name||gName)+'" placeholder="Your name">'+
+    '<p class="ab-l">What do you do?</p><div class="ab-occ" role="radiogroup" aria-label="What do you do">'+OCC.map(([k,n,h])=>'<button type="button" role="radio" aria-checked="'+(d.occupation===k)+'" data-abocc="'+k+'"><b>'+n+'</b>'+(h?'<small>'+h+'</small>':'')+'</button>').join("")+'</div>'+
+    '<input id="abOther" class="ab-in" maxlength="40" placeholder="Tell us in a few words" value="'+esc(d.other||"")+'"'+(d.occupation==="other"?"":" hidden")+'>'+
+    '<p class="gate-err" id="abErr" hidden></p><div class="actions"><button class="primary" data-absave>Continue</button></div></div>',"Skip for now");
+  modalKind="about"; const cl=$("modal").querySelector("[data-close]"); if(cl) cl.setAttribute("data-ablater","");
+  setTimeout(()=>{ const n=$("abName"); if(n&&!n.value) n.focus(); },80);
+}
+function aboutSubmit(){
+  const name=$("abName").value.trim().replace(/\s+/g," "), sel=$("modal").querySelector('[data-abocc][aria-checked="true"]'), occ=sel&&sel.dataset.abocc, other=($("abOther").value||"").trim();
+  const err=m=>{ const e=$("abErr"); e.textContent=m; e.hidden=false; };
+  if(!name) return err("Please add your name.");
+  if(!occ) return err("Pick what you do. It helps HV AI plan your day.");
+  if(occ==="other"&&!other) return err("Tell us in a few words what you do.");
+  aboutSave({name,occupation:occ,other:occ==="other"?other:"",at:Date.now()}); obShow(obStep,0); accRender(); aboutReady();
+}
+function aboutReady(){
+  const f=aboutFirst(), occ=ABOUT.data&&ABOUT.data.occupation, plan=hasAnyPlan();
+  const line={student:"Let's plan your study day, one subject at a time.",working:"Let's fit your work, breaks and your own time into one calm day.",jobseeker:"Let's plan your applications and prep, one step a day.",business:"Let's plan your work and clients so nothing slips.",other:"Let's plan your day, one task at a time."}[occ]||"Let's plan your day.";
+  modal('<div class="about ab-ready"><div class="ab-badge" aria-hidden="true">&#10003;</div><h3>You&#39;re ready, '+esc(f)+'!</h3><p class="ab-sub">'+esc(line)+'</p><p class="ab-note">Your plan now saves to your account and follows you on your phone and laptop. HV AI knows your name too.</p>'+
+    '<div class="actions">'+(plan?'<button class="primary" data-close>Let&#39;s go</button>':'<button class="primary" data-plan="new">Make my plan</button><button class="secondary" data-plan="ai">Tell HV AI my day</button>')+'</div></div>',plan?"Close":"Later");
+  modalKind="aboutready"; if(Snd&&Snd.ctx) chime();
 }
 const GLOGO='<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
 function avatarHTML(){ const u=HVC()&&HVC().user, ini=esc(((AC.email||"?")[0]||"?").toUpperCase());
   return '<span class="av">'+(u&&u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':ini)+'</span>'; }
 function accRender(){
   const w=$("accWrap"); if(!ACC){ w.hidden=true; return; } w.hidden=false;
-  const b=$("accBtn"), u=HVC().user, name=(u&&u.name)||AC.email;
+  const b=$("accBtn"), u=HVC().user, name=(AC.uid&&aboutName())||(u&&u.name)||AC.email;
   b.classList.toggle("signed",!!AC.uid);
   b.innerHTML=AC.uid?avatarHTML()+'<span class="nm">'+esc(String(name).split(" ")[0])+'</span>':'<span class="g">'+GLOGO+'</span><span class="nm">Sign in</span>';
   b.setAttribute("aria-label",AC.uid?"Account: "+AC.email:"Sign in with Google");
-  $("accMenu").innerHTML=AC.uid?'<div class="who">'+avatarHTML()+'<div><b>'+esc(name)+'</b>'+(name!==AC.email?'<small>'+esc(AC.email)+'</small>':'<small>Google account</small>')+'</div></div><p>Your plan is saved to this Google account. Only you can see it.</p><div class="row"><button data-gate="out">Sign out</button></div>'
+  $("accMenu").innerHTML=AC.uid?'<div class="who">'+avatarHTML()+'<div><b>'+esc(name)+'</b>'+(name!==AC.email?'<small>'+esc(AC.email)+'</small>':'<small>Google account</small>')+'</div></div><p>Your plan is saved to this Google account. Only you can see it.</p>'+(aboutOcc()?'<p class="acc-occ">'+esc(aboutOcc())+'</p>':'')+'<div class="row"><button data-abedit>Edit my details</button><button data-gate="out">Sign out</button></div>'
     :'<div class="who"><span class="av">'+GLOGO.replace('<svg','<svg style="width:22px;height:22px;background:#fff;border-radius:50%;padding:3px"')+'</span><div><b>Not signed in</b><small>Try everything freely</small></div></div><p>Sign in with Google to save your plan and use it on your phone and laptop.</p><div class="row"><button data-gate="in">Continue with Google</button></div>';
 }
 /* The account button sits top-right on the start screen, and in the top bar inside the day. */
@@ -1567,8 +1626,8 @@ function hvaiMount(){
     getData:()=>HV.data||{jobs:[],companies:[],followups:[],calendarEvents:[]},
     getSettings:()=>HVAIX.pickConfig(HV.data&&HV.data.settings||{}),   // the site's built-in AI: no key needed
     getPlan:()=>hvaiPlan(keyOf(new Date())),
-    getContext:()=>HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date()))),
-    userName:()=>(AC.uid&&HV.data&&HV.data.settings&&HV.data.settings.myName)||"",
+    getContext:()=>HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date())))+(AC.uid&&aboutName()?"\nABOUT THE USER: name "+aboutName()+(aboutOcc()?"; "+aboutOcc().toLowerCase():"")+". Use their first name now and then, and plan in a way that suits what they do.":""),
+    userName:()=>(AC.uid&&(aboutFirst()||(HV.data&&HV.data.settings&&HV.data.settings.myName)))||"",
     isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
     fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
     execute:hvaiExecute});
@@ -1678,34 +1737,42 @@ function voice(f,t0,dur,g,opt){
 function chime(){ if(!Snd.ctx||!Snd.on) return; const t=Snd.ctx.currentTime+0.05; [72,76,79,84].forEach((m,i)=>voice(mtof(m),t+i*0.24,4.2,0.045-i*0.007,{pan:(i-1.5)*0.3})); }
 function pluck(){ if(!Snd.ctx||!Snd.on) return; const t=Snd.ctx.currentTime+0.02; voice(mtof(79),t,1.9,0.05,{pan:-0.2}); voice(mtof(84),t+0.12,2.6,0.04,{pan:0.2}); }
 
-/* generative ambient: slow warm chords + sparse bell melody, never repeats exactly */
-const PROG=[[48,[60,64,67,71,74]],[45,[57,60,64,67,71]],[41,[57,60,64,65,69]],[43,[55,59,62,64,67]]];
-const PENTA=[72,74,76,79,81,84,86,88];
-function padChord(root,notes,t0,dur){
+/* generative ambient: slow warm chords + sparse bell melody, never repeats exactly.
+   The mood follows the time of day in India (IST), not the look you picked:
+   morning is bright, the day is steady focus, the evening is warm, the night is deep and slow. */
+const MOODS={
+  morning:{name:"Morning",bar:7,mel:0.7,lp:1450,pad:0.026,prog:[[48,[60,64,67,72,74]],[53,[60,65,69,72,76]],[45,[60,64,67,69,72]],[55,[59,62,67,71,74]]],penta:[76,79,81,84,86,88,91]},
+  day:{name:"Day focus",bar:9,mel:0.35,lp:1100,pad:0.024,prog:[[50,[62,66,69,73,76]],[55,[62,67,71,74,78]],[47,[62,66,69,71,74]],[52,[59,64,67,71,74]]],penta:[74,76,78,81,83,86]},
+  evening:{name:"Evening calm",bar:10,mel:0.55,lp:900,pad:0.028,prog:[[45,[57,60,64,67,71]],[41,[57,60,64,65,69]],[48,[55,60,64,67,71]],[40,[55,59,62,64,67]]],penta:[69,72,74,76,79,81]},
+  night:{name:"Night focus",bar:12,mel:0.28,lp:680,pad:0.026,prog:[[45,[57,60,64,67,71]],[41,[53,57,60,64,67]],[43,[55,59,62,67,69]],[38,[53,57,60,62,65]]],penta:[64,67,69,72,74,76]}};
+function istHour(){ try{ return +new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",hour:"numeric",hourCycle:"h23"}).format(new Date()); }catch(e){ return new Date().getHours(); } }
+function moodNow(){ const h=istHour(); return h>=5&&h<11?"morning":h>=11&&h<17?"day":h>=17&&h<21?"evening":"night"; }
+function padChord(root,notes,t0,dur,lpHi,level){ lpHi=lpHi||1050; level=level||0.028;
   const c=Snd.ctx, g=c.createGain(), lp=c.createBiquadFilter();
-  lp.type="lowpass"; lp.Q.value=0.4; lp.frequency.setValueAtTime(480,t0); lp.frequency.linearRampToValueAtTime(1050,t0+dur*0.5); lp.frequency.linearRampToValueAtTime(560,t0+dur+3);
-  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(0.028,t0+3.5); g.gain.setValueAtTime(0.028,t0+dur-0.5); g.gain.linearRampToValueAtTime(0.0001,t0+dur+3.5);
+  lp.type="lowpass"; lp.Q.value=0.4; lp.frequency.setValueAtTime(480,t0); lp.frequency.linearRampToValueAtTime(lpHi,t0+dur*0.5); lp.frequency.linearRampToValueAtTime(560,t0+dur+3);
+  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(level,t0+3.5); g.gain.setValueAtTime(level,t0+dur-0.5); g.gain.linearRampToValueAtTime(0.0001,t0+dur+3.5);
   lp.connect(g); g.connect(Snd.dry); g.connect(Snd.verb);
   notes.forEach(m=>[-7,7].forEach(dt=>{ const o=c.createOscillator(); o.type="triangle"; o.frequency.value=mtof(m); o.detune.value=dt; const og=c.createGain(); og.gain.value=0.16; o.connect(og); og.connect(lp); o.start(t0); o.stop(t0+dur+4); }));
   const b=c.createOscillator(), bg=c.createGain(); b.type="sine"; b.frequency.value=mtof(root);
   bg.gain.setValueAtTime(0.0001,t0); bg.gain.linearRampToValueAtTime(0.045,t0+2.5); bg.gain.linearRampToValueAtTime(0.0001,t0+dur+2); b.connect(bg); bg.connect(Snd.dry); b.start(t0); b.stop(t0+dur+2.5);
 }
 function ambientStart(){
-  if(!Snd.ctx||Snd.amb) return; const c=Snd.ctx, BAR=9;
+  if(!Snd.ctx||Snd.amb) return; const c=Snd.ctx;
   const st={i:0,next:c.currentTime+0.3,mel:c.currentTime+3};
   const loop=()=>{
     if(!Snd.on){ st.next=c.currentTime+0.4; st.mel=c.currentTime+2.5; return; }
-    while(st.next<c.currentTime+1.5){ const [r,n]=PROG[st.i%PROG.length]; padChord(r,n,st.next,BAR); st.i++; st.next+=BAR; }
+    const M=MOODS[moodNow()];                                          // checked every chord, so it changes smoothly at the hour
+    while(st.next<c.currentTime+1.5){ const [r,n]=M.prog[st.i%M.prog.length]; padChord(r,n,st.next,M.bar,M.lp,M.pad); st.i++; st.next+=M.bar; }
     while(st.mel<c.currentTime+1.5){
-      if(Math.random()<0.55){ let t=st.mel; const k=1+Math.floor(Math.random()*3);
-        for(let j=0;j<k;j++){ voice(mtof(PENTA[Math.floor(Math.random()*PENTA.length)]),t,3.4,0.016+Math.random()*0.012,{pan:Math.random()*1.2-0.6}); t+=0.35+Math.random()*0.55; } }
-      st.mel+=2.4+Math.random()*3.4;
+      if(Math.random()<M.mel){ let t=st.mel; const k=1+Math.floor(Math.random()*(M.mel>0.5?3:2));
+        for(let j=0;j<k;j++){ voice(mtof(M.penta[Math.floor(Math.random()*M.penta.length)]),t,M.bar>10?4.2:3.4,0.016+Math.random()*0.012,{pan:Math.random()*1.2-0.6}); t+=0.35+Math.random()*0.55; } }
+      st.mel+=(M.bar/9)*(2.4+Math.random()*3.4);
     }
   };
   st.timer=setInterval(loop,400); loop(); Snd.amb=st;
 }
 function soundLabel(){ const on=Snd.on; const svg=on?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5c1.2 1 1.2 6 0 7M18.5 6c2.4 2.2 2.4 9.8 0 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
-  document.querySelectorAll("[data-sound]").forEach(b=>{ b.innerHTML=svg+'<span class="stxt">'+(on?"Sound on":"Sound off")+'</span>'; b.setAttribute("aria-pressed",String(on)); }); }
+  document.querySelectorAll("[data-sound]").forEach(b=>{ b.innerHTML=svg+'<span class="stxt">'+(on?MOODS[moodNow()].name:"Sound off")+'</span>'; b.setAttribute("aria-pressed",String(on)); b.title=on?MOODS[moodNow()].name+" sound. It follows the time of day. Tap to turn off.":"Sound off. Tap to turn on."; }); }
 function toggleSound(){
   Snd.on=!Snd.on; try{localStorage.setItem(LS+"-sound",Snd.on?"on":"off");}catch(e){}
   audioInit();
@@ -2038,6 +2105,8 @@ function obShow(n,dir){
   obStep=Math.max(0,Math.min(OB_LAST,n)); const w=$("welcome"); if(!w) return;
   w.classList.toggle("back",dir<0);
   w.querySelectorAll(".ob-slide").forEach(sl=>{ sl.hidden=+sl.dataset.ob!==obStep; });
+  { const r=$("obReady"), f=typeof aboutFirst==="function"&&AC.uid?aboutFirst():""; if(r) r.textContent="You're ready"+(f?", "+f:"");
+    const sg=$("obSign"); if(sg){ sg.dataset.o=sg.dataset.o||sg.innerHTML; if(!AC.uid) sg.innerHTML=sg.dataset.o; } if(sg&&AC.uid) sg.textContent="Signed in"+(f?" as "+f:"")+". Your plan, dashboard and HV AI chats save to your account."; }
   $("obNav").hidden=obStep===0||obStep===OB_LAST; w.querySelector("[data-ob-back]").disabled=obStep<=1;
   w.querySelector(".ob-go").textContent=obStep===OB_LAST-1?"Let's plan":"Next";
   w.querySelectorAll(".ob-dots i").forEach((d,i)=>d.classList.toggle("on",i===obStep));
@@ -2254,6 +2323,10 @@ document.addEventListener("click",e=>{
   if(t.dataset.tpd){ setPick(t.dataset.tpd); return pickClose(); }
   if(t.dataset.tpk){ setPick(t.dataset.tpk); return pickClose(); }
   if(t.hasAttribute("data-tpdone")) return pickClose();
+  if(t.dataset.abocc){ $("modal").querySelectorAll("[data-abocc]").forEach(b=>b.setAttribute("aria-checked",String(b===t))); $("abOther").hidden=t.dataset.abocc!=="other"; if(t.dataset.abocc==="other") $("abOther").focus(); $("abErr").hidden=true; return; }
+  if(t.hasAttribute("data-absave")) return aboutSubmit();
+  if(t.hasAttribute("data-ablater")){ try{ sessionStorage.setItem("hr-about-later@"+AC.uid,"1"); }catch(e){} closeModal(); toast("No problem. You can add it any time from your account menu."); return; }
+  if(t.hasAttribute("data-abedit")){ accMenu(false); return aboutAsk(HVC().user); }
   if(t.dataset.start) return askStart(t.dataset.start);
   if(t.dataset.pause){ sessPause(selKey,t.dataset.pause); save(); renderCard(false); tickTimers(); toast("Paused. The timer waits for you."); return; }
   if(t.dataset.resume){ sessResume(selKey,t.dataset.resume); save(); renderCard(false); tickTimers(); toast("Back to it."); return; }
@@ -2286,6 +2359,7 @@ $("modal").addEventListener("scroll",()=>pickClose(),{passive:true});
 $("scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeModal(); });
 $("dscrim").addEventListener("click",()=>setDrawer(false));
 document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target&&(e.target.id==="abName"||e.target.id==="abOther")){ e.preventDefault(); aboutSubmit(); return; }
   if(e.key==="Enter"&&e.target&&e.target.closest&&(e.target.closest(".hvai,#tpop,#scrim")||/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName))) return;   // typing in HV AI or a form: Enter belongs there
   if(e.key==="Escape"&&$("tpop")){ pickClose(); return; }
   if(e.key==="Escape"){ closeModal(); setDrawer(false); return; }
@@ -2306,7 +2380,7 @@ window.addEventListener("focus",()=>hvRefresh());
 window.addEventListener("storage",e=>{ if(e.key===HV_LINBOX) hvRefresh(); });
 if(HVC()) HVC().onChange(()=>hvRefresh());
 obShow(obStep,1);
-applyPhase(); setInterval(applyPhase,60000);
+applyPhase(); setInterval(()=>{ applyPhase(); soundLabel(); },60000);
 soundLabel(); rollTo($("bigTime"),timerInfo().t); render(false); tickTimers();
 setInterval(tickTimers,1000);
 setInterval(()=>{ if(!document.hidden) showQuote(true); },90000);
