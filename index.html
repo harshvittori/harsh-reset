@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790670000">
+<meta name="build" content="1790680000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1543,21 +1543,22 @@ function rollTo(el,str){
     setTimeout(()=>{ if(cur.parentNode) cur.remove(); },750); });
 }
 /* Now and up next: the running task, the next one and how long until it starts */
-const inTxt=m=>{ m=Math.max(0,m); const h=Math.floor(m/60), mm=Math.ceil(m%60); return h?h+"h "+(mm?mm+"m":""):(m<1?"less than a minute":mm+" min"); };
+const inTxt=m=>{ m=Math.max(0,m); if(m<1) return "less than a minute"; const t=Math.ceil(m), h=Math.floor(t/60), mm=t%60; return h?(h+"h"+(mm?" "+mm+"m":"")):mm+" min"; };
 function upNext(key){ const bl=timeline(key).blocks, cur=currentBlock(bl); return {cur,next:cur?bl.find(b=>b.i>cur.i&&!b.done&&!b.skipped)||null:null}; }
 /* when the next task really starts: its own time, or when the running task ends if that is later */
 function nextAt(key,cur,next){ const sm=cur?startedMin(key,cur.id):null; return Math.max(next.s, sm!=null?sm+cur.d:0); }
 function nextHTML(cur,next,nm){
   if(!next) return '<div class="upnext"><span class="un-l">Up next</span><span>Nothing. This is the last task today.</span></div>';
   const at=nextAt(selKey,cur,next);
-  return '<div class="upnext"><span class="un-l">Up next</span><span><b>'+esc(next.title)+'</b> at '+fmt(at)+(at>next.s?' (right after this)':'')+
+  const sm=cur?startedMin(selKey,cur.id):null, gap=sm!=null&&at-(sm+cur.d)>10;
+  return '<div class="upnext"><span class="un-l">Up next</span><span><b>'+esc(next.title)+'</b> at '+fmt(at)+(at>next.s?' (right after this)':gap?' (as planned)':'')+
     (at>nm?' · in <span class="count" data-cd="start" data-t="'+at+'"></span>':', as soon as you finish this')+'</span></div>';
 }
 function introNextHTML(){
   const tk=keyOf(new Date()), {cur,next}=upNext(tk); if(!cur) return "";
   const nm=nowMin(), started=startedMin(tk,cur.id)!=null, on=started||nm>=cur.s;
   return '<span class="in-now"><i class="'+(started?"on":"")+'"></i>'+(on?"Now":"First")+': <b>'+esc(cur.title)+'</b>'+(started?" · ongoing":"")+'</span>'+
-    (next?(()=>{ const at=nextAt(tk,cur,next); return '<span class="in-next">Up next: <b>'+esc(next.title)+'</b> at '+fmt(at)+(at>nm?' · in '+inTxt(at-nm):', as soon as you finish this')+'</span>'; })():'<span class="in-next">Last task today</span>');
+    (next?(()=>{ const at=nextAt(tk,cur,next), sm=startedMin(tk,cur.id), gap=sm!=null&&at-(sm+cur.d)>10; return '<span class="in-next">Up next: <b>'+esc(next.title)+'</b> at '+fmt(at)+(gap?' (as planned)':'')+(at>nm?' · in '+inTxt(at-nm):', as soon as you finish this')+'</span>'; })():'<span class="in-next">Last task today</span>');
 }
 function tickCountdowns(){
   document.querySelectorAll("[data-cd]").forEach(el=>{ const left=Math.max(0,+el.dataset.t-nowMin()); const h=Math.floor(left/60), m=Math.floor(left%60), s=Math.floor((left*60)%60); el.textContent= h ? h+"h "+m+"m" : (left>=1 ? Math.ceil(left)+" min" : Math.max(1,s)+" sec"); });
@@ -1744,6 +1745,24 @@ function markDone(id){
   if(started&&v.cur&&v.cur.id===id&&document.body.classList.contains("in-room")) completeCurrent(mut,DONE_LINES[Math.floor(Math.random()*DONE_LINES.length)]);
   else { mut(); save(); render(true); toast(DONE_LINES[Math.floor(Math.random()*DONE_LINES.length)]); }
 }
+/* Starting a task early or late: ask whether the rest of today moves with it */
+let pendingStart=null;
+function startTask(id,moveRest){
+  const v=cardView(), ds=dayState(selKey), cur=v.blocks.find(b=>b.id===id); if(!cur) return;
+  let msg="Started. The timer now runs for this task.";
+  if(moveRest&&v.today){ const by=Math.round(nowMin()-cur.s); if(by){ ds.shifts.push({from:cur.i,by}); msg="Started. The rest of today moved "+(by<0?"earlier":"later")+" by "+inTxt(Math.abs(by))+"."; } }
+  ds.started=ds.started||{}; ds.started[id]=Date.now(); save();
+  render(false); tickTimers(); toast(msg);
+}
+function askStart(id){
+  const v=cardView(), cur=v.blocks.find(b=>b.id===id); if(!cur) return;
+  const diff=Math.round(nowMin()-cur.s), rest=v.blocks.filter(b=>b.i>cur.i&&!b.done&&!b.skipped);
+  if(!v.today||Math.abs(diff)<5||!rest.length) return startTask(id,false);
+  pendingStart=id; const early=diff<0, nx=rest[0];
+  modal('<h3>'+(early?"Starting early":"Starting late")+'</h3><p><b>'+esc(cur.title)+'</b> was planned for '+fmt(cur.s)+'. You&#39;re starting it '+inTxt(Math.abs(diff))+' '+(early?"early":"late")+'.</p>'+
+    '<p>Move the rest of today '+(early?"earlier":"later")+' by the same time? For example, <b>'+esc(nx.title)+'</b> would move from '+fmt(nx.s)+' to '+fmt(nx.s+diff)+'.</p>'+
+    '<div class="actions"><button class="primary" data-startshift="yes">Yes, move my day '+(early?"earlier":"later")+'</button><button class="secondary" data-startshift="no">No, keep my times</button></div>',"Cancel");
+}
 function doLate(kind){
   const v=cardView(); const cur=v.cur; if(!cur) return; const ds=dayState(selKey); closeModal();
   if(kind==="shift"){ if(!v.today){ toast("You can only shift today's plan"); return; } const by=Math.max(0,Math.round(nowMin()-cur.s)); ds.shifts.push({from:cur.i,by}); save(); render(false); toast("Day moved forward by "+by+" minutes"); }
@@ -1829,7 +1848,7 @@ function begin(){
   if(!hasAnyPlan()) return openPlanner("new");
   const first=!started; started=true;
   document.body.classList.add("in-room"); if(ACC) guestNudge();
-  { const tk=keyOf(new Date()), c=currentBlock(timeline(tk).blocks); if(c&&selKey===tk&&nowMin()>=c.s-5){ const ds=dayState(tk); ds.started=ds.started||{}; if(!ds.started[c.id]){ ds.started[c.id]=Date.now(); save(); } } }
+  { const tk=keyOf(new Date()), c=currentBlock(timeline(tk).blocks); if(c&&selKey===tk&&Math.abs(nowMin()-c.s)<5){ const ds=dayState(tk); ds.started=ds.started||{}; if(!ds.started[c.id]){ ds.started[c.id]=Date.now(); save(); } } }
   if(first||!liveCard()) renderCard(true); else renderCard(false);
   showQuote(false);
   setTimeout(()=>{ audioInit(); if(Snd.ctx&&Snd.ctx.state==="suspended") Snd.ctx.resume(); chime(); if(Snd.on) ambientStart(); },60);
@@ -1878,7 +1897,8 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-confirmshift")){ const tk=keyOf(new Date()); state.skip=(state.skip||[]).filter(k=>k!==tk).concat([tk]); selKey=tk; save(); closeModal(); setDrawer(false); render(true); toast("Plan moved. It starts tomorrow."); return; }
   if(t.dataset.unshift){ state.skip=(state.skip||[]).filter(k=>k!==t.dataset.unshift); save(); render(true); toast("Back on. Today's plan is active."); return; }
   if(t.hasAttribute("data-open-drawer")){ setDrawer(true); return; }
-  if(t.dataset.start){ const ds=dayState(selKey); ds.started=ds.started||{}; ds.started[t.dataset.start]=Date.now(); save(); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); tickTimers(); toast("Started. The timer now runs for this task."); return; }
+  if(t.dataset.start) return askStart(t.dataset.start);
+  if(t.dataset.startshift){ const a=t.dataset.startshift; closeModal(); return startTask(pendingStart,a==="yes"); }
   if(t.dataset.plan){ if(t.dataset.plan==="edit") setDrawer(false); return openPlanner(t.dataset.plan); }
   if(t.dataset.pbstart){ const st=PB_STARTS[t.dataset.pbstart]; PB.rows=st.rows.map(([tt,title,d,kind])=>({t:tt,title,d,kind})); return pbEdit(); }
   if(t.hasAttribute("data-pbadd")){ pbRead(); const l=PB.rows[PB.rows.length-1]; const tt=l&&/^\d\d:\d\d$/.test(l.t)?hhmmOf(toMin(l.t)+l.d):"09:00"; PB.rows.push({t:tt,title:"",d:60,kind:"work"});
