@@ -2,6 +2,14 @@
 
 Your daily plan and reset, paired with [HV Vault](https://harshvittori.github.io/hv-vault-web/). Live at https://harshvittori.github.io/harsh-reset/ (the address keeps its original name so links and saved data keep working).
 
+## First visit and your plan
+
+- A new visitor sees a short welcome that explains HV Reset (plan your day in blocks, press Start, fell behind? one tap moves the day) instead of a timer. No plan means no timer.
+- **Make my plan** opens the plan builder: start from a ready plan (Study day, Work day, Job search day) or from scratch, then set each block's start time, task, minutes and type (Focus, Meal, Break, Free time). Save it for every day, or only for today. HV AI can also build the plan from one sentence.
+- Blocks that were already over when the plan was made don't count as late; a plan made in the evening starts the next day.
+- The timer turns red when a task's time is up. **Start task** marks it In progress, on the card and in Full day.
+- The built-in job-hunt program (Day 1, Day 2, job days) belongs to the owner's account only.
+
 ## Your account
 
 - Anyone can use HV Reset without an account, and even make changes. Those changes stay in that tab only. The first change brings up a small "Sign in to save" card; after "Not now", a "Not saved · Sign in" pill stays. Closing the tab with unsaved changes asks first.
