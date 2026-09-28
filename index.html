@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790680000">
+<meta name="build" content="1790700000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -155,15 +155,16 @@ body.noplan .intro{display:flex;flex-direction:column;align-items:center;justify
 .w-eyebrow{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
 .w-title{font-family:var(--display);font-weight:300;font-size:clamp(34px,5vw,54px);line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
 .w-lead{font-size:17px;line-height:1.55;color:var(--muted);margin:0 auto 26px;max-width:520px}
-.w-steps{list-style:none;padding:0;margin:0 auto 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left}
-.w-steps li{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:18px;background:var(--glass);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
-.w-steps b{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:var(--done);color:#fff}
-.w-steps strong{display:block;font-size:15px;margin-bottom:2px}
-.w-steps span{font-size:13.5px;color:var(--muted);line-height:1.4}
+.w-steps{list-style:none;padding:0;margin:0 auto 30px;display:grid;grid-template-columns:repeat(3,1fr);text-align:left;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border)}
+.w-steps li{padding:18px 20px;line-height:1.35}
+.w-steps li+li{border-left:1px solid var(--glass-border)}
+.w-steps small{display:block;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.w-steps strong{display:block;font-size:16px;font-weight:700;margin-bottom:4px}
+.w-steps span{display:block;font-size:14px;color:var(--muted);line-height:1.45}
 .w-ctas{display:flex;flex-direction:column;align-items:center;gap:12px}
 .w-ai{background:none;border:0;color:var(--ink);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.85}
 .w-note{margin:18px 0 0;font-size:13.5px;color:var(--muted)}
-@media (max-width:720px){.w-steps{grid-template-columns:1fr}.welcome{padding:60px 16px 100px}.w-lead{font-size:16px}.w-title{font-size:32px}}
+@media (max-width:720px){.w-steps{grid-template-columns:1fr}.w-steps li{padding:14px 4px}.w-steps li+li{border-left:0;border-top:1px solid var(--glass-border)}.welcome{padding:60px 16px 100px}.w-lead{font-size:16px}.w-title{font-size:32px}}
 body:not(.jobhunt) .jobonly{display:none!important}
 body.jobhunt .userplan{display:none!important}
 /* plan builder */
@@ -172,20 +173,57 @@ body.jobhunt .userplan{display:none!important}
 .pb-start:hover{border-color:var(--done)}
 .pb-start b{display:block;font-size:15.5px;margin-bottom:3px}.pb-start span{font-size:13px;color:var(--muted);line-height:1.4}
 .pb-list{list-style:none;padding:0;margin:12px 0 8px;display:flex;flex-direction:column;gap:8px}
-.pb-row{display:grid;grid-template-columns:128px 1fr 74px 104px 30px;gap:6px;align-items:center}
-.pb-row input,.pb-row select{width:100%;min-width:0;border-radius:10px;border:1px solid var(--glass-border);background:color-mix(in srgb,var(--sky1) 70%,transparent);color:var(--ink);padding:9px 8px;font:inherit;font-size:14.5px}
-.pb-row .x{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0}
-.pb-head{display:grid;grid-template-columns:128px 1fr 74px 104px 30px;gap:6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 2px}
+.pb-row{display:grid;grid-template-columns:118px 1fr 92px 124px 28px;gap:6px;align-items:center}
+.pb-row input,.pb-row .pick{width:100%;min-width:0;height:44px;border-radius:12px;border:1px solid transparent;background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--ink);padding:0 12px;font:inherit;font-size:14.5px}
+.pb-row input:focus,.pb-row .pick:focus-visible,.pb-row .pick[aria-expanded="true"]{outline:none;border-color:color-mix(in srgb,var(--accent) 70%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.pb-row .pick{display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pb-row .pick:hover{background:color-mix(in srgb,var(--ink) 11%,transparent)}
+.pb-row input::placeholder{color:var(--faint)}
+.kd{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
+.k-work{background:var(--accent)}.k-meal{background:#E0A83E}.k-rest{background:#4FB8A8}.k-free{background:var(--faint)}
+.pb-row .x{border:0;background:none;color:var(--faint);font-size:20px;cursor:pointer;padding:0;height:44px}
+.pb-row .x:hover{color:var(--ink)}
+.pb-head{display:grid;grid-template-columns:118px 1fr 92px 124px 28px;gap:6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 2px}
 :root[data-theme="dark"] .pb-row input,:root[data-theme="dark"] .pb-row select{color-scheme:dark}
 body:has(.hvai:not([hidden])) .accwrap,body:has(#scrim.open) .hvai-fab,body:has(#scrim.open) .accwrap,body:has(#scrim.open) .savepill{opacity:0;pointer-events:none}
 .modal:has(.pb-list){max-width:640px}
 .modal .pb-list{padding:0;margin-left:0}
+.modal .primary{background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);border-color:transparent;color:#fff;box-shadow:0 12px 28px -12px rgba(79,102,224,.8),inset 0 1px 0 rgba(255,255,255,.25)}
+.pb-when input{accent-color:var(--accent);width:16px;height:16px}
+.w-title{text-wrap:balance}
+.tpop{position:fixed;z-index:2147483600;width:280px;padding:14px;border-radius:18px;background:color-mix(in srgb,var(--sky1) 96%,var(--ink) 4%);border:1px solid var(--glass-border);box-shadow:0 24px 60px -16px rgba(10,14,40,.6);color:var(--ink);animation:tpIn .16s ease-out}
+.tpop.narrow{width:260px}
+@keyframes tpIn{from{opacity:0;transform:translateY(-4px)}}
+.tp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;min-height:32px}
+.tp-head b{font-family:var(--display);font-weight:400;font-size:24px;font-variant-numeric:tabular-nums}
+.tp-ap{display:flex;border:1px solid var(--glass-border);border-radius:999px;overflow:hidden}
+.tp-ap button{border:0;background:none;color:var(--muted);padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer}
+.tp-ap button.on{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .tp-ap button.on,:root[data-theme="dark"] .tp-grid button.on{color:#0E1330}
+.tp-l{margin:8px 0 6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.tp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.tp-grid.g4{grid-template-columns:repeat(4,1fr)}
+.tp-grid button{border:1px solid transparent;background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);border-radius:10px;padding:8px 0;font-size:14px;cursor:pointer;font-variant-numeric:tabular-nums}
+.tp-grid button:hover{border-color:var(--glass-border)}
+.tp-grid button.on{background:var(--accent);color:#fff;font-weight:700}
+.tp-own{display:flex;align-items:center;gap:8px}
+.tp-own input{flex:1;height:38px;border-radius:10px;border:1px solid var(--glass-border);background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);padding:0 10px;font:inherit}
+.tp-own span{color:var(--muted);font-size:14px}
+.tp-list{display:flex;flex-direction:column;gap:4px}
+.tp-list button{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid transparent;background:none;color:var(--ink);border-radius:12px;padding:9px 10px;cursor:pointer}
+.tp-list button:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.tp-list button.on{border-color:color-mix(in srgb,var(--accent) 60%,transparent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.tp-list b{display:block;font-size:14.5px}.tp-list small{display:block;font-size:12.5px;color:var(--muted)}
+.tp-list .kd{width:11px;height:11px}
+.tp-done{margin-top:12px;width:100%;border:1px solid var(--glass-border);background:var(--glass);color:var(--ink);border-radius:999px;padding:9px;font-weight:700;cursor:pointer}
+.modal{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 25%,transparent) transparent}
+.modal::-webkit-scrollbar{width:8px}.modal::-webkit-scrollbar-track{background:transparent}.modal::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 22%,transparent);border-radius:8px}
 .pb-add{border:1px dashed var(--glass-border);background:none;color:var(--ink);border-radius:12px;padding:10px;width:100%;cursor:pointer;font-size:14.5px}
 .pb-when{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;font-size:14.5px}
 .pb-when label{display:flex;gap:6px;align-items:center;cursor:pointer}
 .pb-err{color:#D0584C;font-size:14px;margin:8px 0 0}
 .pb-tip{font-size:13.5px;color:var(--muted);margin:10px 0 0}
-@media (max-width:620px){.pb-starts{grid-template-columns:1fr}.pb-head{display:none}.pb-row{grid-template-columns:132px 1fr 30px;grid-template-areas:"t n x" "d k k"}.pb-row .pt{grid-area:t}.pb-row .pn{grid-area:n}.pb-row .pd{grid-area:d}.pb-row .pk{grid-area:k}.pb-row .x{grid-area:x}.pb-row{padding-bottom:8px;border-bottom:1px solid var(--glass-border)}}
+@media (max-width:620px){.pb-starts{grid-template-columns:1fr}.pb-head{display:none}.pb-row{grid-template-columns:1fr .9fr 1.1fr 28px;grid-template-areas:"n n n x" "t d k k"}.pb-row .pt{grid-area:t}.pb-row .pn{grid-area:n}.pb-row .pd{grid-area:d}.pb-row .pk{grid-area:k}.pb-row .x{grid-area:x}.pb-row{padding-bottom:8px;border-bottom:1px solid var(--glass-border)}}
 .intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;transition:opacity .6s cubic-bezier(.22,1,.36,1),filter .6s,transform .6s cubic-bezier(.22,1,.36,1)}
 body.in-room .intro{opacity:0;filter:blur(18px);transform:scale(1.05);pointer-events:none}
 .halo{position:absolute;width:min(62vw,760px);aspect-ratio:1;border-radius:50%;left:50%;top:50%;translate:-50% -50%;
@@ -222,12 +260,26 @@ body.in-room .room{opacity:1;pointer-events:auto}
 .bar{display:flex;justify-content:space-between;align-items:center;gap:12px}
 /* time is up: the timer turns red */
 body[data-timer="late"] .bigtime{color:var(--late);text-shadow:0 0 40px color-mix(in srgb,var(--late) 45%,transparent);transition:color .6s}
-body[data-timer="late"] #introCap{color:var(--late);font-weight:700}
 body[data-timer="late"] #miniTime{color:var(--late);border-color:color-mix(in srgb,var(--late) 55%,transparent)}
 body[data-timer="late"] #miniTime small{color:var(--late)}
 .card[data-state="late"] .c-time{color:var(--late)!important;font-weight:700}
 :root{--late:#F0524A}
 :root[data-theme="light"]{--late:#D63A31}
+.intro-status{display:inline-flex;align-items:center;gap:8px;margin:0 0 8px;padding:5px 14px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--glass);border:1px solid var(--glass-border)}
+.intro-status:empty{display:none}
+.intro-status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.intro-status[data-s="live"]::before{background:var(--done);animation:pulse 1.6s ease-in-out infinite}
+.intro-status[data-s="late"]{color:var(--late);border-color:color-mix(in srgb,var(--late) 50%,transparent)}
+.intro-status[data-s="late"]::before{background:var(--late)}
+.intro-task{font-family:var(--display);font-weight:400;font-size:clamp(24px,3vw,36px);letter-spacing:-.01em;margin:4px 0 18px;padding:0 16px}
+.intro-tlabel{font-size:15px;color:var(--muted);margin:0 0 2px;letter-spacing:.02em}
+.intro-tlabel:empty{display:none}
+.nx-line{margin:0;font-size:16px;color:var(--muted)}
+.nx-line b{color:var(--ink)}
+.nx-l{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+.nx-free{margin:4px 0 0;font-size:14px;color:var(--faint)}
+body[data-timer="late"] .intro-tlabel{color:var(--late);font-weight:700}
+@media (max-width:720px){body:not(.noplan) .intro{display:flex;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto}body:not(.noplan) .intro-inner{padding:84px 16px 130px}.intro-inner .intro-sound{display:none}}
 .intro-next{margin:14px auto 22px;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:15px;color:var(--muted)}
 .intro-next:empty{display:none}
 .intro-next b{color:var(--ink);font-weight:700}
@@ -703,21 +755,24 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <h1 class="w-title">Plan your day.<br>Then just do the next thing.</h1>
     <p class="w-lead">HV Reset turns your day into simple time blocks and shows you one at a time, with a timer. You always know what to do right now.</p>
     <ol class="w-steps">
-      <li><b>1</b><div><strong>Make your plan</strong><span>Pick a ready plan or add your own tasks and times.</span></div></li>
-      <li><b>2</b><div><strong>Press Start</strong><span>See only the current task and the time left for it.</span></div></li>
-      <li><b>3</b><div><strong>Fell behind? No stress</strong><span>One tap moves the rest of your day. Nothing is lost.</span></div></li>
+      <li><small>Step 1</small><strong>Make your plan</strong><span>Pick a ready plan, or add your own tasks and times.</span></li>
+      <li><small>Step 2</small><strong>Start a task</strong><span>See one task at a time, with the time left for it.</span></li>
+      <li><small>Step 3</small><strong>Running late?</strong><span>One tap moves the rest of your day.</span></li>
     </ol>
     <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or tell HV AI your day</button></div>
     <p class="w-note">Free to try, no account needed. Sign in only when you want to save.</p>
   </div>
   <div class="intro-inner">
     <p class="intro-date" id="introDate"></p>
+    <p class="intro-status" id="introStatus"></p>
+    <h2 class="intro-task" id="introTask"></h2>
+    <p class="intro-tlabel" id="introTLabel"></p>
     <div class="bigtime" id="bigTime" role="timer" aria-live="off"></div>
     <p class="intro-cap" id="introCap"></p>
-    <p class="intro-line" id="introLine">You still have time.</p>
+    <p class="intro-line" id="introLine" hidden></p>
     <div class="intro-next" id="introNext"></div>
     <button class="begin" id="beginBtn">Start</button>
-    <p class="intro-hint">or press Enter</p>
+    <p class="intro-hint" id="introHint">or press Enter</p>
     <div class="intro-sound"><button class="pill" data-look aria-label="Change look"></button><button class="pill" data-sound aria-label="Sound on or off"></button></div>
   </div>
 </section>
@@ -1504,23 +1559,41 @@ function hms(s){ s=Math.max(0,Math.floor(s)); return pad(Math.floor(s/3600))+":"
 function atMin(base,min){ const d=new Date(base.getFullYear(),base.getMonth(),base.getDate()); return new Date(d.getTime()+min*60000); }
 /* a started task runs for its own length from the moment you started it */
 function startedMin(key,id){ const ds=dayState(key), t=ds.started&&ds.started[id]; if(!t) return null; const d=new Date(t); if(keyOf(d)!==key) return null; return d.getHours()*60+d.getMinutes()+d.getSeconds()/60; }
+/* What the home screen says. One plain answer to: what am I doing, how long is left,
+   what comes next, and what does the button do. */
 function timerInfo(){
-  const n=new Date(), tk=keyOf(n), bl=timeline(tk).blocks, cur=currentBlock(bl);
-  if(cur&&startedMin(tk,cur.id)!=null){
-    const en=atMin(n,startedMin(tk,cur.id)+cur.d);
-    if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title+" (started)",mini:"left, started",line:"Started. One task, just this one.",st:"live"};
-    return {t:hms((n-en)/1000),cap:"over time on "+cur.title,mini:"over time",line:"Time is up for this task. Finish it, or tap Done and move on.",st:"late"};
-  }
+  const n=new Date(), tk=keyOf(n), bl=timeline(tk).blocks, cur=currentBlock(bl), nm=nowMin();
   if(cur){
-    const st=atMin(n,cur.s), en=atMin(n,cur.e);
-    if(n<st) return {t:hms((st-n)/1000),cap:"until "+fmt(cur.s)+", "+cur.title,mini:"until start",line:"You still have time.",st:"before"};
-    if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title,mini:"left in this block",line:"One task. Just this one, right now.",st:"live"};
-    return {t:hms((n-en)/1000),cap:"late for "+cur.title,mini:"late",line:"Time is up for this task. Start now and the schedule will adjust.",st:"late"};
+    const sm=startedMin(tk,cur.id), next=bl.find(b=>b.i>cur.i&&!b.done&&!b.skipped)||null;
+    let o;
+    if(sm!=null){
+      const endM=sm+cur.d, en=atMin(n,endM);
+      o= n<=en ? {st:"live",status:"In progress",label:"Time left",t:hms((en-n)/1000),sub:"Started at "+fmt(sm)+" · ends at "+fmt(endM),btn:"Back to my task",mini:"left",endM}
+               : {st:"late",status:"Time's up",label:"Over time by",t:hms((n-en)/1000),sub:"This was meant to end at "+fmt(endM)+". Finish up and mark it done.",btn:"Finish this task",mini:"over time",endM};
+    } else {
+      const st=atMin(n,cur.s), en=atMin(n,cur.e);
+      if(n<st) o={st:"before",status:"Coming up",label:"Starts in",t:hms((st-n)/1000),sub:"At "+fmt(cur.s)+" · "+inTxt(cur.d)+". You can start early if you like.",btn:"Open this task",mini:"until it starts",endM:cur.e};
+      else if(n<=en) o={st:"live",status:"Now",label:"Time left in this slot",t:hms((en-n)/1000),sub:"Planned for "+fmt(cur.s)+" to "+fmt(cur.e)+". You haven't started yet.",btn:"Start this task",mini:"left",endM:cur.e,act:"start"};
+      else o={st:"late",status:"Running late",label:"Late by",t:hms((n-en)/1000),sub:"Planned for "+fmt(cur.s)+" to "+fmt(cur.e)+". Start now, and you can move the rest of your day.",btn:"Start this task",mini:"late",endM:nm+cur.d,act:"start"};
+    }
+    o.task=cur.title; o.cur=cur; o.next=next; o.cap=o.label+" "+o.t+": "+cur.title;
+    return o;
   }
-  const nk=nextPlanDay(tk); if(!nk) return {t:"00:00:00",cap:"",mini:"",line:"No plan ahead."};
-  const [yy,mm,dd]=nk.split("-").map(Number), tm=new Date(yy,mm-1,dd), nb=timeline(nk).blocks[0], st=atMin(tm,nb.s);
-  const tomorrow=nk===addDays(tk,1);
-  return {t:hms((st-n)/1000),cap:"until "+(tomorrow?"tomorrow, ":niceDate(nk)+", ")+fmt(nb.s),mini:tomorrow?"until tomorrow":"until next plan",line:bl.length?"Today's work is done. Rest now.":"Rest today. Your plan starts "+(tomorrow?"tomorrow.":"on "+niceDate(nk)+".")};
+  const nk=nextPlanDay(tk);
+  if(!nk) return {st:"",status:bl.length?"Done for today":"No tasks today",task:bl.length?"You finished today's plan":"Nothing planned",label:"",t:"00:00:00",sub:"",btn:bl.length?"See today's summary":"Open my plan",mini:"",cap:"",none:true};
+  const [yy,mm,dd]=nk.split("-").map(Number), tm=new Date(yy,mm-1,dd), nb=timeline(nk).blocks[0], st=atMin(tm,nb.s), tomorrow=nk===addDays(tk,1);
+  return {st:"",status:bl.length?"Done for today":"Rest day",task:bl.length?"You're done for today":"Nothing planned today",label:"Your next task starts in",t:hms((st-n)/1000),
+    sub:nb.title+", "+(tomorrow?"tomorrow":niceDate(nk))+" at "+fmt(nb.s)+".",btn:bl.length?"See today's summary":"See my plan",mini:tomorrow?"until tomorrow":"until next task",cap:"Next task in "+hms((st-n)/1000)};
+}
+function introNextHTML(){
+  const i=timerInfo(); if(!i.cur) return "";
+  const tk=keyOf(new Date()), nm=nowMin();
+  if(!i.next) return '<p class="nx-line">This is your last task today.</p>';
+  const at=nextAt(tk,i.cur,i.next), started=startedMin(tk,i.cur.id)!=null, endM=i.endM||at;
+  let extra="";
+  if(i.st==="before"||(started&&nm<=endM)){ if(at-endM>10) extra="After this task, you&#39;re free until then."; else if(at<=endM+1) extra="It starts right after this task."; }
+  return '<p class="nx-line"><span class="nx-l">Up next</span> <b>'+esc(i.next.title)+'</b> at '+fmt(at)+(at>nm?' <span class="nx-in">(in '+inTxt(at-nm)+')</span>':'')+'</p>'+
+    (extra?'<p class="nx-free">'+extra+'</p>':'');
 }
 function phaseOf(x){ return x>=5&&x<11?"morning":x>=11&&x<16?"afternoon":x>=16&&x<19.5?"evening":"night"; }
 const LOOK_SHORT={auto:"Auto",morning:"Morning",afternoon:"Day",evening:"Evening",night:"Night"};
@@ -1548,23 +1621,22 @@ function upNext(key){ const bl=timeline(key).blocks, cur=currentBlock(bl); retur
 /* when the next task really starts: its own time, or when the running task ends if that is later */
 function nextAt(key,cur,next){ const sm=cur?startedMin(key,cur.id):null; return Math.max(next.s, sm!=null?sm+cur.d:0); }
 function nextHTML(cur,next,nm){
-  if(!next) return '<div class="upnext"><span class="un-l">Up next</span><span>Nothing. This is the last task today.</span></div>';
-  const at=nextAt(selKey,cur,next);
-  const sm=cur?startedMin(selKey,cur.id):null, gap=sm!=null&&at-(sm+cur.d)>10;
-  return '<div class="upnext"><span class="un-l">Up next</span><span><b>'+esc(next.title)+'</b> at '+fmt(at)+(at>next.s?' (right after this)':gap?' (as planned)':'')+
-    (at>nm?' · in <span class="count" data-cd="start" data-t="'+at+'"></span>':', as soon as you finish this')+'</span></div>';
-}
-function introNextHTML(){
-  const tk=keyOf(new Date()), {cur,next}=upNext(tk); if(!cur) return "";
-  const nm=nowMin(), started=startedMin(tk,cur.id)!=null, on=started||nm>=cur.s;
-  return '<span class="in-now"><i class="'+(started?"on":"")+'"></i>'+(on?"Now":"First")+': <b>'+esc(cur.title)+'</b>'+(started?" · ongoing":"")+'</span>'+
-    (next?(()=>{ const at=nextAt(tk,cur,next), sm=startedMin(tk,cur.id), gap=sm!=null&&at-(sm+cur.d)>10; return '<span class="in-next">Up next: <b>'+esc(next.title)+'</b> at '+fmt(at)+(gap?' (as planned)':'')+(at>nm?' · in '+inTxt(at-nm):', as soon as you finish this')+'</span>'; })():'<span class="in-next">Last task today</span>');
+  if(!next) return '<div class="upnext"><span class="un-l">Up next</span><span>Nothing. This is your last task today.</span></div>';
+  const at=nextAt(selKey,cur,next), sm=cur?startedMin(selKey,cur.id):null, endM=sm!=null?sm+cur.d:cur.e, running=sm!=null&&nm<=endM;
+  return '<div class="upnext"><span class="un-l">Up next</span><span><b>'+esc(next.title)+'</b> at '+fmt(at)+
+    (at>nm?' (in <span class="count" data-cd="start" data-t="'+at+'"></span>)':'')+
+    (running&&at<=endM+1?', right after this task.':running&&at-endM>10?'. You&#39;re free after this task until then.':'')+'</span></div>';
 }
 function tickCountdowns(){
-  document.querySelectorAll("[data-cd]").forEach(el=>{ const left=Math.max(0,+el.dataset.t-nowMin()); const h=Math.floor(left/60), m=Math.floor(left%60), s=Math.floor((left*60)%60); el.textContent= h ? h+"h "+m+"m" : (left>=1 ? Math.ceil(left)+" min" : Math.max(1,s)+" sec"); });
+  document.querySelectorAll("[data-cd]").forEach(el=>{ const left=Math.max(0,+el.dataset.t-nowMin()); const h=Math.floor(left/60), m=Math.floor(left%60), s=Math.floor((left*60)%60); el.textContent= h ? h+"h"+(m?" "+m+"m":"") : (left>=1 ? Math.ceil(left)+" min" : Math.max(1,s)+" sec"); });
 }
-function tickTimers(){ const i=timerInfo(); { const h=introNextHTML(), el=$("introNext"); if(el&&el.innerHTML!==h) el.innerHTML=h; } if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||""; if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
-  if($("introCap").textContent!==i.cap) $("introCap").textContent=i.cap; if($("introLine").textContent!==i.line) $("introLine").textContent=i.line; $("bigTime").setAttribute("aria-label",i.t+", "+i.cap); tickCountdowns(); }
+function setTxt(id,v){ const el=$(id); if(el&&el.textContent!==v) el.textContent=v; }
+function tickTimers(){ const i=timerInfo(); { const h=introNextHTML(), el=$("introNext"); if(el&&el.dataset.h!==h){ el.dataset.h=h; el.innerHTML=h; } }
+  if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||"";
+  if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
+  setTxt("introStatus",i.status||""); $("introStatus").dataset.s=i.st||""; setTxt("introTask",i.task||""); setTxt("introTLabel",i.label||""); setTxt("introCap",i.sub||"");
+  $("bigTime").hidden=!!i.none; setTxt("beginBtn",i.btn||"Open"); setTxt("introHint",i.act==="start"?"The timer starts when you tap it":"or press Enter");
+  $("bigTime").setAttribute("aria-label",i.cap||""); tickCountdowns(); }
 
 /* ---------- card ---------- */
 function cardView(){ const {plan,blocks}=timeline(selKey); return {plan,blocks,cur:currentBlock(blocks),today:isToday(selKey),nm:nowMin()}; }
@@ -1602,7 +1674,7 @@ function cardInner(v){
   const sm=v.today?startedMin(selKey,cur.id):null;
   if(!v.today){ st="idle"; timeTxt=fmt(cur.s)+" to "+fmt(cur.e)+". You're looking at "+(selKey>keyOf(new Date())?"a later":"an earlier")+" day. <button class=\"linkbtn\" data-day=\""+keyOf(new Date())+"\">Back to today</button>"; }
   else if(sm!=null){ const endM=sm+cur.d;
-    if(v.nm<=endM) timeTxt='Started. <span class="count" data-cd="end" data-t="'+endM+'"></span> left, until '+fmt(endM);
+    if(v.nm<=endM) timeTxt='<span class="count" data-cd="end" data-t="'+endM+'"></span> left · ends at '+fmt(endM);
     else { st="late"; const ov=Math.max(1,Math.round(v.nm-endM)); timeTxt=ov+(ov===1?" minute":" minutes")+" over time. Tap Done when you finish."; } }
   else if(v.nm<cur.s){ st="idle"; timeTxt='Starts in <span class="count" data-cd="start" data-t="'+cur.s+'"></span>. You can start now.'; }
   else if(v.nm<=cur.e){ timeTxt='<span class="count" data-cd="end" data-t="'+cur.e+'"></span> left, until '+fmt(cur.e); }
@@ -1645,7 +1717,7 @@ function cardInner(v){
   return {state:st,html:'<div class="focus scroll">'+
     '<div class="c-kind"><span class="pulse"></span>'+(v.today?"Now":"Viewing")+", "+KIND[cur.kind].toLowerCase()+'</div>'+
     '<h1 class="c-title">'+esc(cur.title)+'</h1><div class="c-time">'+timeTxt+'</div>'+
-    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>Ongoing · started at '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+' · '+cur.d+' min</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>')+nextHTML(cur,v.blocks.find(b=>b.i>cur.i&&!b.done&&!b.skipped),v.nm):'')+lateHTML+
+    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>In progress · started at '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+'</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>')+nextHTML(cur,v.blocks.find(b=>b.i>cur.i&&!b.done&&!b.skipped),v.nm):'')+lateHTML+
     zone+
     (chips?'<div class="chips">'+chips+'</div>':'')+
     '<div class="f-links"><button data-toggle="all">See all steps</button><button data-toggle="more">Why, tips and more</button></div>'+
@@ -1777,19 +1849,69 @@ function modal(html,closeLabel){ modalKind=null; const m=$("modal"); m.innerHTML
   $("scrim").classList.add("open"); const f=a.querySelector(".primary")||c; f.focus(); }
 /* ---------- plan builder: make your own day (every day, or just today) ---------- */
 const PB_STARTS={
-  study:{name:"Study day",sub:"Focused study blocks, breaks and revision.",rows:[["08:30","Study: hardest subject",90,"work"],["10:00","Break",15,"rest"],["10:15","Practice questions",75,"work"],["11:30","Revise notes",45,"work"],["12:15","Lunch",45,"meal"],["13:00","Study: second subject",90,"work"],["14:30","Break",15,"rest"],["14:45","Mock test or homework",60,"work"],["15:45","Walk outside",30,"rest"],["16:15","Review today, plan tomorrow",15,"work"]]},
-  work:{name:"Work day",sub:"Deep work first, then messages and meetings.",rows:[["09:00","Plan the day",15,"work"],["09:15","Deep work: most important task",120,"work"],["11:15","Break",15,"rest"],["11:30","Emails and messages",45,"work"],["12:15","Lunch",45,"meal"],["13:00","Meetings and calls",90,"work"],["14:30","Break",15,"rest"],["14:45","Deep work: second task",90,"work"],["16:15","Wrap up, plan tomorrow",20,"work"]]},
-  job:{name:"Job search day",sub:"Find roles, apply, reach out and follow up.",rows:[["10:00","Find jobs to apply for",45,"work"],["10:45","Apply to 3 jobs",75,"work"],["12:00","Break",15,"rest"],["12:15","Message 5 people",45,"work"],["13:00","Lunch",45,"meal"],["13:45","Interview practice",60,"work"],["14:45","Break",15,"rest"],["15:00","Follow-ups",30,"work"],["15:30","Learn a skill",60,"work"],["16:30","Review the day",15,"work"]]},
+  study:{name:"Study day",sub:"Two study blocks, lunch and a revision.",rows:[["09:00","Study: hardest subject",90,"work"],["10:30","Break",15,"rest"],["10:45","Practice questions",75,"work"],["12:00","Lunch",45,"meal"],["13:00","Revise notes",45,"work"]]},
+  work:{name:"Work day",sub:"Deep work first, then messages and meetings.",rows:[["09:30","Deep work: most important task",120,"work"],["11:30","Break",15,"rest"],["11:45","Emails and messages",45,"work"],["12:30","Lunch",45,"meal"],["13:15","Meetings and calls",90,"work"]]},
+  job:{name:"Job search day",sub:"Find roles, apply, reach out, follow up.",rows:[["10:00","Find jobs to apply for",45,"work"],["10:45","Apply to 3 jobs",75,"work"],["12:00","Lunch",45,"meal"],["12:45","Message 5 people",45,"work"],["13:30","Follow-ups",30,"work"]]},
   blank:{name:"Start from scratch",sub:"Add your own tasks and times.",rows:[]}
 };
 const PB_KINDS=[["work","Focus"],["meal","Meal"],["rest","Break"],["free","Free time"]];
 let PB=null;
+const PB_KIND_NAME={work:"Focus",meal:"Meal",rest:"Break",free:"Free time"};
 function pbRowHTML(r){
-  return '<li class="pb-row"><input class="pt" type="time" value="'+esc(r.t)+'" aria-label="Start time"><input class="pn" type="text" maxlength="80" value="'+esc(r.title)+'" placeholder="What will you do?" aria-label="Task">'+
-    '<input class="pd" type="number" min="5" max="600" step="5" value="'+(r.d||60)+'" aria-label="Minutes"><select class="pk" aria-label="Type">'+PB_KINDS.map(([k,n])=>'<option value="'+k+'"'+(k===r.kind?" selected":"")+'>'+n+'</option>').join("")+'</select>'+
-    '<button class="x" data-pbdel aria-label="Remove this block">&times;</button></li>';
+  const t=r.t||"09:00", k=PB_KIND_NAME[r.kind]?r.kind:"work", d=r.d||60;
+  return '<li class="pb-row">'+
+    '<button type="button" class="pt pick" data-pick="time" data-v="'+esc(t)+'" aria-label="Start time">'+fmt(toMin(t))+'</button>'+
+    '<input class="pn" type="text" maxlength="80" value="'+esc(r.title)+'" placeholder="What will you do?" aria-label="Task">'+
+    '<button type="button" class="pd pick" data-pick="dur" data-v="'+d+'" aria-label="How long">'+durTxt(d)+'</button>'+
+    '<button type="button" class="pk pick" data-pick="kind" data-v="'+k+'" aria-label="Type"><i class="kd k-'+k+'"></i>'+PB_KIND_NAME[k]+'</button>'+
+    '<button type="button" class="x" data-pbdel aria-label="Remove this block">&times;</button></li>';
 }
-function pbRead(){ PB.rows=[...document.querySelectorAll("#pbList .pb-row")].map(li=>({t:li.querySelector(".pt").value,title:li.querySelector(".pn").value.trim(),d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").value,10)||30)),kind:li.querySelector(".pk").value})); const w=document.querySelector('input[name="pbwhen"]:checked'); if(w) PB.when=w.value; }
+const durTxt=d=>{ d=+d; return d<60?d+" min":(Math.floor(d/60)+"h"+(d%60?" "+(d%60)+"m":"")); };
+/* One themed picker for time, length and type (replaces the browser's own dropdowns). */
+let pickFor=null;
+function pickOpen(btn){
+  pickClose(); pickFor=btn; const kind=btn.dataset.pick;
+  const pop=document.createElement("div"); pop.className="tpop"; pop.id="tpop"; pop.setAttribute("role","dialog");
+  if(kind==="time"){
+    const [h,m]=(btn.dataset.v||"09:00").split(":").map(Number);
+    pop.dataset.h=h%12||12; pop.dataset.m=m; pop.dataset.pm=h>=12?"1":"";
+    pop.setAttribute("aria-label","Choose a start time");
+    pop.innerHTML='<div class="tp-head"><b id="tpShow"></b><div class="tp-ap"><button type="button" data-tpa="am">AM</button><button type="button" data-tpa="pm">PM</button></div></div>'+
+      '<p class="tp-l">Hour</p><div class="tp-grid">'+[12,1,2,3,4,5,6,7,8,9,10,11].map(x=>'<button type="button" data-tph="'+x+'">'+x+'</button>').join("")+'</div>'+
+      '<p class="tp-l">Minutes</p><div class="tp-grid">'+[0,5,10,15,20,25,30,35,40,45,50,55].map(x=>'<button type="button" data-tpm="'+x+'">:'+pad(x)+'</button>').join("")+'</div>'+
+      '<button type="button" class="tp-done" data-tpdone>Done</button>';
+  } else if(kind==="dur"){
+    pop.setAttribute("aria-label","How long");
+    pop.innerHTML='<div class="tp-head"><b id="tpShow"></b></div><p class="tp-l">How long</p><div class="tp-grid g4">'+
+      [5,10,15,20,30,45,60,75,90,120,150,180].map(x=>'<button type="button" data-tpd="'+x+'">'+durTxt(x)+'</button>').join("")+'</div>'+
+      '<p class="tp-l">Or type minutes</p><div class="tp-own"><input type="number" min="5" max="600" step="5" id="tpOwn" aria-label="Minutes"><span>min</span></div>'+
+      '<button type="button" class="tp-done" data-tpdone>Done</button>';
+  } else {
+    pop.setAttribute("aria-label","Type of block"); pop.classList.add("narrow");
+    pop.innerHTML='<p class="tp-l">Type</p><div class="tp-list">'+Object.entries(PB_KIND_NAME).map(([k,n])=>'<button type="button" data-tpk="'+k+'"><i class="kd k-'+k+'"></i><span><b>'+n+'</b><small>'+({work:"A task that needs your focus",meal:"Breakfast, lunch or dinner",rest:"A short pause",free:"Your own time, no work"})[k]+'</small></span></button>').join("")+'</div>';
+  }
+  document.body.appendChild(pop); pickSync();
+  const r=btn.getBoundingClientRect(), w=pop.offsetWidth, hh=pop.offsetHeight;
+  let top=r.bottom+6; if(top+hh>innerHeight-8) top=Math.max(8,r.top-hh-6);
+  pop.style.top=top+"px"; pop.style.left=Math.min(Math.max(8,r.left),innerWidth-w-8)+"px";
+  const own=$("tpOwn"); if(own){ own.value=btn.dataset.v; own.addEventListener("input",()=>{ const v=Math.max(5,Math.min(600,parseInt(own.value,10)||0)); if(own.value) setPick(String(v)); }); }
+}
+function setPick(v){ const b=pickFor; if(!b) return; b.dataset.v=v; const k=b.dataset.pick;
+  if(k==="time") b.textContent=fmt(toMin(v)); else if(k==="dur") b.textContent=durTxt(v); else b.innerHTML='<i class="kd k-'+v+'"></i>'+PB_KIND_NAME[v];
+  pickSync(); }
+function pickSync(){
+  const pop=$("tpop"); if(!pop||!pickFor) return; const k=pickFor.dataset.pick;
+  if(k==="time"){ const h12=+pop.dataset.h, m=+pop.dataset.m, pm=!!pop.dataset.pm, v=pad((h12%12)+(pm?12:0))+":"+pad(m);
+    if(pickFor.dataset.v!==v){ pickFor.dataset.v=v; pickFor.textContent=fmt(toMin(v)); }
+    $("tpShow").textContent=fmt(toMin(v));
+    pop.querySelectorAll("[data-tph]").forEach(b=>b.classList.toggle("on",+b.dataset.tph===h12));
+    pop.querySelectorAll("[data-tpm]").forEach(b=>b.classList.toggle("on",+b.dataset.tpm===m));
+    pop.querySelectorAll("[data-tpa]").forEach(b=>b.classList.toggle("on",(b.dataset.tpa==="pm")===pm)); }
+  else if(k==="dur"){ $("tpShow").textContent=durTxt(pickFor.dataset.v); pop.querySelectorAll("[data-tpd]").forEach(b=>b.classList.toggle("on",b.dataset.tpd===pickFor.dataset.v)); }
+  else pop.querySelectorAll("[data-tpk]").forEach(b=>b.classList.toggle("on",b.dataset.tpk===pickFor.dataset.v));
+}
+function pickClose(){ const p=$("tpop"); if(p) p.remove(); if(pickFor) pickFor.focus({preventScroll:true}); pickFor=null; }
+function pbRead(){ PB.rows=[...document.querySelectorAll("#pbList .pb-row")].map(li=>({t:li.querySelector(".pt").dataset.v,title:li.querySelector(".pn").value.trim(),d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").dataset.v,10)||30)),kind:li.querySelector(".pk").dataset.v})); const w=document.querySelector('input[name="pbwhen"]:checked'); if(w) PB.when=w.value; }
 function pbChoose(){
   modal('<h3>Make your plan</h3><p>Start from a ready plan and change anything you like, or start empty.</p><div class="pb-starts">'+
     Object.entries(PB_STARTS).map(([k,v])=>'<button class="pb-start" data-pbstart="'+k+'"><b>'+v.name+'</b><span>'+v.sub+'</span></button>').join("")+'</div>'+
@@ -1798,8 +1920,8 @@ function pbChoose(){
 }
 function pbEdit(){
   if(!PB.rows.length){ const n=new Date(); const h=Math.min(22,n.getHours()+1); PB.rows=[{t:pad(h)+":00",title:"",d:60,kind:"work"}]; }
-  modal('<h3>'+(PB.editing?"Edit your plan":"Your plan")+'</h3><p>Each block has a start time, a task and how long it takes. Change anything. They&#39;re sorted by time when you save.</p>'+
-    '<div class="pb-head"><span>Start</span><span>Task</span><span>Minutes</span><span>Type</span><span></span></div><ol class="pb-list" id="pbList">'+PB.rows.map(pbRowHTML).join("")+'</ol>'+
+  modal('<h3>'+(PB.editing?"Edit your plan":"Your plan")+'</h3><p>Tap a time, length or type to change it. Add or remove tasks as you like.</p>'+
+    '<div class="pb-head"><span>Starts</span><span>Task</span><span>How long</span><span>Type</span><span></span></div><ol class="pb-list" id="pbList">'+PB.rows.map(pbRowHTML).join("")+'</ol>'+
     '<button class="pb-add" data-pbadd>+ Add a block</button>'+
     '<div class="pb-when"><label><input type="radio" name="pbwhen" value="every"'+(PB.when!=="today"?" checked":"")+'> Use this plan every day</label><label><input type="radio" name="pbwhen" value="today"'+(PB.when==="today"?" checked":"")+'> Only for today</label></div>'+
     '<p class="pb-err" id="pbErr" hidden></p><div class="actions"><button class="primary" data-pbsave>Save my plan</button></div>',"Cancel");
@@ -1833,7 +1955,7 @@ function pbSave(){
   toast(!first?"Plan saved.":live?"Your plan is ready. Press Start to begin.":"Your plan is ready. It starts "+(timerInfo().cap.replace(/^until /,"")||"soon")+".");
 }
 
-function closeModal(){ modalKind=null; $("scrim").classList.remove("open"); clearInterval(modal._t); }
+function closeModal(){ pickClose(); modalKind=null; $("scrim").classList.remove("open"); clearInterval(modal._t); }
 function openDistract(){ const cur=cardView().cur;
   modal('<h3>60 second reset</h3><ol><li>Close whatever is distracting you right now. Tab, app, video.</li><li>Stand up and drink a glass of water.</li><li>Take 3 slow breaths. In for 4 seconds, out for 6.</li><li>Read the finish line: <b>'+esc(cur?cur.finish:"")+'</b></li><li>Not the whole block, just the next step. Start a 5-minute timer.</li></ol><p class="line">Getting distracted is normal. Coming back is the skill.</p><div class="timer" id="ftimer">05:00</div><div class="actions"><button class="primary" data-focus>Start 5-minute timer</button></div>'); }
 function openMood(){ const cur=cardView().cur;
@@ -1848,7 +1970,7 @@ function begin(){
   if(!hasAnyPlan()) return openPlanner("new");
   const first=!started; started=true;
   document.body.classList.add("in-room"); if(ACC) guestNudge();
-  { const tk=keyOf(new Date()), c=currentBlock(timeline(tk).blocks); if(c&&selKey===tk&&Math.abs(nowMin()-c.s)<5){ const ds=dayState(tk); ds.started=ds.started||{}; if(!ds.started[c.id]){ ds.started[c.id]=Date.now(); save(); } } }
+  { const i=timerInfo(); if(i.act==="start"&&i.cur&&selKey===keyOf(new Date())) setTimeout(()=>askStart(i.cur.id),250); }
   if(first||!liveCard()) renderCard(true); else renderCard(false);
   showQuote(false);
   setTimeout(()=>{ audioInit(); if(Snd.ctx&&Snd.ctx.state==="suspended") Snd.ctx.resume(); chime(); if(Snd.on) ambientStart(); },60);
@@ -1857,6 +1979,7 @@ function begin(){
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
   if(!e.target.closest("#accWrap")) accMenu(false);
+  if($("tpop")&&!e.target.closest("#tpop,[data-pick]")) pickClose();
   if(!e.target.closest("#rescue")){ const hm=$("helpMenu"); if(hm) hm.classList.remove("open"); }
   const t=e.target.closest("button"); if(!t) return;
   if(t.id==="accBtn"){ if(AC.uid||!$("accMenu").hidden) accMenu($("accMenu").hidden); else { accMenu(false); const c=HVC(); c.signIn().catch(err=>{ const m=gateError(err); if(m) toast(m); }); } return; }
@@ -1869,7 +1992,7 @@ document.addEventListener("click",e=>{
     return; }
   if(t.classList.contains("primary")){ const r=t.getBoundingClientRect(), s=Math.max(r.width,r.height)*2; const sp=document.createElement("span"); sp.className="ripple"; sp.style.cssText="width:"+s+"px;height:"+s+"px;left:"+(e.clientX-r.left-s/2)+"px;top:"+(e.clientY-r.top-s/2)+"px"; t.appendChild(sp); setTimeout(()=>sp.remove(),800); }
   if(t.id==="beginBtn") return begin();
-  if(t.id==="miniTime"){ document.body.classList.remove("in-room"); rollTo($("bigTime"),timerInfo().t); $("beginBtn").textContent="Continue"; return; }
+  if(t.id==="miniTime"){ document.body.classList.remove("in-room"); rollTo($("bigTime"),timerInfo().t); tickTimers(); return; }
   if(t.hasAttribute("data-sound")) return toggleSound();
   if(t.id==="drawerBtn") return setDrawer(true);
   if(t.id==="drawerClose") return setDrawer(false);
@@ -1897,11 +2020,18 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-confirmshift")){ const tk=keyOf(new Date()); state.skip=(state.skip||[]).filter(k=>k!==tk).concat([tk]); selKey=tk; save(); closeModal(); setDrawer(false); render(true); toast("Plan moved. It starts tomorrow."); return; }
   if(t.dataset.unshift){ state.skip=(state.skip||[]).filter(k=>k!==t.dataset.unshift); save(); render(true); toast("Back on. Today's plan is active."); return; }
   if(t.hasAttribute("data-open-drawer")){ setDrawer(true); return; }
+  if(t.dataset.pick) return (pickFor===t?pickClose():pickOpen(t));
+  if(t.dataset.tph){ $("tpop").dataset.h=t.dataset.tph; return pickSync(); }
+  if(t.dataset.tpm){ $("tpop").dataset.m=t.dataset.tpm; return pickSync(); }
+  if(t.dataset.tpa){ $("tpop").dataset.pm=t.dataset.tpa==="pm"?"1":""; return pickSync(); }
+  if(t.dataset.tpd){ setPick(t.dataset.tpd); return pickClose(); }
+  if(t.dataset.tpk){ setPick(t.dataset.tpk); return pickClose(); }
+  if(t.hasAttribute("data-tpdone")) return pickClose();
   if(t.dataset.start) return askStart(t.dataset.start);
   if(t.dataset.startshift){ const a=t.dataset.startshift; closeModal(); return startTask(pendingStart,a==="yes"); }
   if(t.dataset.plan){ if(t.dataset.plan==="edit") setDrawer(false); return openPlanner(t.dataset.plan); }
   if(t.dataset.pbstart){ const st=PB_STARTS[t.dataset.pbstart]; PB.rows=st.rows.map(([tt,title,d,kind])=>({t:tt,title,d,kind})); return pbEdit(); }
-  if(t.hasAttribute("data-pbadd")){ pbRead(); const l=PB.rows[PB.rows.length-1]; const tt=l&&/^\d\d:\d\d$/.test(l.t)?hhmmOf(toMin(l.t)+l.d):"09:00"; PB.rows.push({t:tt,title:"",d:60,kind:"work"});
+  if(t.hasAttribute("data-pbadd")){ pbRead(); const l=PB.rows[PB.rows.length-1]; const tt=l&&/^\d\d:\d\d$/.test(l.t||"")?hhmmOf(toMin(l.t)+l.d):"09:00"; PB.rows.push({t:tt,title:"",d:60,kind:"work"});
     $("pbList").insertAdjacentHTML("beforeend",pbRowHTML(PB.rows[PB.rows.length-1])); const n=$("pbList").lastElementChild.querySelector(".pn"); n.focus(); return; }
   if(t.hasAttribute("data-pbdel")){ t.closest(".pb-row").remove(); return; }
   if(t.hasAttribute("data-pbsave")) return pbSave();
@@ -1916,9 +2046,12 @@ document.addEventListener("click",e=>{
   if(t.id==="resetDay"){ modal('<h3>Reset this day?</h3><p>This clears every tick, counter and time shift for this day. The day starts fresh.</p><div class="actions"><button class="primary" data-confirmreset>Yes, reset this day</button></div>',"Cancel"); return; }
   if(t.hasAttribute("data-confirmreset")){ delete state.days[selKey]; openTrack=null; save(); closeModal(); setDrawer(false); render(true); toast("Day reset. Fresh start."); return; }
 });
+$("modal").addEventListener("scroll",()=>pickClose(),{passive:true});
 $("scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeModal(); });
 $("dscrim").addEventListener("click",()=>setDrawer(false));
 document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target&&e.target.closest&&(e.target.closest(".hvai,#tpop,#scrim")||/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName))) return;   // typing in HV AI or a form: Enter belongs there
+  if(e.key==="Escape"&&$("tpop")){ pickClose(); return; }
   if(e.key==="Escape"){ closeModal(); setDrawer(false); return; }
   if(e.key==="Enter"&&!document.body.classList.contains("in-room")&&!$("scrim").classList.contains("open")){ e.preventDefault(); begin(); return; }
   if(e.key==="Enter"&&document.body.classList.contains("in-room")&&!$("scrim").classList.contains("open")&&!$("drawer").classList.contains("open")&&!/TEXTAREA|BUTTON|INPUT/.test((document.activeElement||{}).tagName||"")){ const c=liveCard(); const b=c&&c.querySelector(".s-actions .primary"); if(b){ e.preventDefault(); b.click(); } }
