@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790750000">
+<meta name="build" content="1790760000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1694,6 +1694,11 @@ function timerInfo(){
   }
   const nk=nextPlanDay(tk), nb=nk?timeline(nk).blocks[0]:null, tomorrow=nk===addDays(tk,1);
   const nextLine=nb?"Next: "+nb.title+", "+(tomorrow?"tomorrow":niceDate(nk))+" at "+fmt(nb.s)+".":"";
+  /* a plan on a later day: count down to its first task, like any other task */
+  const later=nb?(()=>{ const [y,m,dd]=nk.split("-").map(Number), at=atMin(new Date(y,m-1,dd),nb.s), when=(tomorrow?"Tomorrow":niceDate(nk))+" at "+fmt(nb.s);
+    return {st:"before",status:tomorrow?"Tomorrow":"Coming up",task:nb.title,label:"Starts in",t:hms((at-n)/1000),sub:when+" · "+inTxt(nb.d)+".",mini:"until it starts",cap:"Starts in "+hms((at-n)/1000)+": "+nb.title}; })():null;
+  if(later&&bl.length&&bl.some(b=>b.done)&&!bl.some(b=>!b.done&&!b.skipped)) return Object.assign(later,{status:"Done for today",sub:"Next: "+later.sub,btn:"See my progress",act:"report"});
+  if(later) return Object.assign(later,{btn:"Add a task for today",act:"add"});
   if(bl.length&&!bl.some(b=>b.done)) return {st:"",status:"Free now",task:nb&&tomorrow?"Your plan starts tomorrow":"Nothing left for today",label:"",t:"00:00:00",sub:nextLine,btn:"Add a task for today",act:"add",mini:"no task now",cap:"Nothing left for today",none:true};
   if(bl.length) return {st:"",status:"Done for today",task:"You finished today's plan",label:"",t:"00:00:00",sub:nextLine,btn:"See my progress",act:"report",mini:"done today",cap:"Done for today",none:true};
   return {st:"",status:"Free day",task:"Nothing planned today",label:"",t:"00:00:00",sub:nextLine||"Add a task, or enjoy the free time.",btn:"Add a task for today",act:"add",mini:"no task now",cap:"Nothing planned today",none:true};
