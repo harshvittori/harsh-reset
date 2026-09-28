@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790770000">
+<meta name="build" content="1790780000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -122,6 +122,9 @@ body.in-room .savepill{display:none}
 .accbtn{position:relative}
 body.unsaved #accBtn::after{content:"";position:absolute;top:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:#E0A83E;border:2px solid var(--sky1)}
 body.gated .savecard,body.gated .savepill,body:has(#drawer.open) .savecard,body:has(#drawer.open) .savepill{display:none}
+.dashbtn{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));z-index:80;font-weight:700;padding:9px 16px 9px 13px;color:var(--ink);cursor:pointer}
+.dashbtn:hover{background:var(--glass-hi)}
+body.noplan .dashbtn,body.in-room .dashbtn,body.gated .dashbtn,body.dash-open .dashbtn{display:none}
 .accwrap{position:fixed;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));z-index:80}
 .accwrap[hidden],.accmenu[hidden]{display:none}
 .bar-right .accwrap{position:relative;top:auto;right:auto;z-index:30}
@@ -725,7 +728,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .intro-sound{display:flex;gap:10px;justify-content:center}
 .lookfade{animation:lookfade .8s ease}
 @keyframes lookfade{from{opacity:.35}to{opacity:1}}
-@media (max-width:900px){ .bar [data-look] .stxt{display:none} .bar [data-look]{padding:8px 11px} .bar-right{gap:8px} }
+@media (max-width:900px){ .bar [data-look] .stxt,.bar [data-report] .stxt{display:none} .bar [data-report]{padding:8px 11px} .bar [data-look]{padding:8px 11px} .bar-right{gap:8px} }
 .toast{white-space:nowrap}
 
 .modal .steps li{padding:10px 6px}
@@ -808,6 +811,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 </div>
 <button class="savepill glass" id="savePill" data-gate="in" hidden><i></i><span>Not saved · Sign in</span></button>
 
+<button class="pill dashbtn" id="dashBtn" data-report aria-label="Open your dashboard"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 20v-7M10.5 20V6M16 20v-9M21 20H3"/></svg><span>Dashboard</span></button>
 <div class="accwrap" id="accWrap" hidden>
   <button class="accbtn glass" id="accBtn" aria-haspopup="true" aria-expanded="false"></button>
   <div class="accmenu glass" id="accMenu" role="menu" hidden></div>
@@ -894,7 +898,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <div class="intro-next" id="introNext"></div>
     <button class="begin" id="beginBtn">Start</button>
     <p class="intro-hint" id="introHint">or press Enter</p>
-    <div class="intro-links" id="introLinks"><button data-qadd>+ Add a task for today</button><button data-report>My dashboard</button></div>
+    <div class="intro-links" id="introLinks"><button data-qadd>+ Add a task for today</button></div>
     <div class="intro-sound"><button class="pill" data-look aria-label="Change look"></button><button class="pill" data-sound aria-label="Sound on or off"></button></div>
   </div>
 </section>
@@ -905,6 +909,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <div class="bar-right" id="barRight">
       <button class="pill" data-look aria-label="Change look"></button>
       <button class="pill" data-sound aria-label="Sound on or off"></button>
+      <button class="pill" data-report aria-label="Dashboard"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 20v-7M10.5 20V6M16 20v-9M21 20H3"/></svg><span class="stxt">Dashboard</span></button>
       <button class="pill" id="drawerBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Full day</button>
     </div>
   </header>
@@ -1801,7 +1806,7 @@ function tickTimers(){
   if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.none?"Free":i.t; $("miniCap").textContent=i.mini;
   setTxt("introStatus",i.status||""); $("introStatus").dataset.s=i.st||""; setTxt("introTask",i.task||""); setTxt("introTLabel",i.label||""); setTxt("introCap",i.sub||"");
   $("bigTime").hidden=!!i.none;
-  { const L=$("introLinks"); if(L){ L.querySelector("[data-qadd]").hidden=i.act==="add"; L.querySelector("[data-report]").hidden=i.act==="report"; } } setTxt("beginBtn",i.btn||"Open"); setTxt("introHint",i.act==="start"?"The timer starts when you tap it":"or press Enter");
+  { const L=$("introLinks"); if(L){ L.querySelector("[data-qadd]").hidden=i.act==="add";  } } setTxt("beginBtn",i.btn||"Open"); setTxt("introHint",i.act==="start"?"The timer starts when you tap it":"or press Enter");
   $("bigTime").setAttribute("aria-label",i.cap||""); tickCountdowns(); }
 
 /* ---------- card ---------- */
