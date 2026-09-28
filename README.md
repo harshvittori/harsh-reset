@@ -10,6 +10,10 @@ Your daily plan and reset, paired with [HV Vault](https://harshvittori.github.io
 - Pressing **Start** (or **Start task** on the card) starts the current task: it shows "Started at 10:05 AM · 15 min", and the timer runs for the task's own length from that moment. When that time is up, the timer turns red ("over time"), on the start screen too. A task not started by its end time also turns red ("late"). Full day shows In progress.
 - While a task runs, the card, the start screen and Full day show **Now: <task> · ongoing** and **Up next: <task> at <time> · in N min**, with a live countdown. If the running task ends later than the next one was planned, Up next moves to "right after this".
 - Starting a task 5+ minutes early or late asks: "Move the rest of today earlier/later by the same time?" Yes shifts every later task (only today); No keeps the planned times, and Up next says "(as planned)". The home Start button starts the current task by itself only when it is on time.
+- No task today: no countdown. The home screen says "Nothing planned today" (or "Your plan starts tomorrow") with **Add a task for today**, and a small line with the next task.
+- **Add a task for today**: on the home screen, the day summary, the "no plan" card and Full day. Adds one task to today only.
+- **My progress**: Day, Week or Month, and any date with the arrows. Tasks done of planned, completion %, focus time, tasks started on time (day) or day streak (week, month), each task's result (Done at…, Skipped, Missed), and a bar per day.
+- After HV AI plans another day, the app stays on today and says where the plan went; a future day's card is a preview with Back to today.
 - Breaks and meals have no steps: the card just shows the break and **Done, next block**.
 - Looking at another day shows **Back to today**.
 - The built-in job-hunt program (Day 1, Day 2, job days) belongs to the owner's account only.
