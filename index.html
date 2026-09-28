@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790730000">
+<meta name="build" content="1790750000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -155,16 +155,44 @@ body.noplan .intro{display:flex;flex-direction:column;align-items:center;justify
 .w-eyebrow{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
 .w-title{font-family:var(--display);font-weight:300;font-size:clamp(34px,5vw,54px);line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
 .w-lead{font-size:17px;line-height:1.55;color:var(--muted);margin:0 auto 26px;max-width:520px}
-.w-steps{list-style:none;padding:0;margin:0 auto 30px;display:grid;grid-template-columns:repeat(3,1fr);text-align:left;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border)}
-.w-steps li{padding:18px 20px;line-height:1.35}
-.w-steps li+li{border-left:1px solid var(--glass-border)}
-.w-steps small{display:block;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
-.w-steps strong{display:block;font-size:16px;font-weight:700;margin-bottom:4px}
-.w-steps span{display:block;font-size:14px;color:var(--muted);line-height:1.45}
+.ob-slide{animation:obIn .45s cubic-bezier(.22,1,.36,1)}
+.ob-slide[hidden]{display:none}
+@keyframes obIn{from{opacity:0;transform:translateX(24px)}}
+.welcome.back .ob-slide{animation-name:obBack}
+@keyframes obBack{from{opacity:0;transform:translateX(-24px)}}
+.ob-reset{max-width:480px;margin:0 auto 12px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-border);font-size:16px;line-height:1.5;color:var(--ink)}
+.ob-reset b{font-family:var(--display);font-weight:600;letter-spacing:.02em}
+.ob-logo{width:76px;height:76px;border-radius:22px;box-shadow:0 18px 40px -16px rgba(20,30,80,.7);margin-bottom:22px}
+.ob-mock{max-width:420px;margin:0 auto 8px;padding:10px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);text-align:left}
+.ob-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;font-size:15px}
+.ob-row+.ob-row{margin-top:4px}
+.ob-row span{white-space:nowrap;min-width:72px;color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.ob-row em{font-style:normal;font-size:13px;color:var(--muted)}
+.ob-row:first-child{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.ob-row.late{background:color-mix(in srgb,var(--late) 14%,transparent)}.ob-row.late em{color:var(--late);font-weight:700}
+.ob-move{margin:6px 4px;padding:10px 12px;border-radius:12px;border:1px dashed var(--glass-border);font-size:14px;font-weight:700;text-align:center}
+.ob-timer{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 16px;text-align:center}
+.ob-timer b{font-family:var(--display);font-weight:400;font-size:22px}
+.ob-timer strong{font-family:var(--display);font-weight:200;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
+.ob-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--glass-border)}
+.ob-chip i{width:7px;height:7px;border-radius:50%;background:var(--done)}
+.ob-lbl{font-size:13px;color:var(--muted);margin-top:4px}
+.ob-next{font-size:13.5px;color:var(--muted);margin-top:6px}
+.ob-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:420px;margin:26px auto 0}
+.ob-nav[hidden]{display:none}
+.ob-back,.ob-skip{background:none;border:0;color:var(--muted);font-size:15px;cursor:pointer;padding:10px 4px}
+.ob-back:disabled{visibility:hidden}
+.ob-go{border-radius:999px;padding:12px 30px;font-weight:700;font-size:16px;color:#fff;border:0;background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);box-shadow:0 12px 28px -12px rgba(79,102,224,.8);cursor:pointer}
+.ob-dots{display:flex;gap:7px}
+.ob-dots i{width:7px;height:7px;border-radius:999px;background:var(--faint);transition:width .3s,background .3s}
+.ob-dots i.on{width:22px;background:var(--ink)}
+.ob-skip{position:fixed;top:max(18px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left))}
+.ob-skip[hidden]{display:none}
+body.noplan.ob-intro .hvai-fab{display:none}
 .w-ctas{display:flex;flex-direction:column;align-items:center;gap:12px}
 .w-ai{background:none;border:0;color:var(--ink);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.85}
 .w-note{margin:18px 0 0;font-size:13.5px;color:var(--muted)}
-@media (max-width:720px){.w-steps{grid-template-columns:1fr}.w-steps li{padding:14px 4px}.w-steps li+li{border-left:0;border-top:1px solid var(--glass-border)}.welcome{padding:60px 16px 100px}.w-lead{font-size:16px}.w-title{font-size:32px}}
+@media (max-width:720px){.welcome{padding:70px 16px 110px}.ob-row{font-size:14px}.ob-timer strong{font-size:44px}.w-lead{font-size:16px}.w-title{font-size:32px}}
 body:not(.jobhunt) .jobonly{display:none!important}
 body.jobhunt .userplan{display:none!important}
 /* plan builder */
@@ -788,17 +816,60 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 
 <section class="intro" id="intro" aria-label="Start">
   <div class="halo2"></div><div class="halo"></div>
-  <div class="welcome" id="welcome">
-    <p class="w-eyebrow">HV Reset</p>
-    <h1 class="w-title">Plan your day.<br>Then just do the next thing.</h1>
-    <p class="w-lead">HV Reset turns your day into simple time blocks and shows you one at a time, with a timer. You always know what to do right now.</p>
-    <ol class="w-steps">
-      <li><small>Step 1</small><strong>Make your plan</strong><span>Pick a ready plan, or add your own tasks and times.</span></li>
-      <li><small>Step 2</small><strong>Start a task</strong><span>See one task at a time, with the time left for it.</span></li>
-      <li><small>Step 3</small><strong>Running late?</strong><span>One tap moves the rest of your day.</span></li>
-    </ol>
-    <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or tell HV AI your day</button></div>
-    <p class="w-note">Free to try, no account needed. Sign in only when you want to save.</p>
+  <div class="welcome" id="welcome" aria-roledescription="introduction">
+    <div class="ob-slide" data-ob="0">
+      <img class="ob-logo" src="icon.svg" alt="" width="76" height="76">
+      <h1 class="w-title">Welcome to HV Reset</h1>
+      <p class="ob-reset"><b>Reset</b> means a fresh start. Whatever happened yesterday, today you begin again and come back stronger.</p>
+      <p class="w-lead">Plan your day, stay consistent, and get a little better every week.</p>
+      <div class="w-ctas"><button class="begin" data-ob-next>Get started</button></div>
+      <p class="w-note">Takes 30 seconds. No account needed.</p>
+    </div>
+    <div class="ob-slide" data-ob="1" hidden>
+      <p class="w-eyebrow">1 of 3</p>
+      <h1 class="w-title">Plan your day</h1>
+      <p class="w-lead">Add your tasks with a time, like study at 9 AM. Or pick a ready plan and change it.</p>
+      <div class="ob-mock">
+        <div class="ob-row"><span>9:00 AM</span><b>Study</b><em>1h 30m</em></div>
+        <div class="ob-row"><span>10:30 AM</span><b>Break</b><em>15 min</em></div>
+        <div class="ob-row"><span>10:45 AM</span><b>Practice questions</b><em>1h</em></div>
+      </div>
+    </div>
+    <div class="ob-slide" data-ob="2" hidden>
+      <p class="w-eyebrow">2 of 3</p>
+      <h1 class="w-title">One task at a time</h1>
+      <p class="w-lead">Press Start and HV Reset shows only the task in front of you, with the time left for it. Up next is always one glance away.</p>
+      <div class="ob-mock ob-timer">
+        <small class="ob-chip"><i></i>In progress</small>
+        <b>Study</b>
+        <span class="ob-lbl">Time left</span>
+        <strong>00:42:10</strong>
+        <span class="ob-next">Up next: Break at 10:30 AM</span>
+      </div>
+    </div>
+    <div class="ob-slide" data-ob="3" hidden>
+      <p class="w-eyebrow">3 of 3</p>
+      <h1 class="w-title">Running late? No stress</h1>
+      <p class="w-lead">If you start late or early, one tap moves the rest of your day to fit. The timer turns red only when time is up.</p>
+      <div class="ob-mock">
+        <div class="ob-row late"><span>Planned 9:00</span><b>Study</b><em>Started 9:20</em></div>
+        <div class="ob-move">Move the rest of my day by 20 min?</div>
+        <div class="ob-row"><span>10:50 AM</span><b>Break</b><em>moved</em></div>
+      </div>
+    </div>
+    <div class="ob-slide" data-ob="4" hidden>
+      <p class="w-eyebrow">You're ready</p>
+      <h1 class="w-title">Let's make your first plan</h1>
+      <p class="w-lead">Start from a ready plan, or add your own tasks. You can change it any time.</p>
+      <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or just tell HV AI your day</button></div>
+      <p class="w-note">Free to try, no account needed. Sign in only when you want to save.</p>
+    </div>
+    <div class="ob-nav" id="obNav">
+      <button class="ob-back" data-ob-back>Back</button>
+      <div class="ob-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <button class="ob-go" data-ob-next>Next</button>
+    </div>
+    <button class="ob-skip" data-ob-skip>Skip</button>
   </div>
   <div class="intro-inner">
     <p class="intro-date" id="introDate"></p>
@@ -1898,6 +1969,21 @@ function openAll(){ const sc=$("modal").scrollTop; modal('<h3>All steps</h3>'+st
 function modal(html,closeLabel){ modalKind=null; const m=$("modal"); m.innerHTML=html; let a=m.querySelector(".actions"); if(!a){ a=document.createElement("div"); a.className="actions"; m.appendChild(a); }
   const c=document.createElement("button"); c.className="secondary"; c.setAttribute("data-close",""); c.textContent=closeLabel||"Close"; a.insertBefore(c,a.firstChild);
   $("scrim").classList.add("open"); const f=a.querySelector(".primary")||c; f.focus(); }
+/* ---------- first visit: a short step-by-step introduction ---------- */
+let obStep=0;
+try{ if(localStorage.getItem("hr-onboard-seen")==="1") obStep=4; }catch(e){}
+function obShow(n,dir){
+  obStep=Math.max(0,Math.min(4,n)); const w=$("welcome"); if(!w) return;
+  w.classList.toggle("back",dir<0);
+  w.querySelectorAll(".ob-slide").forEach(sl=>{ sl.hidden=+sl.dataset.ob!==obStep; });
+  $("obNav").hidden=obStep===0||obStep===4; w.querySelector("[data-ob-back]").disabled=obStep<=1;
+  w.querySelector(".ob-go").textContent=obStep===3?"Let's plan":"Next";
+  w.querySelectorAll(".ob-dots i").forEach((d,i)=>d.classList.toggle("on",i===obStep));
+  w.querySelector("[data-ob-skip]").hidden=obStep===0||obStep===4;
+  document.body.classList.toggle("ob-intro",obStep<4);                 // HV AI comes back on the last step
+  if(obStep===4){ try{ localStorage.setItem("hr-onboard-seen","1"); }catch(e){} }
+}
+
 /* ---------- plan builder: make your own day (every day, or just today) ---------- */
 const PB_STARTS={
   study:{name:"Study day",sub:"Two study blocks, lunch and a revision.",rows:[["09:00","Study: hardest subject",90,"work"],["10:30","Break",15,"rest"],["10:45","Practice questions",75,"work"],["12:00","Lunch",45,"meal"],["13:00","Revise notes",45,"work"]]},
@@ -2154,6 +2240,9 @@ document.addEventListener("click",e=>{
     $("pbList").insertAdjacentHTML("beforeend",pbRowHTML(PB.rows[PB.rows.length-1])); const n=$("pbList").lastElementChild.querySelector(".pn"); n.focus(); return; }
   if(t.hasAttribute("data-pbdel")){ t.closest(".pb-row").remove(); return; }
   if(t.hasAttribute("data-pbsave")) return pbSave();
+  if(t.hasAttribute("data-ob-next")) return obShow(obStep+1,1);
+  if(t.hasAttribute("data-ob-back")) return obShow(obStep-1,-1);
+  if(t.hasAttribute("data-ob-skip")) return obShow(4,1);
   if(t.hasAttribute("data-report")){ setDrawer(false); return openReport(); }
   if(t.dataset.rp){ RP.mode=t.dataset.rp; return renderReport(); }
   if(t.dataset.rpmove){ RP.key=RP.mode==="day"?addDays(RP.key,+t.dataset.rpmove):RP.mode==="week"?addDays(RP.key,7*t.dataset.rpmove):monthShift(RP.key,+t.dataset.rpmove); return renderReport(); }
@@ -2179,6 +2268,10 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target&&e.target.closest&&(e.target.closest(".hvai,#tpop,#scrim")||/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName))) return;   // typing in HV AI or a form: Enter belongs there
   if(e.key==="Escape"&&$("tpop")){ pickClose(); return; }
   if(e.key==="Escape"){ closeModal(); setDrawer(false); return; }
+  if(document.body.classList.contains("noplan")&&!$("scrim").classList.contains("open")&&obStep<4){
+    if(e.key==="Enter"||e.key==="ArrowRight"){ e.preventDefault(); obShow(obStep+1,1); return; }
+    if(e.key==="ArrowLeft"){ e.preventDefault(); obShow(obStep-1,-1); return; }
+  }
   if(e.key==="Enter"&&!document.body.classList.contains("in-room")&&!$("scrim").classList.contains("open")){ e.preventDefault(); begin(); return; }
   if(e.key==="Enter"&&document.body.classList.contains("in-room")&&!$("scrim").classList.contains("open")&&!$("drawer").classList.contains("open")&&!/TEXTAREA|BUTTON|INPUT/.test((document.activeElement||{}).tagName||"")){ const c=liveCard(); const b=c&&c.querySelector(".s-actions .primary"); if(b){ e.preventDefault(); b.click(); } }
 });
@@ -2191,6 +2284,7 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden) hvRefres
 window.addEventListener("focus",()=>hvRefresh());
 window.addEventListener("storage",e=>{ if(e.key===HV_LINBOX) hvRefresh(); });
 if(HVC()) HVC().onChange(()=>hvRefresh());
+obShow(obStep,1);
 applyPhase(); setInterval(applyPhase,60000);
 soundLabel(); rollTo($("bigTime"),timerInfo().t); render(false); tickTimers();
 setInterval(tickTimers,1000);
