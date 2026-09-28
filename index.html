@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790650000">
+<meta name="build" content="1790660000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -118,6 +118,9 @@ body.gated .intro,body.gated .room,body.gated .hvai-fab,body.gated .hvai{visibil
 @keyframes scin{from{opacity:0;transform:translate(-50%,16px)}}
 .savepill{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));z-index:74;display:flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-size:14px;color:var(--ink);cursor:pointer}
 .savepill i{width:8px;height:8px;border-radius:50%;background:#E0A83E}
+body.in-room .savepill{display:none}
+.accbtn{position:relative}
+body.unsaved #accBtn::after{content:"";position:absolute;top:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:#E0A83E;border:2px solid var(--sky1)}
 body.gated .savecard,body.gated .savepill,body:has(#drawer.open) .savecard,body:has(#drawer.open) .savepill{display:none}
 .accwrap{position:fixed;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));z-index:80}
 .accwrap[hidden],.accmenu[hidden]{display:none}
@@ -225,6 +228,7 @@ body[data-timer="late"] #miniTime small{color:var(--late)}
 .card[data-state="late"] .c-time{color:var(--late)!important;font-weight:700}
 :root{--late:#F0524A}
 :root[data-theme="light"]{--late:#D63A31}
+.linkbtn{background:none;border:0;padding:0;margin-left:4px;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer}
 .started-badge{align-self:flex-start;width:fit-content;display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 12px;border-radius:999px;font-size:13.5px;font-weight:700;background:color-mix(in srgb,var(--done) 22%,transparent);border:1px solid color-mix(in srgb,var(--done) 55%,transparent)}
 .started-badge i{width:8px;height:8px;border-radius:50%;background:var(--done);animation:pulse 1.6s ease-in-out infinite}
 .startbtn{align-self:flex-start;width:fit-content;margin-top:12px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 18px;font-weight:700;font-size:15px;border:1px solid color-mix(in srgb,var(--done) 60%,transparent);background:color-mix(in srgb,var(--done) 18%,transparent);color:var(--ink);cursor:pointer}
@@ -995,7 +999,7 @@ function startAt(p,hhmm){
 }
 function niceDate(key){ const [y,m,dd]=key.split("-").map(Number); const d=new Date(y,m-1,dd); return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+dd+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]; }
 const toMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m;};
-const fmt=m=>{m=((m%1440)+1440)%1440;let h=Math.floor(m/60),mi=m%60;const ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+pad(mi)+" "+ap;};
+const fmt=m=>{m=Math.round(m);m=((m%1440)+1440)%1440;let h=Math.floor(m/60),mi=m%60;const ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+pad(mi)+" "+ap;};
 const DAYN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 /* ---------- state ---------- */
@@ -1143,6 +1147,7 @@ function acctRow(){ accRender();
 /* Guests: the first change brings up a small "sign in to save" card; after "Not now", a pill stays. */
 function guestNudge(){
   const on=!AC.uid&&AC.guestDirty, card=$("saveCard"), pill=$("savePill");
+  document.body.classList.toggle("unsaved",on);
   if(!on){ card.hidden=true; pill.hidden=true; return; }
   const room=document.body.classList.contains("in-room");            // on the start screen only the small pill, so Start stays free
   if(!AC.nudged&&room){ AC.nudged=true; card.hidden=false; pill.hidden=true; } else if(card.hidden) pill.hidden=false;
@@ -1486,8 +1491,15 @@ function toggleSound(){
 /* ---------- timers ---------- */
 function hms(s){ s=Math.max(0,Math.floor(s)); return pad(Math.floor(s/3600))+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60); }
 function atMin(base,min){ const d=new Date(base.getFullYear(),base.getMonth(),base.getDate()); return new Date(d.getTime()+min*60000); }
+/* a started task runs for its own length from the moment you started it */
+function startedMin(key,id){ const ds=dayState(key), t=ds.started&&ds.started[id]; if(!t) return null; const d=new Date(t); if(keyOf(d)!==key) return null; return d.getHours()*60+d.getMinutes()+d.getSeconds()/60; }
 function timerInfo(){
   const n=new Date(), tk=keyOf(n), bl=timeline(tk).blocks, cur=currentBlock(bl);
+  if(cur&&startedMin(tk,cur.id)!=null){
+    const en=atMin(n,startedMin(tk,cur.id)+cur.d);
+    if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title+" (started)",mini:"left, started",line:"Started. One task, just this one.",st:"live"};
+    return {t:hms((n-en)/1000),cap:"over time on "+cur.title,mini:"over time",line:"Time is up for this task. Finish it, or tap Done and move on.",st:"late"};
+  }
   if(cur){
     const st=atMin(n,cur.s), en=atMin(n,cur.e);
     if(n<st) return {t:hms((st-n)/1000),cap:"until "+fmt(cur.s)+", "+cur.title,mini:"until start",line:"You still have time.",st:"before"};
@@ -1558,7 +1570,11 @@ function cardInner(v){
   }
   const cur=v.cur, rest=cur.kind==="rest"||cur.kind==="meal"||cur.kind==="free";
   let st="live", timeTxt, lateHTML="";
-  if(!v.today){ st="idle"; timeTxt=fmt(cur.s)+" to "+fmt(cur.e)+". Viewing another day's plan."; }
+  const sm=v.today?startedMin(selKey,cur.id):null;
+  if(!v.today){ st="idle"; timeTxt=fmt(cur.s)+" to "+fmt(cur.e)+". You're looking at "+(selKey>keyOf(new Date())?"a later":"an earlier")+" day. <button class=\"linkbtn\" data-day=\""+keyOf(new Date())+"\">Back to today</button>"; }
+  else if(sm!=null){ const endM=sm+cur.d;
+    if(v.nm<=endM) timeTxt='Started. <span class="count" data-cd="end" data-t="'+endM+'"></span> left, until '+fmt(endM);
+    else { st="late"; const ov=Math.max(1,Math.round(v.nm-endM)); timeTxt=ov+(ov===1?" minute":" minutes")+" over time. Tap Done when you finish."; } }
   else if(v.nm<cur.s){ st="idle"; timeTxt='Starts in <span class="count" data-cd="start" data-t="'+cur.s+'"></span>. You can start now.'; }
   else if(v.nm<=cur.e){ timeTxt='<span class="count" data-cd="end" data-t="'+cur.e+'"></span> left, until '+fmt(cur.e); }
   else { st="late"; timeTxt=Math.round(v.nm-cur.e)+" minutes late. Was due by "+fmt(cur.e)+".";
@@ -1573,6 +1589,10 @@ function cardInner(v){
     zone='<div class="stepzone"><div class="s-meta"><span>Minimum version</span><span class="dots" aria-hidden="true"><i class="cur"></i></span></div>'+
       '<div class="step-card '+anim+'" id="stepCard"><div class="s-body" id="sBody"><h2 class="s-head">Just do this</h2><ol class="s-pts"><li>'+esc(cur.minimum||"Do only the first step.")+'</li></ol><p class="s-note">Small is fine. It still counts.</p></div></div>'+
       counterHTML(cur,selKey)+'<div class="s-actions"><button class="secondary s-backbtn" data-exitmin="'+cur.id+'" aria-label="Back to full steps">Back</button><button class="primary" data-mindone="'+cur.id+'">'+CHECK+'Done, next block</button></div></div>';
+  } else if(n===0){
+    zone='<div class="stepzone"><div class="s-meta"><span>'+esc(KIND[cur.kind]||"Block")+', '+cur.d+' min</span></div>'+
+      '<div class="step-card '+anim+'" id="stepCard"><div class="s-body" id="sBody"><h2 class="s-head">'+esc(cur.title)+'</h2><p class="s-note">'+esc(cur.why)+'</p></div></div>'+
+      counterHTML(cur,selKey)+'<div class="s-actions"><button class="primary" data-done="'+cur.id+'">'+CHECK+'Done, next block</button></div></div>';
   } else if(j>=0){
     zone='<div class="stepzone"><div class="s-meta"><span>Step '+(j+1)+' of '+n+'</span>'+dots+'</div>'+
       '<div class="step-card '+anim+'" id="stepCard">'+slideHTML(cur,j)+'</div>'+
@@ -1596,7 +1616,7 @@ function cardInner(v){
   return {state:st,html:'<div class="focus scroll">'+
     '<div class="c-kind"><span class="pulse"></span>'+(v.today?"Now":"Viewing")+", "+KIND[cur.kind].toLowerCase()+'</div>'+
     '<h1 class="c-title">'+esc(cur.title)+'</h1><div class="c-time">'+timeTxt+'</div>'+
-    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>In progress since '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+'</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>'):'')+lateHTML+
+    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>Started at '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+' · '+cur.d+' min</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>'):'')+lateHTML+
     zone+
     (chips?'<div class="chips">'+chips+'</div>':'')+
     '<div class="f-links"><button data-toggle="all">See all steps</button><button data-toggle="more">Why, tips and more</button></div>'+
@@ -1780,6 +1800,7 @@ function begin(){
   if(!hasAnyPlan()) return openPlanner("new");
   const first=!started; started=true;
   document.body.classList.add("in-room"); if(ACC) guestNudge();
+  { const tk=keyOf(new Date()), c=currentBlock(timeline(tk).blocks); if(c&&selKey===tk&&nowMin()>=c.s-5){ const ds=dayState(tk); ds.started=ds.started||{}; if(!ds.started[c.id]){ ds.started[c.id]=Date.now(); save(); } } }
   if(first||!liveCard()) renderCard(true); else renderCard(false);
   showQuote(false);
   setTimeout(()=>{ audioInit(); if(Snd.ctx&&Snd.ctx.state==="suspended") Snd.ctx.resume(); chime(); if(Snd.on) ambientStart(); },60);
@@ -1828,7 +1849,7 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-confirmshift")){ const tk=keyOf(new Date()); state.skip=(state.skip||[]).filter(k=>k!==tk).concat([tk]); selKey=tk; save(); closeModal(); setDrawer(false); render(true); toast("Plan moved. It starts tomorrow."); return; }
   if(t.dataset.unshift){ state.skip=(state.skip||[]).filter(k=>k!==t.dataset.unshift); save(); render(true); toast("Back on. Today's plan is active."); return; }
   if(t.hasAttribute("data-open-drawer")){ setDrawer(true); return; }
-  if(t.dataset.start){ const ds=dayState(selKey); ds.started=ds.started||{}; ds.started[t.dataset.start]=Date.now(); save(); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); toast("Started. One task, just this one."); return; }
+  if(t.dataset.start){ const ds=dayState(selKey); ds.started=ds.started||{}; ds.started[t.dataset.start]=Date.now(); save(); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); tickTimers(); toast("Started. The timer now runs for this task."); return; }
   if(t.dataset.plan){ if(t.dataset.plan==="edit") setDrawer(false); return openPlanner(t.dataset.plan); }
   if(t.dataset.pbstart){ const st=PB_STARTS[t.dataset.pbstart]; PB.rows=st.rows.map(([tt,title,d,kind])=>({t:tt,title,d,kind})); return pbEdit(); }
   if(t.hasAttribute("data-pbadd")){ pbRead(); const l=PB.rows[PB.rows.length-1]; const tt=l&&/^\d\d:\d\d$/.test(l.t)?hhmmOf(toMin(l.t)+l.d):"09:00"; PB.rows.push({t:tt,title:"",d:60,kind:"work"});
