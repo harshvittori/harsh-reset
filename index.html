@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790660000">
+<meta name="build" content="1790670000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -228,6 +228,16 @@ body[data-timer="late"] #miniTime small{color:var(--late)}
 .card[data-state="late"] .c-time{color:var(--late)!important;font-weight:700}
 :root{--late:#F0524A}
 :root[data-theme="light"]{--late:#D63A31}
+.intro-next{margin:14px auto 22px;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:15px;color:var(--muted)}
+.intro-next:empty{display:none}
+.intro-next b{color:var(--ink);font-weight:700}
+.in-now{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-border)}
+.in-now i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.in-now i.on{background:var(--done);animation:pulse 1.6s ease-in-out infinite}
+.upnext{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-top:10px;padding:9px 14px;border-radius:14px;background:color-mix(in srgb,var(--sky1) 40%,transparent);border:1px solid var(--glass-border);font-size:14.5px;align-self:stretch}
+.upnext .un-l{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.upnext .count{font-weight:700}
+.tb.upnext-tb .tag{color:var(--accent);font-weight:700}
 .linkbtn{background:none;border:0;padding:0;margin-left:4px;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer}
 .started-badge{align-self:flex-start;width:fit-content;display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 12px;border-radius:999px;font-size:13.5px;font-weight:700;background:color-mix(in srgb,var(--done) 22%,transparent);border:1px solid color-mix(in srgb,var(--done) 55%,transparent)}
 .started-badge i{width:8px;height:8px;border-radius:50%;background:var(--done);animation:pulse 1.6s ease-in-out infinite}
@@ -705,6 +715,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <div class="bigtime" id="bigTime" role="timer" aria-live="off"></div>
     <p class="intro-cap" id="introCap"></p>
     <p class="intro-line" id="introLine">You still have time.</p>
+    <div class="intro-next" id="introNext"></div>
     <button class="begin" id="beginBtn">Start</button>
     <p class="intro-hint">or press Enter</p>
     <div class="intro-sound"><button class="pill" data-look aria-label="Change look"></button><button class="pill" data-sound aria-label="Sound on or off"></button></div>
@@ -1531,10 +1542,27 @@ function rollTo(el,str){
     const nv=document.createElement("span"); nv.className="v in"; nv.textContent=c; cur.className="v out"; slot.appendChild(nv);
     setTimeout(()=>{ if(cur.parentNode) cur.remove(); },750); });
 }
+/* Now and up next: the running task, the next one and how long until it starts */
+const inTxt=m=>{ m=Math.max(0,m); const h=Math.floor(m/60), mm=Math.ceil(m%60); return h?h+"h "+(mm?mm+"m":""):(m<1?"less than a minute":mm+" min"); };
+function upNext(key){ const bl=timeline(key).blocks, cur=currentBlock(bl); return {cur,next:cur?bl.find(b=>b.i>cur.i&&!b.done&&!b.skipped)||null:null}; }
+/* when the next task really starts: its own time, or when the running task ends if that is later */
+function nextAt(key,cur,next){ const sm=cur?startedMin(key,cur.id):null; return Math.max(next.s, sm!=null?sm+cur.d:0); }
+function nextHTML(cur,next,nm){
+  if(!next) return '<div class="upnext"><span class="un-l">Up next</span><span>Nothing. This is the last task today.</span></div>';
+  const at=nextAt(selKey,cur,next);
+  return '<div class="upnext"><span class="un-l">Up next</span><span><b>'+esc(next.title)+'</b> at '+fmt(at)+(at>next.s?' (right after this)':'')+
+    (at>nm?' · in <span class="count" data-cd="start" data-t="'+at+'"></span>':', as soon as you finish this')+'</span></div>';
+}
+function introNextHTML(){
+  const tk=keyOf(new Date()), {cur,next}=upNext(tk); if(!cur) return "";
+  const nm=nowMin(), started=startedMin(tk,cur.id)!=null, on=started||nm>=cur.s;
+  return '<span class="in-now"><i class="'+(started?"on":"")+'"></i>'+(on?"Now":"First")+': <b>'+esc(cur.title)+'</b>'+(started?" · ongoing":"")+'</span>'+
+    (next?(()=>{ const at=nextAt(tk,cur,next); return '<span class="in-next">Up next: <b>'+esc(next.title)+'</b> at '+fmt(at)+(at>nm?' · in '+inTxt(at-nm):', as soon as you finish this')+'</span>'; })():'<span class="in-next">Last task today</span>');
+}
 function tickCountdowns(){
   document.querySelectorAll("[data-cd]").forEach(el=>{ const left=Math.max(0,+el.dataset.t-nowMin()); const h=Math.floor(left/60), m=Math.floor(left%60), s=Math.floor((left*60)%60); el.textContent= h ? h+"h "+m+"m" : (left>=1 ? Math.ceil(left)+" min" : Math.max(1,s)+" sec"); });
 }
-function tickTimers(){ const i=timerInfo(); if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||""; if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
+function tickTimers(){ const i=timerInfo(); { const h=introNextHTML(), el=$("introNext"); if(el&&el.innerHTML!==h) el.innerHTML=h; } if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||""; if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
   if($("introCap").textContent!==i.cap) $("introCap").textContent=i.cap; if($("introLine").textContent!==i.line) $("introLine").textContent=i.line; $("bigTime").setAttribute("aria-label",i.t+", "+i.cap); tickCountdowns(); }
 
 /* ---------- card ---------- */
@@ -1616,7 +1644,7 @@ function cardInner(v){
   return {state:st,html:'<div class="focus scroll">'+
     '<div class="c-kind"><span class="pulse"></span>'+(v.today?"Now":"Viewing")+", "+KIND[cur.kind].toLowerCase()+'</div>'+
     '<h1 class="c-title">'+esc(cur.title)+'</h1><div class="c-time">'+timeTxt+'</div>'+
-    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>Started at '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+' · '+cur.d+' min</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>'):'')+lateHTML+
+    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>Ongoing · started at '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+' · '+cur.d+' min</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>')+nextHTML(cur,v.blocks.find(b=>b.i>cur.i&&!b.done&&!b.skipped),v.nm):'')+lateHTML+
     zone+
     (chips?'<div class="chips">'+chips+'</div>':'')+
     '<div class="f-links"><button data-toggle="all">See all steps</button><button data-toggle="more">Why, tips and more</button></div>'+
@@ -1666,10 +1694,11 @@ function renderDrawer(){
   const v=cardView(), ds=dayState(selKey);
   $("track").innerHTML=v.blocks.map(b=>{
     const started=!b.done&&!b.skipped&&ds.started&&ds.started[b.id];
+    const isNext=v.today&&v.cur&&!b.done&&!b.skipped&&b.id===((v.blocks.find(x=>x.i>v.cur.i&&!x.done&&!x.skipped))||{}).id;
     const st=b.done?"done":b.skipped?"skipped":(v.cur&&b.id===v.cur.id?((v.today&&v.nm>b.e)?"late":"current"):"");
-    let tag=KIND[b.kind]; if(b.done){ const dt=new Date(ds.done[b.id]); tag=b.skipped==="min"?"Minimum version":"Done at "+fmt(dt.getHours()*60+dt.getMinutes()); } else if(b.skipped) tag="Skipped"; else if(started) tag=st==="late"?"In progress, late":"In progress"; else if(st==="late") tag="Late"; else if(st==="current") tag="Now";
+    let tag=KIND[b.kind]; if(b.done){ const dt=new Date(ds.done[b.id]); tag=b.skipped==="min"?"Minimum version":"Done at "+fmt(dt.getHours()*60+dt.getMinutes()); } else if(b.skipped) tag="Skipped"; else if(started) tag=st==="late"?"In progress, late":"In progress"; else if(isNext){ const at=nextAt(selKey,v.cur,b); tag="Up next"+(at>v.nm?" · in "+inTxt(at-v.nm):""); } else if(st==="late") tag="Late"; else if(st==="current") tag="Now";
     const open=openTrack===b.id;
-    return '<li class="tb '+st+(started?" inprogress":"")+'"><span class="node"></span><button class="tb-btn" data-open="'+b.id+'" aria-expanded="'+open+'"><span><span class="n">'+esc(b.title)+'</span><span class="tag">'+esc(tag)+'</span></span><span class="t">'+fmt(b.s)+'</span></button>'+
+    return '<li class="tb '+st+(started?" inprogress":"")+(isNext?" upnext-tb":"")+'"><span class="node"></span><button class="tb-btn" data-open="'+b.id+'" aria-expanded="'+open+'"><span><span class="n">'+esc(b.title)+'</span><span class="tag">'+esc(tag)+'</span></span><span class="t">'+fmt(b.s)+'</span></button>'+
       (open?'<div class="tb-detail"><p><b>Finish line:</b> '+esc(b.finish)+'</p>'+stepsHTML(b,selKey)+snipsHTML(b)+'<div class="actions">'+(b.done||b.skipped?'<button class="secondary" data-undo="'+b.id+'">Wapas kholo</button>':'<button class="secondary" data-done="'+b.id+'">Mark as done</button>')+'</div></div>':'')+'</li>';
   }).join("");
 }
