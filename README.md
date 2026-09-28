@@ -7,7 +7,9 @@ Your daily plan and reset, paired with [HV Vault](https://harshvittori.github.io
 - A new visitor sees a short welcome that explains HV Reset (plan your day in blocks, press Start, fell behind? one tap moves the day) instead of a timer. No plan means no timer.
 - **Make my plan** opens the plan builder: start from a ready plan (Study day, Work day, Job search day) or from scratch, then set each block's start time, task, minutes and type (Focus, Meal, Break, Free time). Save it for every day, or only for today. HV AI can also build the plan from one sentence.
 - Blocks that were already over when the plan was made don't count as late; a plan made in the evening starts the next day.
-- The timer turns red when a task's time is up. **Start task** marks it In progress, on the card and in Full day.
+- Pressing **Start** (or **Start task** on the card) starts the current task: it shows "Started at 10:05 AM · 15 min", and the timer runs for the task's own length from that moment. When that time is up, the timer turns red ("over time"), on the start screen too. A task not started by its end time also turns red ("late"). Full day shows In progress.
+- Breaks and meals have no steps: the card just shows the break and **Done, next block**.
+- Looking at another day shows **Back to today**.
 - The built-in job-hunt program (Day 1, Day 2, job days) belongs to the owner's account only.
 
 ## Your account
