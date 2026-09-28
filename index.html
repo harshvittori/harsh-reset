@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790830000">
+<meta name="build" content="1790840000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -369,6 +369,14 @@ body.jobhunt .intro-links [data-qadd]{display:none}
 .ab-ready{text-align:center}.ab-ready h3{font-size:26px}.ab-note{font-size:13.5px;color:var(--muted);margin:0 0 6px}
 .ab-badge{width:58px;height:58px;margin:4px auto 12px;border-radius:50%;display:grid;place-items:center;font-size:28px;color:#fff;background:linear-gradient(135deg,#4F66E0,#7C5CE0);box-shadow:0 14px 30px -12px rgba(79,102,224,.8)}
 @media (max-width:520px){.ab-occ{grid-template-columns:1fr}}
+.ob-sign{margin:26px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ob-gbtn{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:9px 18px 9px 13px;font-size:14.5px;font-weight:700;color:var(--ink);background:var(--glass);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 var(--glass-hi);cursor:pointer}
+.ob-gbtn svg{background:#fff;border-radius:50%;padding:3px;width:22px;height:22px;box-sizing:border-box}
+.ob-gbtn:hover{background:var(--glass-hi)}
+.ob-perks{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:13px;color:var(--muted)}
+.ob-perks li::before{content:"\2713";margin-right:5px;font-weight:700;color:var(--done)}
+.ob-free{margin:0;font-size:12.5px;color:var(--faint)}
+.ob-done{margin:0;font-size:13.5px;color:var(--muted)}
 .w-link{background:none;border:0;padding:0;font:inherit;color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .run-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.run-row .started-badge{margin-top:10px}
 .started-badge.paused{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}.started-badge.paused i{background:var(--warn);animation:none}
@@ -893,7 +901,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
       <h1 class="w-title">Let's make your first plan</h1>
       <p class="w-lead">Start from a ready plan, or add your own tasks. You can change it any time.</p>
       <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or just tell HV AI your day</button></div>
-      <p class="w-note" id="obSign">Free to try, no account needed. <button class="w-link" data-gate="in">Sign in with Google</button> to save your plan, unlock your own dashboard, and let HV AI know you by name.</p>
+      <div class="ob-sign" id="obSign"><button class="ob-gbtn" data-gate="in"><svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Continue with Google</span></button><ul class="ob-perks"><li>Saves your plan</li><li>Your own dashboard</li><li>HV AI knows your name</li></ul><p class="ob-free">Free to try. No account needed.</p></div>
     </div>
     <div class="ob-nav" id="obNav">
       <button class="ob-back" data-ob-back>Back</button>
@@ -2107,7 +2115,7 @@ function obShow(n,dir){
   w.classList.toggle("back",dir<0);
   w.querySelectorAll(".ob-slide").forEach(sl=>{ sl.hidden=+sl.dataset.ob!==obStep; });
   { const r=$("obReady"), f=typeof aboutFirst==="function"&&AC.uid?aboutFirst():""; if(r) r.textContent="You're ready"+(f?", "+f:"");
-    const sg=$("obSign"); if(sg){ sg.dataset.o=sg.dataset.o||sg.innerHTML; if(!AC.uid) sg.innerHTML=sg.dataset.o; } if(sg&&AC.uid) sg.textContent="Signed in"+(f?" as "+f:"")+". Your plan, dashboard and HV AI chats save to your account."; }
+    const sg=$("obSign"); if(sg){ sg.dataset.o=sg.dataset.o||sg.innerHTML; if(!AC.uid) sg.innerHTML=sg.dataset.o; } if(sg&&AC.uid) sg.innerHTML='<p class="ob-done">&#10003; Signed in'+(f?" as "+esc(f):"")+'. Your plan and dashboard are saved.</p>'; }
   $("obNav").hidden=obStep===0||obStep===OB_LAST; w.querySelector("[data-ob-back]").disabled=obStep<=1;
   w.querySelector(".ob-go").textContent=obStep===OB_LAST-1?"Let's plan":"Next";
   w.querySelectorAll(".ob-dots i").forEach((d,i)=>d.classList.toggle("on",i===obStep));
