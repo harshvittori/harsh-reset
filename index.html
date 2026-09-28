@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790640000">
+<meta name="build" content="1790650000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -174,7 +174,7 @@ body.jobhunt .userplan{display:none!important}
 .pb-row .x{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0}
 .pb-head{display:grid;grid-template-columns:128px 1fr 74px 104px 30px;gap:6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 2px}
 :root[data-theme="dark"] .pb-row input,:root[data-theme="dark"] .pb-row select{color-scheme:dark}
-body:has(#scrim.open) .hvai-fab,body:has(#scrim.open) .accwrap,body:has(#scrim.open) .savepill{opacity:0;pointer-events:none}
+body:has(.hvai:not([hidden])) .accwrap,body:has(#scrim.open) .hvai-fab,body:has(#scrim.open) .accwrap,body:has(#scrim.open) .savepill{opacity:0;pointer-events:none}
 .modal:has(.pb-list){max-width:640px}
 .modal .pb-list{padding:0;margin-left:0}
 .pb-add{border:1px dashed var(--glass-border);background:none;color:var(--ink);border-radius:12px;padding:10px;width:100%;cursor:pointer;font-size:14.5px}
@@ -1338,7 +1338,7 @@ function hvaiMount(){
     getSettings:()=>HVAIX.pickConfig(HV.data&&HV.data.settings||{}),   // the site's built-in AI: no key needed
     getPlan:()=>hvaiPlan(keyOf(new Date())),
     getContext:()=>HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date()))),
-    userName:()=>(HV.data&&HV.data.settings&&HV.data.settings.myName)||"Harsh",
+    userName:()=>(AC.uid&&HV.data&&HV.data.settings&&HV.data.settings.myName)||"",
     isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
     fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
     execute:hvaiExecute});
