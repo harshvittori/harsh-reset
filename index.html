@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790630000">
+<meta name="build" content="1790640000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -118,7 +118,7 @@ body.gated .intro,body.gated .room,body.gated .hvai-fab,body.gated .hvai{visibil
 @keyframes scin{from{opacity:0;transform:translate(-50%,16px)}}
 .savepill{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));z-index:74;display:flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-size:14px;color:var(--ink);cursor:pointer}
 .savepill i{width:8px;height:8px;border-radius:50%;background:#E0A83E}
-body.gated .savecard,body.gated .savepill{display:none}
+body.gated .savecard,body.gated .savepill,body:has(#drawer.open) .savecard,body:has(#drawer.open) .savepill{display:none}
 .accwrap{position:fixed;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));z-index:80}
 .accwrap[hidden],.accmenu[hidden]{display:none}
 .bar-right .accwrap{position:relative;top:auto;right:auto;z-index:30}
@@ -144,6 +144,45 @@ body.gated .accwrap{display:none}
 .acct{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px;color:var(--muted);margin-top:6px}
 .acct:empty{display:none}
 .acct span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.welcome{display:none;position:relative;max-width:620px;padding:0 20px;text-align:center}
+body.noplan .welcome{display:block;animation:wIn .7s cubic-bezier(.22,1,.36,1)}
+body.noplan .intro-inner{display:none}
+body.noplan .intro{display:flex;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px 0}
+@keyframes wIn{from{opacity:0;transform:translateY(14px)}}
+.w-eyebrow{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.w-title{font-family:var(--display);font-weight:300;font-size:clamp(34px,5vw,54px);line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+.w-lead{font-size:17px;line-height:1.55;color:var(--muted);margin:0 auto 26px;max-width:520px}
+.w-steps{list-style:none;padding:0;margin:0 auto 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left}
+.w-steps li{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:18px;background:var(--glass);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.w-steps b{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:var(--done);color:#fff}
+.w-steps strong{display:block;font-size:15px;margin-bottom:2px}
+.w-steps span{font-size:13.5px;color:var(--muted);line-height:1.4}
+.w-ctas{display:flex;flex-direction:column;align-items:center;gap:12px}
+.w-ai{background:none;border:0;color:var(--ink);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.85}
+.w-note{margin:18px 0 0;font-size:13.5px;color:var(--muted)}
+@media (max-width:720px){.w-steps{grid-template-columns:1fr}.welcome{padding:60px 16px 100px}.w-lead{font-size:16px}.w-title{font-size:32px}}
+body:not(.jobhunt) .jobonly{display:none!important}
+body.jobhunt .userplan{display:none!important}
+/* plan builder */
+.pb-starts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 4px}
+.pb-start{text-align:left;padding:14px;border-radius:16px;border:1px solid var(--glass-border);background:var(--glass);cursor:pointer;color:var(--ink)}
+.pb-start:hover{border-color:var(--done)}
+.pb-start b{display:block;font-size:15.5px;margin-bottom:3px}.pb-start span{font-size:13px;color:var(--muted);line-height:1.4}
+.pb-list{list-style:none;padding:0;margin:12px 0 8px;display:flex;flex-direction:column;gap:8px}
+.pb-row{display:grid;grid-template-columns:128px 1fr 74px 104px 30px;gap:6px;align-items:center}
+.pb-row input,.pb-row select{width:100%;min-width:0;border-radius:10px;border:1px solid var(--glass-border);background:color-mix(in srgb,var(--sky1) 70%,transparent);color:var(--ink);padding:9px 8px;font:inherit;font-size:14.5px}
+.pb-row .x{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0}
+.pb-head{display:grid;grid-template-columns:128px 1fr 74px 104px 30px;gap:6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 2px}
+:root[data-theme="dark"] .pb-row input,:root[data-theme="dark"] .pb-row select{color-scheme:dark}
+body:has(#scrim.open) .hvai-fab,body:has(#scrim.open) .accwrap,body:has(#scrim.open) .savepill{opacity:0;pointer-events:none}
+.modal:has(.pb-list){max-width:640px}
+.modal .pb-list{padding:0;margin-left:0}
+.pb-add{border:1px dashed var(--glass-border);background:none;color:var(--ink);border-radius:12px;padding:10px;width:100%;cursor:pointer;font-size:14.5px}
+.pb-when{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;font-size:14.5px}
+.pb-when label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.pb-err{color:#D0584C;font-size:14px;margin:8px 0 0}
+.pb-tip{font-size:13.5px;color:var(--muted);margin:10px 0 0}
+@media (max-width:620px){.pb-starts{grid-template-columns:1fr}.pb-head{display:none}.pb-row{grid-template-columns:132px 1fr 30px;grid-template-areas:"t n x" "d k k"}.pb-row .pt{grid-area:t}.pb-row .pn{grid-area:n}.pb-row .pd{grid-area:d}.pb-row .pk{grid-area:k}.pb-row .x{grid-area:x}.pb-row{padding-bottom:8px;border-bottom:1px solid var(--glass-border)}}
 .intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;transition:opacity .6s cubic-bezier(.22,1,.36,1),filter .6s,transform .6s cubic-bezier(.22,1,.36,1)}
 body.in-room .intro{opacity:0;filter:blur(18px);transform:scale(1.05);pointer-events:none}
 .halo{position:absolute;width:min(62vw,760px);aspect-ratio:1;border-radius:50%;left:50%;top:50%;translate:-50% -50%;
@@ -178,6 +217,19 @@ body.in-room .room{opacity:1;pointer-events:auto}
 .hair{position:fixed;top:0;left:0;right:0;height:3px;z-index:6;background:rgba(255,255,255,.06)}
 .hair i{display:block;height:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,var(--accent),var(--done));transition:transform 1.2s cubic-bezier(.22,1,.36,1);box-shadow:0 0 12px var(--done)}
 .bar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+/* time is up: the timer turns red */
+body[data-timer="late"] .bigtime{color:var(--late);text-shadow:0 0 40px color-mix(in srgb,var(--late) 45%,transparent);transition:color .6s}
+body[data-timer="late"] #introCap{color:var(--late);font-weight:700}
+body[data-timer="late"] #miniTime{color:var(--late);border-color:color-mix(in srgb,var(--late) 55%,transparent)}
+body[data-timer="late"] #miniTime small{color:var(--late)}
+.card[data-state="late"] .c-time{color:var(--late)!important;font-weight:700}
+:root{--late:#F0524A}
+:root[data-theme="light"]{--late:#D63A31}
+.started-badge{align-self:flex-start;width:fit-content;display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 12px;border-radius:999px;font-size:13.5px;font-weight:700;background:color-mix(in srgb,var(--done) 22%,transparent);border:1px solid color-mix(in srgb,var(--done) 55%,transparent)}
+.started-badge i{width:8px;height:8px;border-radius:50%;background:var(--done);animation:pulse 1.6s ease-in-out infinite}
+.startbtn{align-self:flex-start;width:fit-content;margin-top:12px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 18px;font-weight:700;font-size:15px;border:1px solid color-mix(in srgb,var(--done) 60%,transparent);background:color-mix(in srgb,var(--done) 18%,transparent);color:var(--ink);cursor:pointer}
+.tb.inprogress .node{background:var(--done);box-shadow:0 0 0 4px color-mix(in srgb,var(--done) 30%,transparent)}
+.tb.inprogress .tag{color:var(--done);font-weight:700}
 .mini{font-family:var(--display);font-weight:300;font-variant-numeric:tabular-nums}
 .mini small{font-family:var(--body);color:var(--muted);font-size:13px}
 .bar-right{display:flex;gap:10px}
@@ -632,6 +684,18 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
 
 <section class="intro" id="intro" aria-label="Start">
   <div class="halo2"></div><div class="halo"></div>
+  <div class="welcome" id="welcome">
+    <p class="w-eyebrow">HV Reset</p>
+    <h1 class="w-title">Plan your day.<br>Then just do the next thing.</h1>
+    <p class="w-lead">HV Reset turns your day into simple time blocks and shows you one at a time, with a timer. You always know what to do right now.</p>
+    <ol class="w-steps">
+      <li><b>1</b><div><strong>Make your plan</strong><span>Pick a ready plan or add your own tasks and times.</span></div></li>
+      <li><b>2</b><div><strong>Press Start</strong><span>See only the current task and the time left for it.</span></div></li>
+      <li><b>3</b><div><strong>Fell behind? No stress</strong><span>One tap moves the rest of your day. Nothing is lost.</span></div></li>
+    </ol>
+    <div class="w-ctas"><button class="begin" data-plan="new">Make my plan</button><button class="w-ai" data-plan="ai">Or tell HV AI your day</button></div>
+    <p class="w-note">Free to try, no account needed. Sign in only when you want to save.</p>
+  </div>
   <div class="intro-inner">
     <p class="intro-date" id="introDate"></p>
     <div class="bigtime" id="bigTime" role="timer" aria-live="off"></div>
@@ -677,8 +741,8 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
   <p class="dr-sub" id="dateline"></p>
   <nav class="days" id="days" aria-label="Choose a day"></nav>
   <ol class="track" id="track"></ol>
-  <div class="rules hvbox" id="hvDrawer"></div>
-  <div class="rules">
+  <div class="rules hvbox jobonly" id="hvDrawer"></div>
+  <div class="rules jobonly">
     <h3>Today's rules</h3>
     <ul>
       <li>One block, one task. Everything else can wait.</li>
@@ -688,7 +752,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
       <li>Core tasks can shrink, never drop. Never skip a meal.</li>
     </ul>
   </div>
-  <div class="rules">
+  <div class="rules jobonly">
     <h3>2-minute apply rule</h3>
     <ul id="ruleList">
       <li>Role family: GTM, growth, founder's office, BD, partnerships, rev ops.</li>
@@ -699,7 +763,8 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
   </div>
   <div class="dr-foot">
     <button class="pill" data-look aria-label="Change look"></button>
-    <button class="pill" data-r="shiftday">Move today to tomorrow</button>
+    <button class="pill userplan" data-plan="edit">Edit my plan</button>
+    <button class="pill jobonly" data-r="shiftday">Move today to tomorrow</button>
     <button class="pill" id="resetDay">Reset this day</button>
     <div class="acct" id="acct"></div>
   </div>
@@ -890,18 +955,31 @@ function planIndex(key){
   let i=0; for(let k=PLAN_START;k<key;k=addDays(k,1)){ if(sk.indexOf(k)<0) i++; }
   return i;
 }
-/* HV AI day plans: state.custom[date] = {blocks:[{id,t,d,title,kind,core}]}; kinds map onto Reset's blocks */
+/* Plans people make themselves (the plan builder or HV AI): {blocks:[{id,t,d,title,kind,core}]}.
+   state.routine is the plan for every day; state.custom[date] is a plan for one date and wins over it.
+   The built-in job-hunt program (dayOne/dayTwo/dayRegular) is the owner's own: only state.program="jobhunt" uses it. */
+const ST=()=>(typeof state!=="undefined"&&state)||{};
+const JOBHUNT=()=>ST().program==="jobhunt";
+const hasAnyPlan=()=>JOBHUNT()||!!(ST().routine&&ST().routine.blocks&&ST().routine.blocks.length)||!!(ST().custom&&Object.values(ST().custom).some(c=>c&&c.blocks&&c.blocks.length));
 function customPlan(key){
-  const c=typeof state!=="undefined"&&state&&state.custom&&state.custom[key]; if(!c||!c.blocks||!c.blocks.length) return null;
-  const blocks=c.blocks.map(x=>{ const kind=x.kind==="apply"||x.kind==="outreach"||x.kind==="prep"||x.kind==="work"?"work":x.kind;
+  const c=ST().custom&&ST().custom[key]; if(!c||!c.blocks||!c.blocks.length) return null;
+  return userPlan(c,JOBHUNT()?"Your plan (HV AI)":"Today's plan");
+}
+function userPlan(c,label){
+  const blocks=c.blocks.slice().sort((a,b)=>a.t<b.t?-1:1).map(x=>{ const kind=x.kind==="apply"||x.kind==="outreach"||x.kind==="prep"||x.kind==="work"?"work":x.kind;
     return B({id:x.id,t:x.t,d:x.d,title:x.title,kind,core:!!x.core,counter:x.kind==="apply"?"apps":x.kind==="outreach"?"msgs":undefined,aiKind:x.kind,
-      why:"Planned with HV AI. One block, one task.",finish:x.title+": done.",line:"One block, one task.",
+      why:kind==="work"?"One block, one task. Everything else can wait.":kind==="meal"?"Eat properly. Never skip a meal.":"A short break keeps the next block fresh.",
+      finish:x.title+": done.",line:"One block, one task.",
       steps:kind==="work"?[S(x.title,["Do only this until the block ends.","Everything else can wait."])]:[],minimum:x.core?"A shorter version, but do it.":undefined}); });
-  return {label:"Your plan (HV AI)",start:blocks[0].t,end:hhmmOf(toMin(blocks[blocks.length-1].t)+blocks[blocks.length-1].d),reminders:"Made with HV AI. Core blocks can shrink, never drop. Never skip a meal.",blocks,custom:true};
+  return {label,start:blocks[0].t,end:hhmmOf(toMin(blocks[blocks.length-1].t)+blocks[blocks.length-1].d),reminders:"One block at a time. Running late? Tap Running late and the rest of the day moves with you.",blocks,custom:true};
 }
 const hhmmOf=m=>pad(Math.floor(((m%1440)+1440)%1440/60))+":"+pad(((m%60)+60)%60);
 function planFor(key){
   const cp=customPlan(key); if(cp) return cp;
+  if(!JOBHUNT()){
+    const r=ST().routine; if(r&&r.blocks&&r.blocks.length) return userPlan(r,"Your daily plan");
+    return {label:"No plan yet",start:"09:00",end:"18:00",reminders:"Make your plan to get started.",blocks:[],none:"empty"};
+  }
   const i=planIndex(key);
   if(i===-1) return {label:"No plan today",start:"09:30",end:"19:00",reminders:"Your plan starts on "+niceDate(PLAN_START)+".",blocks:[],none:"before"};
   if(i===-2) return {label:"Moved to tomorrow",start:"09:30",end:"19:00",reminders:"You moved this day's plan to the next day.",blocks:[],none:"skipped"};
@@ -930,6 +1008,7 @@ const ACC=!window.claude&&!!(window.HVCloud&&window.HVCloud.configured);
 if(!ACC) document.body.classList.remove("gated");
 if(!ACC){ try{const s=localStorage.getItem(LS); if(s) state=JSON.parse(s)||state;}catch(e){} }
 if(!state.days) state.days={};
+if(!ACC&&!state.program) state.program="jobhunt";
 function dayState(key){ if(!state.days[key]) state.days[key]={done:{},skipped:{},steps:{},shifts:[],apps:0,msgs:0,good:"",tomorrow:""}; return state.days[key]; }
 let dbRef=null, saveTimer=null;
 function save(){
@@ -1031,6 +1110,7 @@ async function acOpen(u){
       if(useGuest){ base=guest; base.updatedAt=Date.now(); push=true; }
     }
     state=base; if(!state.days) state.days={};
+    if(owner&&!state.program){ state.program="jobhunt"; state.updatedAt=Date.now(); push=true; }   // the built-in job-hunt program is the owner's
     AC.guestDirty=false; AC.loading=false;
     if(push) await acPush();
     if(owner&&!moved) localStorage.setItem(LS+"-moved@"+u.uid,"1");
@@ -1064,14 +1144,15 @@ function acctRow(){ accRender();
 function guestNudge(){
   const on=!AC.uid&&AC.guestDirty, card=$("saveCard"), pill=$("savePill");
   if(!on){ card.hidden=true; pill.hidden=true; return; }
-  if(!AC.nudged){ AC.nudged=true; card.hidden=false; pill.hidden=true; } else if(card.hidden) pill.hidden=false;
+  const room=document.body.classList.contains("in-room");            // on the start screen only the small pill, so Start stays free
+  if(!AC.nudged&&room){ AC.nudged=true; card.hidden=false; pill.hidden=true; } else if(card.hidden) pill.hidden=false;
 }
 window.addEventListener("beforeunload",e=>{ if(ACC&&!AC.uid&&AC.guestDirty){ e.preventDefault(); e.returnValue=""; } });
 async function acSignOut(){
   const c=HVC(); try{ if(AC.uid) localStorage.removeItem(acKey()); }catch(e){}
   setDrawer(false); if(c) await c.signOut();
 }
-function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Saved to your account":(AC.uid?"Sync paused, will retry":"Saved on this device only"); }
+function setSync(on){ const el=document.getElementById("sync"); el.classList.toggle("on",on); el.querySelector("span").textContent=on?"Saved to your account":(AC.uid?"Sync paused, will retry":ACC?"Not saved. Sign in to save":"Saved on this device only"); }
 
 /* ---------- HV Vault link ----------
    HV Vault is the record; Reset reads it and never writes it. What Reset does (log an application,
@@ -1409,9 +1490,9 @@ function timerInfo(){
   const n=new Date(), tk=keyOf(n), bl=timeline(tk).blocks, cur=currentBlock(bl);
   if(cur){
     const st=atMin(n,cur.s), en=atMin(n,cur.e);
-    if(n<st) return {t:hms((st-n)/1000),cap:"until "+fmt(cur.s)+", "+cur.title,mini:"until start",line:"You still have time."};
-    if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title,mini:"left in this block",line:"One task. Just this one, right now."};
-    return {t:hms((n-en)/1000),cap:"late for "+cur.title,mini:"late",line:"It's okay. Start now and the schedule will adjust."};
+    if(n<st) return {t:hms((st-n)/1000),cap:"until "+fmt(cur.s)+", "+cur.title,mini:"until start",line:"You still have time.",st:"before"};
+    if(n<=en) return {t:hms((en-n)/1000),cap:"left for "+cur.title,mini:"left in this block",line:"One task. Just this one, right now.",st:"live"};
+    return {t:hms((n-en)/1000),cap:"late for "+cur.title,mini:"late",line:"Time is up for this task. Start now and the schedule will adjust.",st:"late"};
   }
   const nk=nextPlanDay(tk); if(!nk) return {t:"00:00:00",cap:"",mini:"",line:"No plan ahead."};
   const [yy,mm,dd]=nk.split("-").map(Number), tm=new Date(yy,mm-1,dd), nb=timeline(nk).blocks[0], st=atMin(tm,nb.s);
@@ -1441,7 +1522,7 @@ function rollTo(el,str){
 function tickCountdowns(){
   document.querySelectorAll("[data-cd]").forEach(el=>{ const left=Math.max(0,+el.dataset.t-nowMin()); const h=Math.floor(left/60), m=Math.floor(left%60), s=Math.floor((left*60)%60); el.textContent= h ? h+"h "+m+"m" : (left>=1 ? Math.ceil(left)+" min" : Math.max(1,s)+" sec"); });
 }
-function tickTimers(){ const i=timerInfo(); if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
+function tickTimers(){ const i=timerInfo(); if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||""; if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.t; $("miniCap").textContent=i.mini;
   if($("introCap").textContent!==i.cap) $("introCap").textContent=i.cap; if($("introLine").textContent!==i.line) $("introLine").textContent=i.line; $("bigTime").setAttribute("aria-label",i.t+", "+i.cap); tickCountdowns(); }
 
 /* ---------- card ---------- */
@@ -1454,6 +1535,9 @@ function nextPlanDay(from){ for(let i=1;i<=14;i++){ const k=addDays(from,i); if(
 function cardInner(v){
   const ds=dayState(selKey);
   if(!v.blocks.length){
+    if(v.plan.none==="empty"||!JOBHUNT()) return {state:"idle",html:'<div class="focus scroll"><div class="stepzone"><div class="step-card" id="stepCard"><div class="s-body" id="sBody">'+
+      '<h2 class="s-head">No plan for this day.</h2><ol class="s-pts"><li>Make a plan, or rest today.</li></ol></div></div>'+
+      '<div class="s-actions"><button class="primary" data-plan="'+(hasAnyPlan()?"edit":"new")+'">'+(hasAnyPlan()?"Edit my plan":"Make my plan")+'</button></div></div></div>'};
     const nk=nextPlanDay(selKey), np=nk?planFor(nk):null, skipped=v.plan.none==="skipped";
     return {state:"idle",html:'<div class="focus scroll"><div class="stepzone"><div class="step-card" id="stepCard"><div class="s-body" id="sBody">'+
       '<h2 class="s-head">'+(skipped?"Today's plan moved to tomorrow.":"No plan today.")+'</h2>'+
@@ -1462,9 +1546,13 @@ function cardInner(v){
   }
   if(!v.cur){
     const counted=v.blocks.filter(b=>b.kind!=="free"); const done=counted.filter(b=>b.done).length; const all=done===counted.length;
+    if(v.blocks.every(b=>b.skipped==="before")){ const nk=nextPlanDay(selKey), nb=nk&&timeline(nk).blocks[0];
+      return {state:"idle",html:'<div class="focus scroll"><div class="stepzone"><div class="step-card" id="stepCard"><div class="s-body" id="sBody">'+
+        '<h2 class="s-head">Your plan starts '+(nk===addDays(selKey,1)?"tomorrow":nk?niceDate(nk):"soon")+'.</h2><ol class="s-pts"><li>Today&#39;s blocks were already over when you made the plan.</li>'+(nb?'<li>First block: <strong>'+esc(nb.title)+'</strong> at '+fmt(nb.s)+'.</li>':'')+'<li>Come back then and press Start.</li></ol></div></div>'+
+        '<div class="s-actions"><button class="primary" data-plan="edit">Edit my plan</button></div></div></div>'}; }
     return {state:"idle",html:'<div class="c-grid is-sum"><section class="c-left scroll"><div class="c-kind"><span class="pulse"></span>Day summary</div><h1 class="c-title">'+(all?"Full day done.":"Today is closed.")+'</h1><p class="c-time">'+(all?"Every block checked. This is the routine.":"What you did counts. Tomorrow starts from here.")+'</p>'+
-      '<div class="stats"><div class="stat"><b>'+done+'/'+counted.length+'</b><span>blocks</span></div><div class="stat"><b>'+appsCount(selKey)+'</b><span>applications</span></div><div class="stat"><b>'+ds.msgs+'</b><span>messages</span></div><div class="stat"><b>'+calcStreak()+'</b><span>day streak</span></div></div>'+
-      (isToday(selKey)?hvReviewHTML():"")+
+      '<div class="stats"><div class="stat"><b>'+done+'/'+counted.length+'</b><span>blocks</span></div>'+(JOBHUNT()?'<div class="stat"><b>'+appsCount(selKey)+'</b><span>applications</span></div><div class="stat"><b>'+ds.msgs+'</b><span>messages</span></div>':'')+'<div class="stat"><b>'+calcStreak()+'</b><span>day streak</span></div></div>'+
+      (isToday(selKey)&&JOBHUNT()?hvReviewHTML():"")+
       '<p class="c-line">Your streak grows on days you finish 70% of blocks. Not perfect days, consistent days.</p></section>'+
       '<section class="c-right scroll"><div class="lbl">One good thing from today</div><textarea data-note="good" placeholder="One line. Short is fine.">'+esc(ds.good)+'</textarea><div class="lbl">Tomorrow&#39;s first step</div><textarea data-note="tomorrow" placeholder="What will you do first when you wake up?">'+esc(ds.tomorrow)+'</textarea></section></div>'};
   }
@@ -1507,7 +1595,8 @@ function cardInner(v){
   cardMore=more; cardCur=cur;
   return {state:st,html:'<div class="focus scroll">'+
     '<div class="c-kind"><span class="pulse"></span>'+(v.today?"Now":"Viewing")+", "+KIND[cur.kind].toLowerCase()+'</div>'+
-    '<h1 class="c-title">'+esc(cur.title)+'</h1><div class="c-time">'+timeTxt+'</div>'+lateHTML+
+    '<h1 class="c-title">'+esc(cur.title)+'</h1><div class="c-time">'+timeTxt+'</div>'+
+    (v.today?(ds.started&&ds.started[cur.id]?'<div class="started-badge"><i></i>In progress since '+fmt(new Date(ds.started[cur.id]).getHours()*60+new Date(ds.started[cur.id]).getMinutes())+'</div>':'<button class="startbtn" data-start="'+cur.id+'">&#9654; Start task</button>'):'')+lateHTML+
     zone+
     (chips?'<div class="chips">'+chips+'</div>':'')+
     '<div class="f-links"><button data-toggle="all">See all steps</button><button data-toggle="more">Why, tips and more</button></div>'+
@@ -1539,6 +1628,7 @@ function renderCard(anim){
   fitStep(); tickCountdowns();
 }
 function renderMeta(){
+  document.body.classList.toggle("noplan",!hasAnyPlan()); document.body.classList.toggle("jobhunt",JOBHUNT());
   const p=progress(selKey); $("prog").style.transform="scaleX("+(p/100)+")";
   $("todayPct").textContent=(isToday(selKey)?"Today ":"This day ")+p+"%";
   const [y,m,d]=selKey.split("-").map(Number); const dObj=new Date(y,m-1,d); const plan=planFor(selKey);
@@ -1555,10 +1645,11 @@ function renderDrawer(){
   $("hvDrawer").innerHTML=hvDrawerHTML();
   const v=cardView(), ds=dayState(selKey);
   $("track").innerHTML=v.blocks.map(b=>{
+    const started=!b.done&&!b.skipped&&ds.started&&ds.started[b.id];
     const st=b.done?"done":b.skipped?"skipped":(v.cur&&b.id===v.cur.id?((v.today&&v.nm>b.e)?"late":"current"):"");
-    let tag=KIND[b.kind]; if(b.done){ const dt=new Date(ds.done[b.id]); tag=b.skipped==="min"?"Minimum version":"Done at "+fmt(dt.getHours()*60+dt.getMinutes()); } else if(b.skipped) tag="Skipped"; else if(st==="late") tag="Late"; else if(st==="current") tag="Now";
+    let tag=KIND[b.kind]; if(b.done){ const dt=new Date(ds.done[b.id]); tag=b.skipped==="min"?"Minimum version":"Done at "+fmt(dt.getHours()*60+dt.getMinutes()); } else if(b.skipped) tag="Skipped"; else if(started) tag=st==="late"?"In progress, late":"In progress"; else if(st==="late") tag="Late"; else if(st==="current") tag="Now";
     const open=openTrack===b.id;
-    return '<li class="tb '+st+'"><span class="node"></span><button class="tb-btn" data-open="'+b.id+'" aria-expanded="'+open+'"><span><span class="n">'+esc(b.title)+'</span><span class="tag">'+esc(tag)+'</span></span><span class="t">'+fmt(b.s)+'</span></button>'+
+    return '<li class="tb '+st+(started?" inprogress":"")+'"><span class="node"></span><button class="tb-btn" data-open="'+b.id+'" aria-expanded="'+open+'"><span><span class="n">'+esc(b.title)+'</span><span class="tag">'+esc(tag)+'</span></span><span class="t">'+fmt(b.s)+'</span></button>'+
       (open?'<div class="tb-detail"><p><b>Finish line:</b> '+esc(b.finish)+'</p>'+stepsHTML(b,selKey)+snipsHTML(b)+'<div class="actions">'+(b.done||b.skipped?'<button class="secondary" data-undo="'+b.id+'">Wapas kholo</button>':'<button class="secondary" data-done="'+b.id+'">Mark as done</button>')+'</div></div>':'')+'</li>';
   }).join("");
 }
@@ -1580,7 +1671,7 @@ function startMin(id){
 function stepDone(key){
   const now=performance.now(); if(busy||now-lastStepAt<220) return; lastStepAt=now; stepTick();
   const after=ghostSwap(1);
-  dayState(selKey).steps[key]=true; save(); stepAnim="s-in"; renderCard(false); after();
+  const dsx=dayState(selKey); dsx.steps[key]=true; dsx.started=dsx.started||{}; const bid=key.split(":")[0]; if(!dsx.started[bid]) dsx.started[bid]=Date.now(); save(); stepAnim="s-in"; renderCard(false); after();
   if($("drawer").classList.contains("open")) renderDrawer();
 }
 function stepBack(bid){
@@ -1616,6 +1707,64 @@ function openAll(){ const sc=$("modal").scrollTop; modal('<h3>All steps</h3>'+st
 function modal(html,closeLabel){ modalKind=null; const m=$("modal"); m.innerHTML=html; let a=m.querySelector(".actions"); if(!a){ a=document.createElement("div"); a.className="actions"; m.appendChild(a); }
   const c=document.createElement("button"); c.className="secondary"; c.setAttribute("data-close",""); c.textContent=closeLabel||"Close"; a.insertBefore(c,a.firstChild);
   $("scrim").classList.add("open"); const f=a.querySelector(".primary")||c; f.focus(); }
+/* ---------- plan builder: make your own day (every day, or just today) ---------- */
+const PB_STARTS={
+  study:{name:"Study day",sub:"Focused study blocks, breaks and revision.",rows:[["08:30","Study: hardest subject",90,"work"],["10:00","Break",15,"rest"],["10:15","Practice questions",75,"work"],["11:30","Revise notes",45,"work"],["12:15","Lunch",45,"meal"],["13:00","Study: second subject",90,"work"],["14:30","Break",15,"rest"],["14:45","Mock test or homework",60,"work"],["15:45","Walk outside",30,"rest"],["16:15","Review today, plan tomorrow",15,"work"]]},
+  work:{name:"Work day",sub:"Deep work first, then messages and meetings.",rows:[["09:00","Plan the day",15,"work"],["09:15","Deep work: most important task",120,"work"],["11:15","Break",15,"rest"],["11:30","Emails and messages",45,"work"],["12:15","Lunch",45,"meal"],["13:00","Meetings and calls",90,"work"],["14:30","Break",15,"rest"],["14:45","Deep work: second task",90,"work"],["16:15","Wrap up, plan tomorrow",20,"work"]]},
+  job:{name:"Job search day",sub:"Find roles, apply, reach out and follow up.",rows:[["10:00","Find jobs to apply for",45,"work"],["10:45","Apply to 3 jobs",75,"work"],["12:00","Break",15,"rest"],["12:15","Message 5 people",45,"work"],["13:00","Lunch",45,"meal"],["13:45","Interview practice",60,"work"],["14:45","Break",15,"rest"],["15:00","Follow-ups",30,"work"],["15:30","Learn a skill",60,"work"],["16:30","Review the day",15,"work"]]},
+  blank:{name:"Start from scratch",sub:"Add your own tasks and times.",rows:[]}
+};
+const PB_KINDS=[["work","Focus"],["meal","Meal"],["rest","Break"],["free","Free time"]];
+let PB=null;
+function pbRowHTML(r){
+  return '<li class="pb-row"><input class="pt" type="time" value="'+esc(r.t)+'" aria-label="Start time"><input class="pn" type="text" maxlength="80" value="'+esc(r.title)+'" placeholder="What will you do?" aria-label="Task">'+
+    '<input class="pd" type="number" min="5" max="600" step="5" value="'+(r.d||60)+'" aria-label="Minutes"><select class="pk" aria-label="Type">'+PB_KINDS.map(([k,n])=>'<option value="'+k+'"'+(k===r.kind?" selected":"")+'>'+n+'</option>').join("")+'</select>'+
+    '<button class="x" data-pbdel aria-label="Remove this block">&times;</button></li>';
+}
+function pbRead(){ PB.rows=[...document.querySelectorAll("#pbList .pb-row")].map(li=>({t:li.querySelector(".pt").value,title:li.querySelector(".pn").value.trim(),d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").value,10)||30)),kind:li.querySelector(".pk").value})); const w=document.querySelector('input[name="pbwhen"]:checked'); if(w) PB.when=w.value; }
+function pbChoose(){
+  modal('<h3>Make your plan</h3><p>Start from a ready plan and change anything you like, or start empty.</p><div class="pb-starts">'+
+    Object.entries(PB_STARTS).map(([k,v])=>'<button class="pb-start" data-pbstart="'+k+'"><b>'+v.name+'</b><span>'+v.sub+'</span></button>').join("")+'</div>'+
+    '<p class="pb-tip">Or tap HV AI and just say it, like: &ldquo;Tomorrow 9 to 5 study, lunch at 1&rdquo;.</p>',"Cancel");
+  $("modal").scrollTop=0;
+}
+function pbEdit(){
+  if(!PB.rows.length){ const n=new Date(); const h=Math.min(22,n.getHours()+1); PB.rows=[{t:pad(h)+":00",title:"",d:60,kind:"work"}]; }
+  modal('<h3>'+(PB.editing?"Edit your plan":"Your plan")+'</h3><p>Each block has a start time, a task and how long it takes. Change anything. They&#39;re sorted by time when you save.</p>'+
+    '<div class="pb-head"><span>Start</span><span>Task</span><span>Minutes</span><span>Type</span><span></span></div><ol class="pb-list" id="pbList">'+PB.rows.map(pbRowHTML).join("")+'</ol>'+
+    '<button class="pb-add" data-pbadd>+ Add a block</button>'+
+    '<div class="pb-when"><label><input type="radio" name="pbwhen" value="every"'+(PB.when!=="today"?" checked":"")+'> Use this plan every day</label><label><input type="radio" name="pbwhen" value="today"'+(PB.when==="today"?" checked":"")+'> Only for today</label></div>'+
+    '<p class="pb-err" id="pbErr" hidden></p><div class="actions"><button class="primary" data-pbsave>Save my plan</button></div>',"Cancel");
+  $("modal").scrollTop=0;
+  const first=document.querySelector("#pbList .pn"); if(first&&!first.value) first.focus({preventScroll:true});
+}
+function openPlanner(mode){
+  if(mode==="ai"){ if(hvai&&hvai.open){ hvai.open(); } else toast("HV AI is loading. Try again in a moment."); return; }
+  if(mode==="edit"){
+    const tk=keyOf(new Date()), c=state.custom&&state.custom[tk], src=(c&&c.blocks&&c.blocks.length)?c:state.routine;
+    if(src&&src.blocks&&src.blocks.length){ PB={editing:true,when:src===c?"today":"every",rows:src.blocks.slice().sort((a,b)=>a.t<b.t?-1:1).map(b=>({t:b.t,title:b.title,d:b.d,kind:PB_KINDS.some(k=>k[0]===b.kind)?b.kind:"work"}))}; return pbEdit(); }
+  }
+  PB={editing:false,when:"every",rows:[]}; pbChoose();
+}
+function pbSave(){
+  pbRead(); const err=$("pbErr"), bad=m=>{ err.textContent=m; err.hidden=false; };
+  const rows=PB.rows.filter(r=>r.title||r.t);
+  if(!rows.length) return bad("Add at least one block.");
+  if(rows.some(r=>!r.title)) return bad("Give every block a task name.");
+  if(rows.some(r=>!/^\d\d:\d\d$/.test(r.t))) return bad("Give every block a start time.");
+  rows.sort((a,b)=>a.t<b.t?-1:1);
+  const blocks=rows.map((r,i)=>({id:"u"+Date.now().toString(36)+i,t:r.t,d:r.d,title:r.title,kind:r.kind,core:r.kind==="work"}));
+  const tk=keyOf(new Date()), first=!hasAnyPlan();
+  state.custom=state.custom||{};
+  if(PB.when==="today") state.custom[tk]={blocks};
+  else { state.routine={blocks}; delete state.custom[tk]; }
+  const nm=nowMin(), ds=dayState(tk);                                  // blocks that were already over when the plan was made don't count as late
+  if(PB.when==="today"||!ds.done||!Object.keys(ds.done).length) blocks.forEach(b=>{ if(toMin(b.t)+b.d<=nm) ds.skipped[b.id]="before"; });
+  selKey=tk; save(); closeModal(); render(false); rollTo($("bigTime"),timerInfo().t); tickTimers();
+  const live=currentBlock(timeline(tk).blocks);
+  toast(!first?"Plan saved.":live?"Your plan is ready. Press Start to begin.":"Your plan is ready. It starts "+(timerInfo().cap.replace(/^until /,"")||"soon")+".");
+}
+
 function closeModal(){ modalKind=null; $("scrim").classList.remove("open"); clearInterval(modal._t); }
 function openDistract(){ const cur=cardView().cur;
   modal('<h3>60 second reset</h3><ol><li>Close whatever is distracting you right now. Tab, app, video.</li><li>Stand up and drink a glass of water.</li><li>Take 3 slow breaths. In for 4 seconds, out for 6.</li><li>Read the finish line: <b>'+esc(cur?cur.finish:"")+'</b></li><li>Not the whole block, just the next step. Start a 5-minute timer.</li></ol><p class="line">Getting distracted is normal. Coming back is the skill.</p><div class="timer" id="ftimer">05:00</div><div class="actions"><button class="primary" data-focus>Start 5-minute timer</button></div>'); }
@@ -1628,8 +1777,9 @@ function setDrawer(open){ $("drawer").classList.toggle("open",open); $("dscrim")
 /* ---------- begin ---------- */
 function begin(){
   if(document.body.classList.contains("in-room")||document.body.classList.contains("gated")) return;
+  if(!hasAnyPlan()) return openPlanner("new");
   const first=!started; started=true;
-  document.body.classList.add("in-room");
+  document.body.classList.add("in-room"); if(ACC) guestNudge();
   if(first||!liveCard()) renderCard(true); else renderCard(false);
   showQuote(false);
   setTimeout(()=>{ audioInit(); if(Snd.ctx&&Snd.ctx.state==="suspended") Snd.ctx.resume(); chime(); if(Snd.on) ambientStart(); },60);
@@ -1678,10 +1828,17 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-confirmshift")){ const tk=keyOf(new Date()); state.skip=(state.skip||[]).filter(k=>k!==tk).concat([tk]); selKey=tk; save(); closeModal(); setDrawer(false); render(true); toast("Plan moved. It starts tomorrow."); return; }
   if(t.dataset.unshift){ state.skip=(state.skip||[]).filter(k=>k!==t.dataset.unshift); save(); render(true); toast("Back on. Today's plan is active."); return; }
   if(t.hasAttribute("data-open-drawer")){ setDrawer(true); return; }
+  if(t.dataset.start){ const ds=dayState(selKey); ds.started=ds.started||{}; ds.started[t.dataset.start]=Date.now(); save(); renderCard(false); if($("drawer").classList.contains("open")) renderDrawer(); toast("Started. One task, just this one."); return; }
+  if(t.dataset.plan){ if(t.dataset.plan==="edit") setDrawer(false); return openPlanner(t.dataset.plan); }
+  if(t.dataset.pbstart){ const st=PB_STARTS[t.dataset.pbstart]; PB.rows=st.rows.map(([tt,title,d,kind])=>({t:tt,title,d,kind})); return pbEdit(); }
+  if(t.hasAttribute("data-pbadd")){ pbRead(); const l=PB.rows[PB.rows.length-1]; const tt=l&&/^\d\d:\d\d$/.test(l.t)?hhmmOf(toMin(l.t)+l.d):"09:00"; PB.rows.push({t:tt,title:"",d:60,kind:"work"});
+    $("pbList").insertAdjacentHTML("beforeend",pbRowHTML(PB.rows[PB.rows.length-1])); const n=$("pbList").lastElementChild.querySelector(".pn"); n.focus(); return; }
+  if(t.hasAttribute("data-pbdel")){ t.closest(".pb-row").remove(); return; }
+  if(t.hasAttribute("data-pbsave")) return pbSave();
   if(t.dataset.r==="distract") return openDistract();
   if(t.dataset.r==="mood") return openMood();
   if(t.dataset.r==="late") return openLate();
-  if(t.dataset.late) return doLate(t.dataset.late);
+  if(t.dataset.late){ if(t.dataset.late==="shift"){ const c=cardView().cur, ds=dayState(selKey); if(c){ ds.started=ds.started||{}; ds.started[c.id]=ds.started[c.id]||Date.now(); } } return doLate(t.dataset.late); }
   if(t.hasAttribute("data-close")) return closeModal();
   if(t.hasAttribute("data-focus")){ const end=Date.now()+300000; clearInterval(modal._t); modal._t=setInterval(()=>{ const left=Math.max(0,end-Date.now()); const el=$("ftimer"); if(el) el.textContent=pad(Math.floor(left/60000))+":"+pad(Math.floor(left/1000)%60); if(!left){ clearInterval(modal._t); chime(); toast("5 minutes done. You're moving now. Keep going."); } },500); t.textContent="Running"; t.disabled=true; return; }
   if(t.hasAttribute("data-look")){ themePref=LOOKS[(LOOKS.indexOf(themePref)+1)%LOOKS.length]; try{localStorage.setItem(LS+"-theme",themePref);}catch(e){} const s=document.querySelector(".sky"); s.classList.remove("lookfade"); void s.offsetWidth; s.classList.add("lookfade"); applyPhase(); toast(themePref==="auto"?"Auto: follows the time":LOOK_SHORT[themePref]+" look"); return; }
