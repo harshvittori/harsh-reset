@@ -231,7 +231,7 @@ const COL={s1:"var(--c1)",s2:"var(--c2)",s3:"var(--c3)",good:"var(--good)",warn:
 /* ---------- small UI pieces ---------- */
 function tag(kind){ return '<span class="dtag t-'+kind+'">'+({measured:"Measured",calc:"Calculated",self:"You rated",none:"Not tracked yet",plan:"Planned"})[kind]+'</span>'; }
 function delta(cur,prev,unit,better,ok){ if(ok==null) ok=CUR?CUR.cmpOK:true;
-  if(cur==null||prev==null||!ok) return '<span class="dl none">Not enough earlier data to compare</span>';
+  if(cur==null||prev==null||!ok) return '';
   const d=Math.round((cur-prev)*10)/10; if(Math.abs(d)<(unit==="pts"?1:0.5)) return '<span class="dl flat">&#8594; Same as '+esc(prevName())+'</span>';
   const up=d>0, good=better==null?null:(better==="up"?up:!up);
   return '<span class="dl '+(good==null?"flat":good?"up":"down")+'">'+(up?"&#9650; +":"&#9660; &minus;")+esc(unit==="min"?dur(Math.abs(d)):Math.abs(d)+(unit==="pts"?" pts":unit?" "+unit:""))+' vs '+esc(prevName())+'</span>'; }
@@ -284,33 +284,36 @@ function threeQ(m,pm,sc,psc){
 
 /* ---------- overview ---------- */
 function secOverview(){
-  const [a,b]=presetRange(D.preset), m=CUR.m, pm=CUR.pm, sc=scoreOf(m,m.keys,true), psc=scoreOf(pm,pm.keys,true), st=streaks();
-  const td=agg(recsIn([A.today])), soon=drillList("soon")[1].length, openN=m.pending+m.overdue;
+  /* kept short on purpose: how am I doing, in five seconds. Every detail lives in its own section. */
+  const m=CUR.m, pm=CUR.pm, sc=scoreOf(m,m.keys,true), psc=scoreOf(pm,pm.keys,true), st=streaks();
   if(!A.hasAnyPlan()) return empty("Make your first plan and this dashboard fills in by itself. Nothing here is made up: it only shows what you plan and do.",'<button class="dbtn pri" data-dact="plan">Make my plan</button>');
+  const t=A.today, tr=recsIn([t],true), td=agg(tr), nm=nowMin();
+  const nx=tr.filter(r=>!r.isDone&&r.status!=="moved"&&r.s!=null).sort((x,y)=>x.s-y.s)[0];
+  const todayLine=!td.n?"Nothing planned today.":td.done===td.n?"All "+plural(td.n,"task")+" done today. Great day.":
+    "<b>"+td.done+" of "+td.n+"</b> tasks done"+(td.worked?" · <b>"+dur(td.worked)+"</b> worked":"")+(nx?" · "+(nx.running?"Now: ":nx.status==="overdue"?"Overdue: ":"Next: ")+"<b>"+esc(nx.title)+"</b>"+(nx.status==="pending"&&nx.s>nm?" at "+A.fmt(nx.s):""):"");
+  const today='<div class="ov-today"><div><span class="ov-lbl">Today</span><p>'+todayLine+'</p></div><button class="dbtn pri" data-dgo="'+t+'|">Go to my day</button></div>';
   const kp=[
-    kpi({label:"Tasks",value:m.n,sub:m.done+" done · "+openN+" open · "+m.missed+" missed",drill:"all"}),
-    kpi({label:"Completed",value:m.done,sub:m.short?m.short+" as the short version":"of "+m.due+" that were due",drill:"done",delta:delta(m.done,pm.done,"",null)}),
-    kpi({label:"Today",value:P(td.n?pct(td.done,td.n):null),sub:td.done+" of "+td.n+" planned today",drill:"today"}),
-    kpi({label:"Completion rate",value:P(m.completion),sub:"Done out of tasks that were due",drill:"done",delta:delta(m.completion,pm.completion,"pts","up"),tag:"calc"}),
-    kpi({label:"On time vs late",value:m.dlN?(m.dlEarly+m.dlOn)+'<small> / '+m.dlLate+'</small>':"–",sub:"Finished by the planned end, or after",drill:"late"}),
-    kpi({label:"Time worked",value:m.worked?dur(m.worked):"–",sub:plural(m.measuredN,"task")+" with measured time",drill:"tracked",delta:m.worked||pm.worked?delta(m.worked,pm.worked,"min",null):"",tag:"measured"}),
-    kpi({label:"Timer focus",value:m.timer?dur(m.timer):"–",sub:m.ratedMin?"Fully focused: "+dur(m.verified):"Rate your focus after a task to verify it",drill:"timer",tag:"measured"}),
-    kpi({label:"Average per task",value:m.measuredN?dur(m.worked/m.measuredN):"–",sub:m.accN?"You planned "+dur(m.estSum/m.accN)+" on average":"Measured tasks only",drill:"tracked"}),
-    kpi({label:"Streak",value:plural(st.cur,"day"),sub:"Longest: "+plural(st.best,"day"),drill:null}),
-    kpi({label:"Punctuality",value:P(m.punct),sub:"Started on time"+(m.dlN?" · deadlines met "+m.deadline+"%":""),drill:"startlate",delta:delta(m.punct,pm.punct,"pts","up")}),
-    kpi({label:"Consistency",value:P(m.cons.pct),sub:m.cons.good+" of "+plural(m.cons.plan,"day")+" at 70% or more",drill:null,delta:delta(m.cons.pct,pm.cons.pct,"pts","up")}),
-    kpi({label:"Overdue now",value:td.overdue,sub:soon?soon+" more due in the next 3 hours":"Nothing else due soon",drill:td.overdue?"overdue":"soon"})
+    kpi({label:"Tasks completed",value:m.due?m.done+'<small> of '+m.due+'</small>':"–",sub:m.due?m.completion+"% of tasks that were due":"Nothing due yet",drill:"done",delta:delta(m.completion,pm.completion,"pts","up")}),
+    kpi({label:"Time worked",value:m.worked?dur(m.worked):"–",sub:m.worked?"Measured with the timer":"Press Start on a task to measure it",drill:"tracked",delta:m.worked||pm.worked?delta(m.worked,pm.worked,"min",null):""}),
+    kpi({label:"Started on time",value:P(m.punct),sub:m.sN?(m.sEarly+m.sOn)+" of "+plural(m.sN,"started task"):"No started tasks yet",drill:"startlate",delta:delta(m.punct,pm.punct,"pts","up")}),
+    kpi({label:"Streak",value:plural(st.cur,"day"),sub:"Best: "+plural(st.best,"day")+". Days with 70% done count."})
   ].join("");
-  const ins=insights().slice(0,3), al=alerts().slice(0,3);
-  const trend=(()=>{ const ks=clamp(add(A.today,-13),A.today); if(ks.length<2) return empty("Your trend appears after two days with a plan.");
-    const rows=ks.map(k=>agg(recsIn([k]))); return chart({type:"line",title:"Completion, last 14 days",labels:ks.map(k=>DAYN[kd(k).getDay()].slice(0,2)+" "+kd(k).getDate()),tips:ks.map(niceD),xName:"Day",series:[{name:"Completion",c:COL.s1,vals:rows.map(r=>r.due?r.completion:null)}],max:100,fmt:v=>v+"%",h:170,click:i=>openDrill("day:"+ks[i])}); })();
-  return threeQ(m,pm,sc,psc)+
-    '<div class="ov-top">'+card("Productivity score",scoreMini(sc,psc),{cls:"sc-card",right:'<button class="dlink" data-dsec="score">How it works</button>'})+
-      card("Last 14 days",trend,{right:'<button class="dlink" data-dsec="trends">All trends</button>'})+'</div>'+
-    '<div class="kpis">'+kp+'</div>'+
-    '<div class="two">'+card("Insights",ins.length?'<ul class="ins">'+ins.map(insHTML).join("")+'</ul>':empty("Insights appear once there's enough data. A few days of planning and timing tasks is enough."),{right:'<button class="dlink" data-dsec="insights">See all</button>'})+
-      card("Needs attention",al.length?'<ul class="alerts">'+al.map(alertHTML).join("")+'</ul>':empty("All clear. Nothing needs your attention right now."),{right:'<button class="dlink" data-dsec="alerts">See all</button>'})+'</div>';
+  const al=alerts()[0], ins=insights()[0], look=[];
+  if(al) look.push('<ul class="alerts">'+alertHTML(al)+'</ul>');
+  if(ins) look.push('<ul class="ins">'+insHTML(ins)+'</ul>');
+  const trend=(()=>{ const ks=clamp(add(t,-13),t); if(ks.length<2) return empty("Your trend appears after two days with a plan.");
+    const rows=ks.map(k=>agg(recsIn([k]))); return chart({type:"line",title:"Completion, last 14 days",labels:ks.map(k=>DAYN[kd(k).getDay()].slice(0,2)+" "+kd(k).getDate()),tips:ks.map(niceD),xName:"Day",series:[{name:"Completion",c:COL.s1,vals:rows.map(r=>r.due?r.completion:null)}],max:100,fmt:v=>v+"%",h:160,noTable:true,click:i=>openDrill("day:"+ks[i])}); })();
+  return today+threeQ(m,pm,sc,psc)+'<div class="kpis k4">'+kp+'</div>'+(CUR.cmpOK?'':'<p class="fine">Comparisons with '+esc(prevName())+' appear once that period has enough data.</p>')+
+    '<div class="ov-top">'+card("Your score",scoreSimple(sc,psc),{cls:"sc-card",right:'<button class="dlink" data-dsec="score">How it works</button>'})+
+      card("Last 14 days",trend,{sub:"Share of due tasks you finished each day",right:'<button class="dlink" data-dsec="trends">More trends</button>'})+'</div>'+
+    (look.length?card("Worth a look",look.join(""),{right:'<button class="dlink" data-dsec="'+(al?"alerts":"insights")+'">See all</button>'}):"");
 }
+function scoreSimple(sc,psc){ if(sc.overall==null) return empty("Your score appears after about 3 finished tasks and 2 days with a plan.");
+  const w=cfg().weights, ch=CUR.cmpOK?PARTS.map(([k,n])=>sc.parts[k]!=null&&psc.parts[k]!=null&&w[k]?{n,d:sc.parts[k]-psc.parts[k]}:null).filter(x=>x&&Math.abs(x.d)>=3).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d))[0]:null;
+  const parts=PARTS.filter(([k])=>sc.parts[k]!=null).map(([k,n])=>({n,v:sc.parts[k]})).sort((a,b)=>b.v-a.v), best=parts[0], low=parts[parts.length-1];
+  const line=ch?(ch.d>0?"Biggest help: <b>"+esc(ch.n.toLowerCase())+"</b>, up "+Math.round(ch.d)+" points.":"Biggest drop: <b>"+esc(ch.n.toLowerCase())+"</b>, down "+Math.round(-ch.d)+" points."):
+    (best&&low&&best!==low?"Strongest: <b>"+esc(best.n.toLowerCase())+"</b>. Room to grow: <b>"+esc(low.n.toLowerCase())+"</b>.":"");
+  return '<div class="sc-simple"><div class="sc-num"><b>'+sc.overall+'</b><span>out of 100</span>'+delta(sc.overall,psc.overall,"pts","up")+'</div><p>'+line+'</p></div>'; }
 function scoreMini(sc,psc){ if(sc.overall==null) return empty("Your score needs a little more data: about 3 finished tasks and 2 days with a plan.");
   return '<div class="sc-hero"><div class="sc-num"><b>'+sc.overall+'</b><span>out of 100</span>'+delta(sc.overall,psc.overall,"pts","up")+'</div><div class="sc-parts">'+
     PARTS.map(([k,n])=>'<div class="sp"><span>'+n+'</span>'+(sc.parts[k]==null?'<em>No data yet</em>':'<div class="m-bar"><i style="width:'+sc.parts[k]+'%"></i></div><b>'+sc.parts[k]+'</b>')+'</div>').join("")+'</div></div>'; }
