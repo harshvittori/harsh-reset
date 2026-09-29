@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790880000">
+<meta name="build" content="1790890000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -282,6 +282,8 @@ body:has(.hvai:not([hidden])) .accwrap,body:has(#scrim.open) .hvai-fab,body:has(
 .pb-when{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;font-size:14.5px}
 .pb-when label{display:flex;gap:6px;align-items:center;cursor:pointer}
 .qa-day{margin:0 0 12px}
+.clr-list{list-style:none;margin:6px 0 4px;padding:0;max-height:240px;overflow:auto}.clr-list li{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid var(--glass-border);font-size:15px}.clr-list span{color:var(--muted);min-width:74px;font-variant-numeric:tabular-nums}
+.primary.danger-btn{background:linear-gradient(135deg,#D8584C,#B8412F)}
 .tb-acts{flex-wrap:wrap;gap:8px!important}.tb-acts .secondary{padding:8px 14px;font-size:14px}
 .secondary.danger{color:var(--late);border-color:color-mix(in srgb,var(--late) 45%,transparent)}
 .te-core{display:flex;gap:8px;align-items:center;margin:12px 0 0;font-size:14.5px;cursor:pointer}.te-core input{accent-color:var(--accent);width:16px;height:16px}
@@ -1001,6 +1003,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <button class="pill userplan" data-qadd>+ Add a task</button>
     <button class="pill userplan" data-plan="edit">Edit my plan</button>
     <button class="pill jobonly" data-r="shiftday">Move today to tomorrow</button>
+    <button class="pill" data-clearday>Clear this day</button>
     <button class="pill" id="resetDay">Reset this day</button>
     <div class="acct" id="acct"></div>
   </div>
@@ -1213,6 +1216,7 @@ function userPlan(c,label){
 }
 const hhmmOf=m=>pad(Math.floor(((m%1440)+1440)%1440/60))+":"+pad(((m%60)+60)%60);
 function planFor(key){
+  { const c0=ST().custom&&ST().custom[key]; if(c0&&c0.cleared&&!(c0.blocks&&c0.blocks.length)) return {label:"Cleared",start:"09:00",end:"18:00",reminders:"You cleared this day. Add a task or make a plan any time.",blocks:[],none:"empty"}; }
   const cp=customPlan(key); if(cp) return cp;
   if(!JOBHUNT()){
     const r=ST().routine; if(r&&r.blocks&&r.blocks.length) return userPlan(r,"Your daily plan");
@@ -1270,7 +1274,7 @@ function runInfo(key,id){ const a=sessList(key,id); if(!a.length) return null; c
 /* when a started task will end: its length counted from when you started, with paused time added back */
 function taskEndM(key,b){ const sm=startedMin(key,b.id); if(sm==null) return null; const ri=runInfo(key,b.id); return ri&&ri.open?nowMin()+(b.d-ri.activeMin):sm+b.d; }
 /* the plan as it was that day, so later plan edits don't rewrite history */
-function snapDay(key){ const d=state.days[key]; if(!d) return; const bl=planFor(key).blocks; if(bl.length) d.snap=bl.map(b=>({id:b.id,t:b.t,d:b.d,title:b.title,kind:b.kind,core:!!b.core})); }
+function snapDay(key){ const d=state.days[key]; if(!d) return; const bl=planFor(key).blocks; if(!bl.length){ delete d.snap; return; } d.snap=bl.map(b=>({id:b.id,t:b.t,d:b.d,title:b.title,kind:b.kind,core:!!b.core})); }
 /* read-only view of a day for the dashboard: never creates an empty day */
 function dayView(key){ const ds=state.days[key]||{}, src=ds.snap&&ds.snap.length?ds.snap:planFor(key).blocks; let shift=0;
   return src.map((b,i)=>{ (ds.shifts||[]).forEach(x=>{ if(x.from===i) shift+=x.by; }); const st=toMin(b.t)+shift; return {id:b.id,title:b.title,kind:b.kind,core:!!b.core,d:b.d,i,planS:toMin(b.t),s:st,e:st+b.d}; }); }
@@ -1633,9 +1637,35 @@ function hvaiApplyPlan(a){
   if(a.date!==tk) setTimeout(()=>toast("Plan saved for "+(a.date===addDays(tk,1)?"tomorrow, ":"")+niceDate(a.date)+". It starts at "+fmt(toMin(a.blocks[0].start))+"."),300);
   return ()=>{ if(prev) state.custom[a.date]=prev; else delete state.custom[a.date]; save(); render(false); };
 }
+/* what HV AI knows about the coming days, and what a delete would remove (shown on the confirm card) */
+function hvaiUpcoming(){ const tk=keyOf(new Date()), out=[]; for(let i=0;i<14;i++){ const k=addDays(tk,i), bl=dayBlocks(k); if(bl.length) out.push({date:k,from:followsRoutine(k)?"daily plan":"this day's own plan",tasks:bl.sort((a,b)=>a.t<b.t?-1:1).map(b=>({block_id:b.id,start:b.t,title:b.title}))}); } return out; }
+function hvaiPreviewDelete(action){
+  const a=action.args||{}, tk=keyOf(new Date()), norm=x=>String(x||"").toLowerCase().replace(/[^a-z0-9\u0900-\u097f ]+/g," ").replace(/\s+/g," ").trim();
+  if(action.type==="deleteTasks"){
+    if(a.date<tk) return {ok:false,message:niceDate(a.date)+" has already passed."};
+    const bl=dayBlocks(a.date); if(!bl.length) return {ok:false,message:"There are no tasks on "+niceDate(a.date)+"."};
+    const ids=(a.block_ids||[]).filter(id=>bl.some(b=>b.id===id));
+    (a.titles||[]).forEach(t=>{ const n=norm(t); const m=bl.find(b=>norm(b.title)===n)||bl.find(b=>n&&norm(b.title).indexOf(n)>=0); if(m&&ids.indexOf(m.id)<0) ids.push(m.id); });
+    if(!ids.length) return {ok:false,message:"I couldn't find "+((a.titles||[]).length?"\u201c"+a.titles.join(", ")+"\u201d":"those tasks")+" on "+niceDate(a.date)+"."};
+    return {ok:true,days:[{date:a.date,tasks:bl.filter(b=>ids.indexOf(b.id)>=0).sort((x,y)=>x.t<y.t?-1:1).map(b=>({id:b.id,start:b.t,title:b.title}))}]};
+  }
+  let keys=[];
+  if(a.all_upcoming){ for(let i=0;i<60;i++) keys.push(addDays(tk,i)); }
+  else { (a.dates||[]).forEach(d=>keys.push(d)); if(a.from){ let k=a.from<tk?tk:a.from; const end=a.to&&a.to>=k?a.to:k; for(let i=0;i<60&&k<=end;i++){ keys.push(k); k=addDays(k,1); } } }
+  keys=[...new Set(keys)].filter(k=>k>=tk).sort();
+  const daily=!!a.include_daily_plan||(!!a.all_upcoming&&!!(state.routine&&state.routine.blocks&&state.routine.blocks.length));
+  let days=keys.map(k=>({date:k,tasks:dayBlocks(k).sort((x,y)=>x.t<y.t?-1:1).map(b=>({id:b.id,start:b.t,title:b.title}))})).filter(d=>d.tasks.length);
+  if(a.all_upcoming&&daily) days=days.slice(0,7).concat(days.length>7?[{date:addDays(tk,7),tasks:[{title:"and every day after"}]}]:[]);
+  if(!days.length) return {ok:false,message:"There's nothing planned on "+(keys.length===1?niceDate(keys[0]):"those days")+"."};
+  return {ok:true,days,daily,keys:a.all_upcoming?[]:days.map(d=>d.date)};
+}
 async function hvaiExecute(actions){              // HV Reset's HV AI changes only HV Reset (day plans); HV Vault data is changed only in HV Vault
   const msgs=[], undos=[];
   actions.filter(a=>a.type==="buildDayPlan"||a.type==="editDayPlan").forEach(a=>{ undos.push(hvaiApplyPlan(a.args)); msgs.push("Saved your plan for "+niceDate(a.args.date)+": "+a.args.blocks.length+" blocks."); });
+  actions.filter(a=>a.type==="deleteTasks"||a.type==="clearPlans").forEach(a=>{ const r=a.resolved||hvaiPreviewDelete(a); if(!r||!r.ok) return; const snap=taskSnapshot();
+    if(a.type==="deleteTasks"){ const d=r.days[0]; deleteTasksOn(d.date,d.tasks.map(t=>t.id)); msgs.push("Deleted "+d.tasks.map(t=>t.title).join(", ")+" from "+niceDate(d.date)+"."); }
+    else { clearDays(r.keys||[],r.daily); msgs.push(r.daily?"Cleared all upcoming days and your daily plan.":"Cleared "+r.days.map(d=>niceDate(d.date)).join(", ")+"."); }
+    save(); undos.push(()=>{ const o=JSON.parse(snap); state.custom=o.custom; state.routine=o.routine; state.days=o.days; save(); render(false); tickTimers(); }); });
   hvRerender();
   return {messages:msgs,undo:async()=>{ for(const u of undos.reverse()) await u(); return "Undone."; }};
 }
@@ -1650,11 +1680,13 @@ function hvaiMount(){
     getSettings:()=>HVAIX.pickConfig(HV.data&&HV.data.settings||{}),   // the site's built-in AI: no key needed
     getPlan:()=>hvaiPlan(keyOf(new Date())),
     getContext:()=>{ const c=HVAIX.buildContext(HV.data,hvaiPlan(keyOf(new Date())));   // an object: today's date, time and plan
+      c.upcoming_plans=hvaiUpcoming(); if(state.routine&&state.routine.blocks&&state.routine.blocks.length) c.daily_plan=state.routine.blocks.map(b=>({block_id:b.id,start:b.t,title:b.title}));
       if(AC.uid&&aboutName()) c.about_user={name:aboutName(),does:aboutOcc()||undefined,note:"Use their first name now and then, and plan in a way that suits what they do."};
       return c; },
     userName:()=>(AC.uid&&(aboutFirst()||(HV.data&&HV.data.settings&&HV.data.settings.myName)))||"",
     isDark:()=>/night|evening/.test(document.documentElement.getAttribute("data-phase")||""),
     fabCSS:"@media(max-width:900px){.hvai-fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}",
+    previewDelete:hvaiPreviewDelete,
     execute:hvaiExecute});
 }
 
@@ -2293,6 +2325,25 @@ function taskAct(op,key,id){
     undoToast("Deleted "+b.title+(scope==="every"?" from every day.":"."),snap); });
   if(op==="edit") return openTaskEdit(key,b);
 }
+/* delete tasks from one day, or empty whole days: used by Full day and by HV AI (always after a confirm) */
+function deleteTasksOn(key,ids){
+  const ds=dayState(key), sorted=dayBlocks(key).sort((x,y)=>x.t<y.t?-1:1);
+  const idx=ids.map(id=>sorted.findIndex(x=>x.id===id)).filter(i=>i>=0).sort((a,b)=>b-a);
+  const left=sorted.filter(x=>ids.indexOf(x.id)<0); state.custom=state.custom||{}; state.custom[key]=left.length?{blocks:left}:{blocks:[],cleared:true};
+  idx.forEach(i=>{ ds.shifts=(ds.shifts||[]).map(x=>x.from>i?Object.assign({},x,{from:x.from-1}):x); });
+  ids.forEach(id=>{ ["done","skipped","started","focus","intr","mv"].forEach(k=>{ if(ds[k]) delete ds[k][id]; }); if(ds.sess) delete ds.sess[id]; if(openTrack===id) openTrack=null; });
+}
+function clearDays(keys,daily){
+  state.custom=state.custom||{};
+  if(daily){ state.routine=null; const tk=keyOf(new Date()); Object.keys(state.custom).forEach(k=>{ if(k>=tk) delete state.custom[k]; }); }   // nothing fills the days any more
+  keys.forEach(k=>{ state.custom[k]={blocks:[],cleared:true}; const ds=state.days[k]; if(ds) ds.shifts=[]; });
+}
+function openClearDay(key){
+  const bl=dayBlocks(key); if(!bl.length){ toast((isToday(key)?"Today":niceDate(key))+" is already empty."); return; }
+  pendingTask={key,go:null};
+  modal('<h3>Clear '+(isToday(key)?"today":niceDate(key))+'?</h3><p>These tasks will be removed:</p><ul class="clr-list">'+bl.sort((a,b)=>a.t<b.t?-1:1).map(b=>'<li><span>'+fmt(toMin(b.t))+'</span>'+esc(b.title)+'</li>').join("")+'</ul>'+
+    '<div class="actions"><button class="primary danger-btn" data-clearday-go="day">Clear this day</button>'+(followsRoutine(key)?'<button class="secondary danger" data-clearday-go="daily">Delete my daily plan (every day)</button>':'')+'</div>',"Cancel");
+}
 function openTaskEdit(key,b){
   modal('<h3>Edit task</h3><p>'+(isToday(key)?"Today":niceDate(key))+'</p><ol class="pb-list" id="pbList">'+pbRowHTML({t:b.t,title:b.title,d:b.d,kind:PB_KIND_NAME[b.kind]?b.kind:"work"}).replace('<button type="button" class="x" data-pbdel aria-label="Remove this block">&times;</button>','<span></span>')+'</ol>'+
     '<label class="te-core"><input type="checkbox" id="teCore"'+(b.core?" checked":"")+'> Must do (can shrink on a hard day, never dropped)</label>'+
@@ -2406,6 +2457,9 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-absave")) return aboutSubmit();
   if(t.hasAttribute("data-ablater")){ try{ sessionStorage.setItem("hr-about-later@"+AC.uid,"1"); }catch(e){} closeModal(); toast("No problem. You can add it any time from your account menu."); return; }
   if(t.hasAttribute("data-abedit")){ accMenu(false); return aboutAsk(HVC().user); }
+  if(t.hasAttribute("data-clearday")){ setDrawer(false); return openClearDay(selKey); }
+  if(t.dataset.cleardayGo){ const key=selKey, snap=taskSnapshot(), daily=t.dataset.cleardayGo==="daily"; clearDays(daily?[]:[key],daily); closeModal(); save(); render(false); tickTimers();
+    return undoToast(daily?"Deleted your daily plan.":"Cleared "+(isToday(key)?"today":niceDate(key))+".",snap); }
   if(t.dataset.tact){ const [op,id]=t.dataset.tact.split("|"); return taskAct(op,selKey,id); }
   if(t.dataset.tscope){ const pt=pendingTask; pendingTask=null; if(pt) pt.go(t.dataset.tscope); return; }
   if(t.dataset.tesave){ const [k,id]=t.dataset.tesave.split("|"); return taskEditSave(k,id); }
