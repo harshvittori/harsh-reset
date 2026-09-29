@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790900000">
+<meta name="build" content="1790910000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -977,7 +977,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
   <p class="dr-sub" id="dateline"></p>
   <nav class="days" id="days" aria-label="Choose a day"></nav>
   <ol class="track" id="track"></ol>
-  <div class="rules hvbox jobonly" id="hvDrawer"></div>
+  <div class="rules hvbox" id="hvDrawer" hidden></div>
   <div class="rules jobonly">
     <h3>Today's rules</h3>
     <ul>
@@ -1198,7 +1198,7 @@ function planIndex(key){
 }
 /* Plans people make themselves (the plan builder or HV AI): {blocks:[{id,t,d,title,kind,core}]}.
    state.routine is the plan for every day; state.custom[date] is a plan for one date and wins over it.
-   The built-in job-hunt program (dayOne/dayTwo/dayRegular) is the owner's own: only state.program="jobhunt" uses it. */
+   The old built-in job-hunt program (dayOne/dayTwo/dayRegular) is retired; dropJobHunt() moves old accounts off it. */
 const ST=()=>(typeof state!=="undefined"&&state)||{};
 const JOBHUNT=()=>ST().program==="jobhunt";
 const hasAnyPlan=()=>JOBHUNT()||!!(ST().routine&&ST().routine.blocks&&ST().routine.blocks.length)||!!(ST().custom&&Object.values(ST().custom).some(c=>c&&c.blocks&&c.blocks.length));
@@ -1250,7 +1250,15 @@ const ACC=!window.claude&&!!(window.HVCloud&&window.HVCloud.configured);
 if(!ACC) document.body.classList.remove("gated");
 if(!ACC){ try{const s=localStorage.getItem(LS); if(s) state=JSON.parse(s)||state;}catch(e){} }
 if(!state.days) state.days={};
-if(!ACC&&!state.program) state.program="jobhunt";
+/* The built-in job-hunt plan is retired: nobody gets default tasks, everyone starts empty and makes their own plan.
+   Old job-hunt days keep what they showed (a snapshot), so past records still read right. */
+function dropJobHunt(){
+  if(state.program!=="jobhunt") return false;
+  const tk=keyOf(new Date());
+  Object.keys(state.days||{}).forEach(k=>{ const d=state.days[k]; if(k<tk&&d&&!(d.snap&&d.snap.length)&&!(state.custom&&state.custom[k]&&state.custom[k].blocks&&state.custom[k].blocks.length)){ try{ const bl=planFor(k).blocks; if(bl.length) d.snap=bl.map(b=>({id:b.id,t:b.t,d:b.d,title:b.title,kind:b.kind,core:!!b.core})); }catch(e){} } });
+  delete state.program; state.updatedAt=Date.now(); return true;
+}
+if(!ACC&&dropJobHunt()){ try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){} }
 function dayState(key){ if(!state.days[key]) state.days[key]={done:{},skipped:{},steps:{},shifts:[],apps:0,msgs:0,good:"",tomorrow:""}; return state.days[key]; }
 /* ---------- time tracking ----------
    Every start, pause, resume and finish of a task is kept as a timer session in the day:
@@ -1379,7 +1387,7 @@ async function acOpen(u){
       if(useGuest){ base=guest; base.updatedAt=Date.now(); push=true; }
     }
     state=base; if(!state.days) state.days={};
-    if(owner&&!state.program){ state.program="jobhunt"; state.updatedAt=Date.now(); push=true; }   // the built-in job-hunt program is the owner's
+    if(dropJobHunt()) push=true;
     AC.guestDirty=false; AC.loading=false;
     if(push) await acPush();
     if(owner&&!moved) localStorage.setItem(LS+"-moved@"+u.uid,"1");
@@ -1479,17 +1487,6 @@ const HV_MAIN="jobhunthub-data-v1", HV_LINBOX="hv-inbox";
 const HV_APPLIED=["Applied","Follow-up Needed","Recruiter Responded","Interview","Assignment","Final Round","Offer","Rejected","Closed"];
 const HVC=()=>(window.HVCloud&&window.HVCloud.configured?window.HVCloud:null);
 function hvLocalInbox(){ try{ const a=JSON.parse(localStorage.getItem(HV_LINBOX)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-/* HV Vault's copy in this browser. Opening must never create its database (HV Vault would then miss its setup). */
-function hvIDB(){ return new Promise(res=>{ try{
-  const r=indexedDB.open("hv-vault",1);
-  r.onupgradeneeded=()=>{ try{ r.transaction.abort(); }catch(e){} };
-  r.onerror=()=>res(null); r.onblocked=()=>res(null);
-  r.onsuccess=()=>{ const db=r.result; try{
-    if(!db.objectStoreNames.contains("kv")){ db.close(); return res(null); }
-    const g=db.transaction("kv","readonly").objectStore("kv").get(HV_MAIN);
-    g.onsuccess=()=>{ db.close(); res(g.result||null); }; g.onerror=()=>{ db.close(); res(null); };
-  }catch(e){ try{db.close();}catch(e2){} res(null); } };
-}catch(e){ res(null); } }); }
 async function hvRefresh(){
   if(HV.loading) return; HV.loading=true;
   try{
@@ -1500,10 +1497,9 @@ async function hvRefresh(){
         const g=await c.getValue("hv/"+encodeURIComponent(HV_MAIN)); raw=g&&g.value; via="cloud";
         const doc=await c.req("GET","apps/inbox");
         Object.entries((doc&&doc.fields)||{}).forEach(([k,v])=>{ if(/^a_/.test(k)){ try{ pend.push(JSON.parse(v.stringValue)); }catch(e){} } });
-      }catch(e){ raw=null; }
+      }catch(e){ HV.loading=false; return; }   // a failed read keeps what we had
     }
-    if(!raw){ raw=await hvIDB(); via=raw?"local":""; }
-    pend=pend.concat(hvLocalInbox());
+    // HV Vault shows here only for someone signed in whose Google account also has HV Vault data
     const data=raw?JSON.parse(raw):null;
     const done=new Set((data&&data.settings&&data.settings.inboxDone)||[]);
     HV.data=data&&Array.isArray(data.jobs)?data:null; HV.via=HV.data?via:"";
@@ -1562,6 +1558,7 @@ function hvWeek(){
     interviews:jobs.filter(j=>inW(j.interview_date)||(j.timeline||[]).some(e=>inW(e.date)&&/Moved to Interview/.test(e.event||""))).length };
 }
 function hvStatusLine(){
+  if(!HV.data) return "";
   if(HV.data) return '<p class="hv-src">'+(HV.via==="cloud"?"Synced with HV Vault":"From HV Vault in this browser")+(HV.pending.length?" · "+HV.pending.length+" waiting for HV Vault to record":"")+'</p>';
   return '<p class="hv-empty">'+(HVC()?'Connect HV Vault to see your queue and follow-ups. <button data-hv="signin">Sign in with Google</button>':"Open HV Vault once in this browser to connect it.")+'</p>';
 }
@@ -2065,7 +2062,7 @@ function renderDrawer(){
   let tabs=""; for(let i=0;i<7;i++){ const dd=new Date(first.getFullYear(),first.getMonth(),first.getDate()+i); const k=keyOf(dd); const p=state.days[k]?progress(k):0;
     tabs+='<button class="'+(k===selKey?"sel":"")+'" data-day="'+k+'"><small>'+(isToday(k)?"Today":DAYN[dd.getDay()])+'</small><b>'+dd.getDate()+' '+MON[dd.getMonth()]+'</b><span class="dot '+(p>=80?"full":p>0?"part":"")+'"></span></button>'; }
   $("days").innerHTML=tabs;
-  $("hvDrawer").innerHTML=hvDrawerHTML();
+  { const h=HV.data?hvDrawerHTML():""; $("hvDrawer").innerHTML=h; $("hvDrawer").hidden=!h; }
   const v=cardView(), ds=dayState(selKey);
   $("track").innerHTML=v.blocks.map(b=>{
     const started=!b.done&&!b.skipped&&ds.started&&ds.started[b.id];
@@ -2535,6 +2532,7 @@ window.HRApp={
   save(){ save(); render(false); tickTimers(); }, toast, goTask, openPlanner:m=>{ closeModal(); openPlanner(m||"edit"); }, openQuickAdd:()=>{ openQuickAdd(); },
   moveToTomorrow(key,id){ const ds=dayState(key); sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"tomorrow"}; save(); render(false); tickTimers(); }
 };
+if(window.__HV_TEST_CLOUD) window.HRApp._t={dropJobHunt,dayBlocks,renderDrawer,render,HV};   // tests only
 /* ---------- cross-device sync ---------- */
 (async()=>{
   try{
