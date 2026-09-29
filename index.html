@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790890000">
+<meta name="build" content="1790900000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1666,6 +1666,7 @@ async function hvaiExecute(actions){              // HV Reset's HV AI changes on
     if(a.type==="deleteTasks"){ const d=r.days[0]; deleteTasksOn(d.date,d.tasks.map(t=>t.id)); msgs.push("Deleted "+d.tasks.map(t=>t.title).join(", ")+" from "+niceDate(d.date)+"."); }
     else { clearDays(r.keys||[],r.daily); msgs.push(r.daily?"Cleared all upcoming days and your daily plan.":"Cleared "+r.days.map(d=>niceDate(d.date)).join(", ")+"."); }
     save(); undos.push(()=>{ const o=JSON.parse(snap); state.custom=o.custom; state.routine=o.routine; state.days=o.days; save(); render(false); tickTimers(); }); });
+  if(undos.length){ render(false); tickTimers(); }   // show the change now (hvRerender skips while the chat box has focus)
   hvRerender();
   return {messages:msgs,undo:async()=>{ for(const u of undos.reverse()) await u(); return "Undone."; }};
 }
