@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HV Reset">
 <meta name="application-name" content="HV Reset">
-<meta name="build" content="1790870000">
+<meta name="build" content="1790880000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -281,6 +281,12 @@ body:has(.hvai:not([hidden])) .accwrap,body:has(#scrim.open) .hvai-fab,body:has(
 .pb-add{border:1px dashed var(--glass-border);background:none;color:var(--ink);border-radius:12px;padding:10px;width:100%;cursor:pointer;font-size:14.5px}
 .pb-when{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;font-size:14.5px}
 .pb-when label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.qa-day{margin:0 0 12px}
+.tb-acts{flex-wrap:wrap;gap:8px!important}.tb-acts .secondary{padding:8px 14px;font-size:14px}
+.secondary.danger{color:var(--late);border-color:color-mix(in srgb,var(--late) 45%,transparent)}
+.te-core{display:flex;gap:8px;align-items:center;margin:12px 0 0;font-size:14.5px;cursor:pointer}.te-core input{accent-color:var(--accent);width:16px;height:16px}
+.toast.act{pointer-events:auto;display:flex;align-items:center;gap:12px}
+.tundo{border:0;background:none;color:var(--accent);font-weight:700;font-size:15px;cursor:pointer;padding:2px 4px}
 .pb-err{color:#D0584C;font-size:14px;margin:8px 0 0}
 .pb-tip{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 @media (max-width:620px){.pb-starts{grid-template-columns:1fr}.pb-head{display:none}.pb-row{grid-template-columns:1fr .9fr 1.1fr 28px;grid-template-areas:"n n n x" "t d k k"}.pb-row .pt{grid-area:t}.pb-row .pn{grid-area:n}.pb-row .pd{grid-area:d}.pb-row .pk{grid-area:k}.pb-row .x{grid-area:x}.pb-row{padding-bottom:8px;border-bottom:1px solid var(--glass-border)}}
@@ -295,8 +301,11 @@ body.in-room .intro{opacity:0;filter:blur(18px);transform:scale(1.05);pointer-ev
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes breathe{0%,100%{transform:scale(.94);opacity:.7}50%{transform:scale(1.06);opacity:1}}
 .intro-inner{position:relative}
+/* the timer screen scrolls whenever it doesn't fit (short windows, bookmarks bar, zoom), and stays centred when it does */
+body:not(.noplan) .intro{display:flex;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;overscroll-behavior:contain}
+body:not(.noplan) .intro-inner{padding:76px 16px 84px}
 .intro-date{font-size:16px;color:var(--muted);margin:0 0 18px;letter-spacing:.02em}
-.bigtime{font-family:var(--display);font-weight:200;font-size:clamp(72px,10.5vw,210px);line-height:1;letter-spacing:-.02em;display:inline-flex;}
+.bigtime{font-family:var(--display);font-weight:200;font-size:clamp(64px,min(10.5vw,21vh),210px);line-height:1;letter-spacing:-.02em;display:inline-flex;}
 .d{position:relative;display:inline-block;width:.64em;height:1.08em;overflow:hidden}
 .d.sep{width:.3em;opacity:.35}
 @keyframes sep{50%{opacity:.2}}
@@ -1682,7 +1691,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
 const CHECK='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const KIND={work:"Work",claude:"With Claude",rest:"Break",meal:"Meal",start:"Start",close:"Wrap-up",free:"Free time"};
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2400);}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.remove("act");t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2400);}
 function copyText(txt){ (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast("Copied"),()=>{const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Copied");}catch(e){toast("Copy failed. Select the text manually.");}ta.remove();}); }
 
 function stepPlain(s){ if(typeof s==="string") return md(s); return "<b>"+esc(s.h)+"</b>"+(s.pts.length?'<ul class="sub">'+s.pts.map(x=>"<li>"+md(x)+"</li>").join("")+"</ul>":""); }
@@ -2032,7 +2041,7 @@ function renderDrawer(){
     let tag=KIND[b.kind]; if(b.done){ const dt=new Date(ds.done[b.id]); tag=b.skipped==="min"?"Minimum version":"Done at "+fmt(dt.getHours()*60+dt.getMinutes()); } else if(b.skipped) tag="Skipped"; else if(started) tag=st==="late"?"In progress, late":"In progress"; else if(isNext){ const at=nextAt(selKey,v.cur,b); tag="Up next"+(at>v.nm?" · in "+inTxt(at-v.nm):""); } else if(st==="late") tag="Late"; else if(st==="current") tag="Now";
     const open=openTrack===b.id;
     return '<li class="tb '+st+(started?" inprogress":"")+(isNext?" upnext-tb":"")+'"><span class="node"></span><button class="tb-btn" data-open="'+b.id+'" aria-expanded="'+open+'"><span><span class="n">'+esc(b.title)+'</span><span class="tag">'+esc(tag)+'</span></span><span class="t">'+fmt(b.s)+'</span></button>'+
-      (open?'<div class="tb-detail"><p><b>Finish line:</b> '+esc(b.finish)+'</p>'+stepsHTML(b,selKey)+snipsHTML(b)+'<div class="actions">'+(b.done||b.skipped?'<button class="secondary" data-undo="'+b.id+'">Wapas kholo</button>':'<button class="secondary" data-done="'+b.id+'">Mark as done</button>')+'</div></div>':'')+'</li>';
+      (open?'<div class="tb-detail"><p><b>Finish line:</b> '+esc(b.finish)+'</p>'+stepsHTML(b,selKey)+snipsHTML(b)+'<div class="actions tb-acts">'+(b.done||b.skipped?'<button class="secondary" data-undo="'+b.id+'">Open again</button>':'<button class="secondary" data-done="'+b.id+'">Mark as done</button><button class="secondary" data-tact="edit|'+b.id+'">Edit</button><button class="secondary" data-tact="skip|'+b.id+'">Skip '+(isToday(selKey)?"today":"this day")+'</button><button class="secondary" data-tact="move|'+b.id+'">Move to tomorrow</button>')+(b.done||b.skipped?'<button class="secondary" data-tact="edit|'+b.id+'">Edit</button>':'')+'<button class="secondary danger" data-tact="delete|'+b.id+'">Delete</button></div></div>':'')+'</li>';
   }).join("");
 }
 function render(anim){ renderMeta(); renderCard(!!anim); renderDrawer(); }
@@ -2143,7 +2152,7 @@ let PB=null;
 const PB_KIND_NAME={work:"Focus",meal:"Meal",rest:"Break",free:"Free time"};
 function pbRowHTML(r){
   const t=r.t||"09:00", k=PB_KIND_NAME[r.kind]?r.kind:"work", d=r.d||60;
-  return '<li class="pb-row">'+
+  return '<li class="pb-row"'+(r.id?' data-id="'+esc(r.id)+'"':'')+(r.core?' data-core="1"':'')+'>'+
     '<button type="button" class="pt pick" data-pick="time" data-v="'+esc(t)+'" aria-label="Start time">'+fmt(toMin(t))+'</button>'+
     '<input class="pn" type="text" maxlength="80" value="'+esc(r.title)+'" placeholder="What will you do?" aria-label="Task">'+
     '<button type="button" class="pd pick" data-pick="dur" data-v="'+d+'" aria-label="How long">'+durTxt(d)+'</button>'+
@@ -2195,7 +2204,7 @@ function pickSync(){
   else pop.querySelectorAll("[data-tpk]").forEach(b=>b.classList.toggle("on",b.dataset.tpk===pickFor.dataset.v));
 }
 function pickClose(){ const p=$("tpop"); if(p) p.remove(); if(pickFor) pickFor.focus({preventScroll:true}); pickFor=null; }
-function pbRead(){ PB.rows=[...document.querySelectorAll("#pbList .pb-row")].map(li=>({t:li.querySelector(".pt").dataset.v,title:li.querySelector(".pn").value.trim(),d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").dataset.v,10)||30)),kind:li.querySelector(".pk").dataset.v})); const w=document.querySelector('input[name="pbwhen"]:checked'); if(w) PB.when=w.value; }
+function pbRead(){ PB.rows=[...document.querySelectorAll("#pbList .pb-row")].map(li=>({id:li.dataset.id||undefined,core:li.dataset.core==="1"||undefined,t:li.querySelector(".pt").dataset.v,title:li.querySelector(".pn").value.trim(),d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").dataset.v,10)||30)),kind:li.querySelector(".pk").dataset.v})); const w=document.querySelector('input[name="pbwhen"]:checked'); if(w){ PB.when=w.value==="every"?"every":"day"; if(w.value!=="every") PB.day=w.value; } }
 function pbChoose(){
   modal('<h3>Make your plan</h3><p>Start from a ready plan and change anything you like, or start empty.</p><div class="pb-starts">'+
     Object.entries(PB_STARTS).map(([k,v])=>'<button class="pb-start" data-pbstart="'+k+'"><b>'+v.name+'</b><span>'+v.sub+'</span></button>').join("")+'</div>'+
@@ -2207,7 +2216,7 @@ function pbEdit(){
   modal('<h3>'+(PB.editing?"Edit your plan":"Your plan")+'</h3><p>Tap a time, length or type to change it. Add or remove tasks as you like.</p>'+
     '<div class="pb-head"><span>Starts</span><span>Task</span><span>How long</span><span>Type</span><span></span></div><ol class="pb-list" id="pbList">'+PB.rows.map(pbRowHTML).join("")+'</ol>'+
     '<button class="pb-add" data-pbadd>+ Add a block</button>'+
-    '<div class="pb-when"><label><input type="radio" name="pbwhen" value="every"'+(PB.when!=="today"?" checked":"")+'> Use this plan every day</label><label><input type="radio" name="pbwhen" value="today"'+(PB.when==="today"?" checked":"")+'> Only for today</label></div>'+
+    '<div class="pb-when">'+dayChoices("pbwhen",PB.when==="every"?"every":(PB.day||keyOf(new Date())),true)+'</div>'+
     '<p class="pb-err" id="pbErr" hidden></p><div class="actions"><button class="primary" data-pbsave>Save my plan</button></div>',"Cancel");
   $("modal").scrollTop=0;
   const first=document.querySelector("#pbList .pn"); if(first&&!first.value) first.focus({preventScroll:true});
@@ -2215,10 +2224,10 @@ function pbEdit(){
 function openPlanner(mode){
   if(mode==="ai"){ if(hvai&&hvai.open){ hvai.open(); } else toast("HV AI is loading. Try again in a moment."); return; }
   if(mode==="edit"){
-    const tk=keyOf(new Date()), c=state.custom&&state.custom[tk], src=(c&&c.blocks&&c.blocks.length)?c:state.routine;
-    if(src&&src.blocks&&src.blocks.length){ PB={editing:true,when:src===c?"today":"every",rows:src.blocks.slice().sort((a,b)=>a.t<b.t?-1:1).map(b=>({t:b.t,title:b.title,d:b.d,kind:PB_KINDS.some(k=>k[0]===b.kind)?b.kind:"work"}))}; return pbEdit(); }
+    const tk=selKey>=keyOf(new Date())?selKey:keyOf(new Date()), c=state.custom&&state.custom[tk], src=(c&&c.blocks&&c.blocks.length)?c:state.routine;   // the day open in Full day
+    if(src&&src.blocks&&src.blocks.length){ PB={editing:true,when:src===c?"day":"every",day:tk,rows:src.blocks.slice().sort((a,b)=>a.t<b.t?-1:1).map(b=>({id:b.id,core:b.core,t:b.t,title:b.title,d:b.d,kind:PB_KINDS.some(k=>k[0]===b.kind)?b.kind:"work"}))}; return pbEdit(); }
   }
-  PB={editing:false,when:"every",rows:[]}; pbChoose();
+  PB={editing:false,when:"every",day:keyOf(new Date()),rows:[]}; pbChoose();
 }
 /* Add one task to today only (keeps the rest of today's plan and what's already done) */
 /* ---------- productivity dashboard (dashboard.js) ---------- */
@@ -2228,8 +2237,8 @@ function openReport(opts){ if(window.HRDash) return window.HRDash.open(opts||{})
 function goTask(key,id){ selKey=key; openTrack=id||null; closeModal(); started=true; document.body.classList.add("in-room"); render(false); setDrawer(true); renderDrawer();
   const el=id&&document.querySelector('#track [data-open="'+id+'"]'); if(el) el.scrollIntoView({block:"center"}); }
 function openQuickAdd(){
-  const nm=Math.ceil((nowMin()+1)/5)*5, t=hhmmOf(Math.min(nm,23*60+55));
-  modal('<h3>Add a task for today</h3><p>It&#39;s added to today only. Your other days don&#39;t change.</p>'+
+  const nm=Math.ceil((nowMin()+1)/5)*5, t=hhmmOf(Math.min(nm,23*60+55)), tk=keyOf(new Date()), day=selKey>=tk&&$("drawer").classList.contains("open")?selKey:tk;
+  modal('<h3>Add a task</h3><p>It&#39;s added to that day only. Your other days don&#39;t change.</p><div class="pb-when qa-day">'+dayChoices("qaday",day,false)+'</div>'+
     '<ol class="pb-list" id="pbList">'+pbRowHTML({t,title:"",d:30,kind:"work"}).replace('<button type="button" class="x" data-pbdel aria-label="Remove this block">&times;</button>','<span></span>')+'</ol>'+
     '<p class="pb-err" id="pbErr" hidden></p><div class="actions"><button class="primary" data-qasave>Add task</button></div>',"Cancel");
   $("modal").scrollTop=0; const n=document.querySelector("#pbList .pn"); if(n) n.focus({preventScroll:true});
@@ -2238,11 +2247,65 @@ function quickAddSave(){
   const li=document.querySelector("#pbList .pb-row"), err=$("pbErr");
   const title=li.querySelector(".pn").value.trim(), t=li.querySelector(".pt").dataset.v, d=Math.max(5,parseInt(li.querySelector(".pd").dataset.v,10)||30), kind=li.querySelector(".pk").dataset.v;
   if(!title){ err.textContent="Give the task a name."; err.hidden=false; li.querySelector(".pn").focus(); return; }
-  const tk=keyOf(new Date()); state.custom=state.custom||{};
-  const c=state.custom[tk], base=(c&&c.blocks&&c.blocks.length)?c.blocks:((state.routine&&state.routine.blocks)||[]);
-  const blocks=base.map(b=>Object.assign({},b)).concat([{id:"q"+Date.now().toString(36),t,d,title,kind,core:kind==="work"}]).sort((a,b)=>a.t<b.t?-1:1);
-  if(!state.since) state.since=tk; state.custom[tk]={blocks}; selKey=tk; save(); closeModal(); render(true); tickTimers();
-  toast("Added: "+title+" at "+fmt(toMin(t))+".");
+  const w=document.querySelector('input[name="qaday"]:checked'), tk=w?w.value:keyOf(new Date()); state.custom=state.custom||{};
+  const blocks=dayBlocks(tk).concat([{id:"q"+Date.now().toString(36),t,d,title,kind,core:kind==="work"}]).sort((a,b)=>a.t<b.t?-1:1);
+  if(!state.since) state.since=keyOf(new Date()); state.custom[tk]={blocks}; selKey=tk; save(); closeModal(); render(true); tickTimers();
+  toast("Added: "+title+" at "+fmt(toMin(t))+(tk!==keyOf(new Date())?", "+niceDate(tk):"")+".");
+}
+/* ---------- change one task by hand: edit, skip, move to tomorrow, delete ----------
+   Everything HV AI can do to a plan can also be done here. A day with its own plan changes only that
+   day; a day that follows the daily plan asks "only this day, or every day?". Every change can be undone. */
+function dayChoices(name,sel,withEvery){ const tk=keyOf(new Date()), tm=addDays(tk,1), opts=[];
+  if(withEvery) opts.push(["every","Every day"]);
+  opts.push([tk,"Only today"],[tm,"Only tomorrow"]); if(sel!=="every"&&sel!==tk&&sel!==tm) opts.push([sel,"Only "+niceDate(sel)]);
+  return opts.map(([v,l])=>'<label><input type="radio" name="'+name+'" value="'+v+'"'+(v===sel?" checked":"")+'> '+l+'</label>').join(""); }
+function dayBlocks(key){                                               // this day's tasks as plain blocks (a copy)
+  const c=state.custom&&state.custom[key]; if(c&&c.blocks&&c.blocks.length) return c.blocks.map(b=>Object.assign({},b));
+  return planFor(key).blocks.map(b=>({id:b.id,t:b.t,d:b.d,title:b.title,kind:b.aiKind||b.kind,core:!!b.core})); }
+const followsRoutine=key=>!(state.custom&&state.custom[key]&&state.custom[key].blocks&&state.custom[key].blocks.length)&&!!(state.routine&&state.routine.blocks&&state.routine.blocks.length)&&!JOBHUNT();
+let pendingTask=null;
+function askScope(key,id,verb,go){                                     // "only this day, or every day?"
+  if(!followsRoutine(key)) return go("day");
+  pendingTask={key,id,go}; const b=dayBlocks(key).find(x=>x.id===id);
+  modal('<h3>'+verb+' \u201c'+esc(b?b.title:"this task")+'\u201d</h3><p>This task is part of your daily plan.</p><div class="actions"><button class="primary" data-tscope="day">Only '+(isToday(key)?"today":niceDate(key))+'</button><button class="secondary" data-tscope="every">Every day</button></div>',"Cancel");
+}
+function taskSnapshot(){ return JSON.stringify({custom:state.custom||{},routine:state.routine||null,days:state.days}); }
+function undoToast(msg,snap){ const t=$("toast"); t.innerHTML=esc(msg)+' <button class="tundo" data-tundo>Undo</button>'; t.classList.add("show","act"); undoToast.snap=snap;
+  clearTimeout(toast._t); toast._t=setTimeout(()=>{ t.classList.remove("show","act"); undoToast.snap=null; },6000); }
+function changeTask(key,id,scope,fn){                                  // fn(blocks) returns the new blocks
+  if(scope==="every"){ state.routine={blocks:fn(state.routine.blocks.map(b=>Object.assign({},b)))}; }
+  else { state.custom=state.custom||{}; state.custom[key]={blocks:fn(dayBlocks(key))}; }
+}
+function taskAct(op,key,id){
+  const b=dayBlocks(key).find(x=>x.id===id); if(!b) return; const snap=taskSnapshot(), ds=dayState(key);
+  if(op==="skip"){ sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"skip"}; save(); render(false); tickTimers(); return undoToast("Skipped "+b.title+" for "+(isToday(key)?"today":niceDate(key))+".",snap); }
+  if(op==="move"){ const nk=addDays(key,1);
+    sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"tomorrow"};
+    const nb=dayBlocks(nk), there=nb.some(x=>x.title.trim().toLowerCase()===b.title.trim().toLowerCase()&&x.t===b.t);   // a daily task is already on tomorrow's plan
+    if(!there){ state.custom=state.custom||{}; state.custom[nk]={blocks:nb.concat([Object.assign({},b,{id:"m"+Date.now().toString(36)})]).sort((x,y)=>x.t<y.t?-1:1)}; }
+    save(); render(false); tickTimers(); return undoToast(there?"Skipped "+b.title+" today. It's already on "+niceDate(nk)+"'s plan.":"Moved "+b.title+" to "+niceDate(nk)+", "+fmt(toMin(b.t))+".",snap); }
+  if(op==="delete") return askScope(key,id,"Delete",scope=>{
+    const i=dayBlocks(key).sort((x,y)=>x.t<y.t?-1:1).findIndex(x=>x.id===id);
+    changeTask(key,id,scope,bl=>bl.filter(x=>x.id!==id));
+    ds.shifts=(ds.shifts||[]).map(x=>x.from>i?Object.assign({},x,{from:x.from-1}):x);   // later "moved my day" shifts keep pointing at the same tasks
+    ["done","skipped","started","focus","intr","mv"].forEach(k=>{ if(ds[k]) delete ds[k][id]; }); if(ds.sess) delete ds.sess[id];
+    if(openTrack===id) openTrack=null; closeModal(); save(); render(false); tickTimers();
+    undoToast("Deleted "+b.title+(scope==="every"?" from every day.":"."),snap); });
+  if(op==="edit") return openTaskEdit(key,b);
+}
+function openTaskEdit(key,b){
+  modal('<h3>Edit task</h3><p>'+(isToday(key)?"Today":niceDate(key))+'</p><ol class="pb-list" id="pbList">'+pbRowHTML({t:b.t,title:b.title,d:b.d,kind:PB_KIND_NAME[b.kind]?b.kind:"work"}).replace('<button type="button" class="x" data-pbdel aria-label="Remove this block">&times;</button>','<span></span>')+'</ol>'+
+    '<label class="te-core"><input type="checkbox" id="teCore"'+(b.core?" checked":"")+'> Must do (can shrink on a hard day, never dropped)</label>'+
+    '<p class="pb-err" id="pbErr" hidden></p><div class="actions"><button class="primary" data-tesave="'+esc(key+"|"+b.id)+'">Save</button></div>',"Cancel");
+  const n=document.querySelector("#pbList .pn"); if(n) n.focus({preventScroll:true});
+}
+function taskEditSave(key,id){
+  const li=document.querySelector("#pbList .pb-row"), err=$("pbErr");
+  const nb={title:li.querySelector(".pn").value.trim(),t:li.querySelector(".pt").dataset.v,d:Math.max(5,Math.min(600,parseInt(li.querySelector(".pd").dataset.v,10)||30)),kind:li.querySelector(".pk").dataset.v,core:$("teCore").checked};
+  if(!nb.title){ err.textContent="Give the task a name."; err.hidden=false; return; }
+  const snap=taskSnapshot();
+  askScope(key,id,"Change",scope=>{ changeTask(key,id,scope,bl=>bl.map(x=>x.id===id?Object.assign({},x,nb):x).sort((x,y)=>x.t<y.t?-1:1));
+    closeModal(); save(); render(false); tickTimers(); undoToast("Saved "+nb.title+(scope==="every"?" for every day.":"."),snap); });
 }
 function pbSave(){
   pbRead(); const err=$("pbErr"), bad=m=>{ err.textContent=m; err.hidden=false; };
@@ -2251,18 +2314,18 @@ function pbSave(){
   if(rows.some(r=>!r.title)) return bad("Give every block a task name.");
   if(rows.some(r=>!/^\d\d:\d\d$/.test(r.t))) return bad("Give every block a start time.");
   rows.sort((a,b)=>a.t<b.t?-1:1);
-  const blocks=rows.map((r,i)=>({id:"u"+Date.now().toString(36)+i,t:r.t,d:r.d,title:r.title,kind:r.kind,core:r.kind==="work"}));
-  const tk=keyOf(new Date()), first=!hasAnyPlan();
+  const blocks=rows.map((r,i)=>({id:r.id||("u"+Date.now().toString(36)+i),t:r.t,d:r.d,title:r.title,kind:r.kind,core:r.core!=null?!!r.core:r.kind==="work"}));   // edited tasks keep their id, so today's progress stays
+  const tk=keyOf(new Date()), first=!hasAnyPlan(), day=PB.when==="every"?tk:(PB.day||tk);
   state.custom=state.custom||{};
   if(!state.since) state.since=tk;
-  if(PB.when==="today") state.custom[tk]={blocks};
+  if(PB.when!=="every") state.custom[day]={blocks};
   else { state.routine={blocks}; delete state.custom[tk]; }
-  const nm=nowMin(), ds=dayState(tk);                                  // blocks that were already over when the plan was made don't count as late
-  if(PB.when==="today"||!ds.done||!Object.keys(ds.done).length) blocks.forEach(b=>{ if(toMin(b.t)+b.d<=nm) ds.skipped[b.id]="before"; });
-  selKey=tk; save(); closeModal(); render(false); rollTo($("bigTime"),timerInfo().t); tickTimers();
+  if(day===tk){ const nm=nowMin(), ds=dayState(tk);                   // blocks that were already over when the plan was made don't count as late
+    if(PB.when!=="every"||!ds.done||!Object.keys(ds.done).length) blocks.forEach(b=>{ if(toMin(b.t)+b.d<=nm&&!(ds.done&&ds.done[b.id])) ds.skipped[b.id]="before"; }); }
+  selKey=day; save(); closeModal(); render(false); rollTo($("bigTime"),timerInfo().t); tickTimers();
   const live=currentBlock(timeline(tk).blocks);
   const nk=nextPlanDay(tk), nb=nk?timeline(nk).blocks[0]:null;
-  toast(!first?"Plan saved.":live?"Your plan is ready. Press Start to begin.":nb?"Your plan is ready. First task: "+nb.title+", "+(nk===addDays(tk,1)?"tomorrow":niceDate(nk))+" at "+fmt(nb.s)+".":"Your plan is ready.");
+  toast(!first?(day!==tk?"Plan saved for "+niceDate(day)+".":"Plan saved."):live?"Your plan is ready. Press Start to begin.":nb?"Your plan is ready. First task: "+nb.title+", "+(nk===addDays(tk,1)?"tomorrow":niceDate(nk))+" at "+fmt(nb.s)+".":"Your plan is ready.");
 }
 
 function closeModal(){ pickClose(); $("modal").classList.remove("wide"); modalKind=null; $("scrim").classList.remove("open"); clearInterval(modal._t); }
@@ -2343,6 +2406,10 @@ document.addEventListener("click",e=>{
   if(t.hasAttribute("data-absave")) return aboutSubmit();
   if(t.hasAttribute("data-ablater")){ try{ sessionStorage.setItem("hr-about-later@"+AC.uid,"1"); }catch(e){} closeModal(); toast("No problem. You can add it any time from your account menu."); return; }
   if(t.hasAttribute("data-abedit")){ accMenu(false); return aboutAsk(HVC().user); }
+  if(t.dataset.tact){ const [op,id]=t.dataset.tact.split("|"); return taskAct(op,selKey,id); }
+  if(t.dataset.tscope){ const pt=pendingTask; pendingTask=null; if(pt) pt.go(t.dataset.tscope); return; }
+  if(t.dataset.tesave){ const [k,id]=t.dataset.tesave.split("|"); return taskEditSave(k,id); }
+  if(t.hasAttribute("data-tundo")){ const sn=undoToast.snap; if(!sn) return; const o=JSON.parse(sn); state.custom=o.custom; state.routine=o.routine; state.days=o.days; undoToast.snap=null; $("toast").classList.remove("show","act"); save(); render(false); tickTimers(); toast("Undone."); return; }
   if(t.dataset.start) return askStart(t.dataset.start);
   if(t.dataset.pause){ sessPause(selKey,t.dataset.pause); save(); renderCard(false); tickTimers(); toast("Paused. The timer waits for you."); return; }
   if(t.dataset.resume){ sessResume(selKey,t.dataset.resume); save(); renderCard(false); tickTimers(); toast("Back to it."); return; }
