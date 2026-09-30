@@ -1371,8 +1371,9 @@ async function acLegacy(){
   let best=null;
   try{ const l=JSON.parse(localStorage.getItem(LS)||"null"); if(l&&l.days) best=l; }catch(e){}
   const ids=[LEGACY_ID]; try{ const x=localStorage.getItem(LS+"-sync"); if(x&&x!==LEGACY_ID) ids.push(x); }catch(e){}
+  let tk=null; try{ const u=window.firebase&&window.firebase.auth&&window.firebase.auth().currentUser; if(u) tk=await u.getIdToken(); }catch(e){}   // the owner's old plan only opens for the signed-in admin
   for(const id of ids){ try{
-    const r=await fetch("https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+id,{cache:"no-store"});
+    const r=await fetch("https://firestore.googleapis.com/v1/projects/harsh-reset/databases/(default)/documents/reset/"+id,{cache:"no-store",headers:tk?{Authorization:"Bearer "+tk}:{}});
     if(r.ok){ const d=await r.json(); best=newer(JSON.parse(d.fields.json.stringValue),best); }
   }catch(e){} }
   return best;
@@ -1769,7 +1770,7 @@ function progress(key){
 }
 
 /* ---------- helpers ---------- */
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
 const CHECK='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const KIND={work:"Work",claude:"With Claude",rest:"Break",meal:"Meal",start:"Start",close:"Wrap-up",free:"Free time"};
