@@ -96,7 +96,7 @@
   --accent:#A3B6FF; --done:#6FD6A0; --done-soft:rgba(111,214,160,.14); --warn:#F2B35E; --warn-soft:rgba(242,179,94,.14);
   --veil:rgba(4,7,15,.35); --stars:1;
 }
-:root[data-phase="morning"]{--sky1:#9DC1E4;--sky2:#D6E4F1;--sky3:#F5D9C0;--orb1:#FFD9AE;--orb2:#F4C3BD;--orb3:#BCD8F0;--stars:0;--sun-op:.85;--sun-x:22vw;--sun-y:58vh;--sun-c:#FFE2B8;--moon-op:0}
+:root[data-phase="morning"]{--sky1:#8DB6F2;--sky2:#D2E1F7;--sky3:#F8CFB4;--orb1:#FFD9AE;--orb2:#F6B7C8;--orb3:#BCD8F0;--stars:0;--sun-op:.85;--sun-x:22vw;--sun-y:58vh;--sun-c:#FFE2B8;--moon-op:0}
 :root[data-phase="afternoon"]{--sky1:#6EA6DA;--sky2:#BBDAF2;--sky3:#EFE8D4;--orb1:#FFF0C4;--orb2:#A3CEEF;--orb3:#C3E4D8;--stars:0;--sun-op:.9;--sun-x:70vw;--sun-y:10vh;--sun-c:#FFF6D8;--moon-op:0}
 :root[data-phase="evening"]{--sky1:#1C2853;--sky2:#77486C;--sky3:#E3876A;--orb1:#F0A064;--orb2:#9A5C8A;--orb3:#3A4C9A;--stars:.35;--sun-op:.95;--sun-x:74vw;--sun-y:66vh;--sun-c:#FFB27A;--moon-op:0}
 :root[data-phase="night"]{--sky1:#060B18;--sky2:#101632;--sky3:#241E38;--orb1:#2A3B8A;--orb2:#4A3969;--orb3:#1B5864;--stars:1;--sun-op:0;--moon-op:1}
@@ -870,13 +870,204 @@ body .hvai .hvai-msg.me{background:color-mix(in srgb,var(--accent) 20%,var(--gla
 body .hvai .hvai-send,body .hvai button.b.p,body .hvai a.b.p{box-shadow:0 10px 24px -12px color-mix(in srgb,var(--done) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
 body .hvai .hvai-x{background:var(--glass);border-color:var(--glass-border)}
 body .hvai .hvai-ttl b{font-family:var(--display)}
+
+/* =================== v2 look (home, timer states, task sheet, dock) =================== */
+@property --sky1{syntax:'<color>';inherits:true;initial-value:#8DB6F2}
+@property --sky2{syntax:'<color>';inherits:true;initial-value:#D2E1F7}
+@property --sky3{syntax:'<color>';inherits:true;initial-value:#F8CFB4}
+@property --orb1{syntax:'<color>';inherits:true;initial-value:transparent}
+@property --orb2{syntax:'<color>';inherits:true;initial-value:transparent}
+@property --orb3{syntax:'<color>';inherits:true;initial-value:transparent}
+@property --sun-c{syntax:'<color>';inherits:true;initial-value:#FFE2B8}
+@property --sun-op{syntax:'<number>';inherits:true;initial-value:0}
+@property --moon-op{syntax:'<number>';inherits:true;initial-value:0}
+@property --sun-x{syntax:'<length>';inherits:true;initial-value:22vw}
+@property --sun-y{syntax:'<length>';inherits:true;initial-value:58vh}
+@property --m1{syntax:'<color>';inherits:true;initial-value:#DDBCD8}
+@property --m2{syntax:'<color>';inherits:true;initial-value:#BCAFDD}
+@property --m3{syntax:'<color>';inherits:true;initial-value:#9DA2D4}
+@property --m4{syntax:'<color>';inherits:true;initial-value:#7F8DC7}
+@property --m5{syntax:'<color>';inherits:true;initial-value:#6077B5}
+@property --tree{syntax:'<color>';inherits:true;initial-value:#3F5691}
+@property --hazeC{syntax:'<color>';inherits:true;initial-value:#F5E6F0}
+/* switching the time of day blends every colour over ~2.4s instead of jumping */
+:root{transition:--sky1 2.4s ease,--sky2 2.4s ease,--sky3 2.4s ease,--orb1 2.4s ease,--orb2 2.4s ease,--orb3 2.4s ease,--sun-c 2.4s ease,--sun-op 2.4s ease,--moon-op 2.4s ease,--sun-x 2.4s ease,--sun-y 2.4s ease,--m1 2.4s ease,--m2 2.4s ease,--m3 2.4s ease,--m4 2.4s ease,--m5 2.4s ease,--tree 2.4s ease,--hazeC 2.4s ease;
+  --m1:#DDBCD8;--m2:#BCAFDD;--m3:#9DA2D4;--m4:#7F8DC7;--m5:#6077B5;--tree:#3F5691;--hazeC:#F5E6F0;--glowL:rgba(255,196,140,.55);--glowR:rgba(255,160,190,.45)}
+:root[data-phase="afternoon"]{--m1:#C3D6F0;--m2:#A2BCE4;--m3:#82A1D5;--m4:#6688C2;--m5:#4A6AA5;--tree:#3A5488;--hazeC:#E6F0FB;--glowL:rgba(255,240,200,.35);--glowR:rgba(200,225,255,.35)}
+/* landscape: rolling ridges with valley mist for morning and day; the original soft hills for evening and night */
+.sund{position:absolute;left:var(--sun-x);top:calc(var(--sun-y) - 4vh);width:72px;height:72px;translate:-50% -50%;border-radius:50%;opacity:var(--sun-op);background:radial-gradient(circle,#FFFDF4 0 55%,color-mix(in srgb,var(--sun-c) 80%,#fff) 70%,transparent 72%);box-shadow:0 0 60px 30px color-mix(in srgb,var(--sun-c) 55%,transparent)}
+.glow{position:absolute;left:0;right:0;bottom:22vh;height:46vh;background:radial-gradient(ellipse 45% 70% at 18% 75%,var(--glowL),transparent 70%),radial-gradient(ellipse 45% 65% at 85% 70%,var(--glowR),transparent 70%)}
+.mtn{position:absolute;left:0;bottom:0;width:100%;height:44vh}
+.hills,.mtn,.glow,.sund{transition:opacity 2.4s ease}
+.hills{opacity:0}
+:root[data-phase="evening"] .hills,:root[data-phase="night"] .hills{opacity:.55}
+:root[data-phase="evening"] :is(.mtn,.glow,.sund),:root[data-phase="night"] :is(.mtn,.glow,.sund){opacity:0}
+body:not(.noplan) .halo,body:not(.noplan) .halo2{display:none}
+/* top: Dashboard left; Full day + you right; music and look as icons below you */
+.accbtn .nm{display:none}.accbtn,.accbtn.signed{padding:4px;width:42px;height:42px;justify-content:center}
+.accbtn .av,.accbtn .g{width:32px;height:32px}
+.dashbtn{height:42px}
+body.in-room .dashbtn{display:inline-flex}
+.h-top{position:fixed;top:max(16px,env(safe-area-inset-top));right:calc(max(16px,env(safe-area-inset-right)) + 52px);z-index:80;display:flex;gap:10px}
+.h-full{height:42px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;font-weight:700;font-size:15px;color:var(--ink);border:1px solid var(--glass-border)}
+.h-full svg{width:18px;height:18px}
+.h-stack{position:fixed;top:calc(max(16px,env(safe-area-inset-top)) + 54px);right:max(16px,env(safe-area-inset-right));z-index:79;display:flex;flex-direction:column;gap:10px}
+.h-ib{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;padding:0;color:var(--ink);border:1px solid var(--glass-border);cursor:pointer}
+.h-ib svg{width:18px;height:18px}.h-ib .stxt{display:none}
+body.noplan :is(.h-top,.h-stack,.h-dock),body.gated :is(.h-top,.h-stack,.h-dock),body.dash-open :is(.h-top,.h-stack,.h-dock){display:none}
+body:has(#scrim.open) :is(.h-top,.h-stack,.h-dock){opacity:0;pointer-events:none}
+.hvai-fab{display:none!important}
+/* dock: Add task + HV AI; slides to the corner as icons while a timer runs */
+.h-dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:78;display:flex;align-items:center;gap:10px;padding:8px;border-radius:999px;border:1px solid var(--glass-border);box-shadow:0 10px 30px rgba(20,30,80,.12);transition:left .9s cubic-bezier(.65,0,.25,1),translate .9s cubic-bezier(.65,0,.25,1)}
+.h-db{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 22px 0 7px;border-radius:999px;border:0;background:color-mix(in srgb,#fff 45%,transparent);font-weight:700;font-size:17px;color:var(--ink);cursor:pointer;white-space:nowrap;transition:padding .9s cubic-bezier(.65,0,.25,1),gap .9s cubic-bezier(.65,0,.25,1)}
+:root[data-theme="dark"] .h-db{background:rgba(255,255,255,.08)}
+.h-db .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-border)}
+.h-db svg{width:20px;height:20px}
+.h-db .dl{display:inline-block;max-width:120px;overflow:hidden;transition:max-width .9s cubic-bezier(.65,0,.25,1),opacity .5s}
+.h-sep{width:1px;height:30px;background:var(--glass-border)}
+body.timer-on .h-dock,body.in-room .h-dock{left:calc(100% - max(22px,env(safe-area-inset-right)));translate:-100% 0}
+body.timer-on .h-db,body.in-room .h-db{padding:0 6px;gap:0}
+body.timer-on .h-db .dl,body.in-room .h-db .dl{max-width:0;opacity:0}
+body.jobhunt .h-dock [data-qadd]{display:none}body.jobhunt .h-sep{display:none}
+/* home boxes */
+body:not(.noplan) .intro{justify-content:flex-start}
+body:not(.noplan) .intro-inner{width:100%;padding:118px 16px 130px;display:flex;flex-direction:column;align-items:center}
+.h-box{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;animation:hIn .6s cubic-bezier(.22,1,.36,1)}
+.h-box[hidden]{display:none}
+@keyframes hIn{from{opacity:0;transform:translateY(10px)}}
+.h-greet{margin:0;font-weight:700;font-size:14px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
+.h-dash{display:block;width:26px;height:2px;border-radius:2px;background:var(--accent);margin-top:14px;opacity:.7}
+.h-qwrap{--qf:clamp(30px,4.6vw,60px);margin-top:30px;width:min(860px,100%);height:calc(var(--qf) * .82 * 1.15 * 3);display:flex;align-items:center;justify-content:center}
+.h-q{margin:0;font-family:var(--display);font-weight:400;font-size:calc(var(--qf) * .82);line-height:1.15;letter-spacing:-.035em;text-wrap:balance;transition:opacity .6s,transform .6s}
+.h-q b{font-weight:400;background:linear-gradient(90deg,#7B5CF0,#3A6DF0);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-theme="dark"] .h-q b{background-image:linear-gradient(90deg,#B49CFF,#8FB0FF)}
+.h-q.fade{opacity:0;transform:translateY(8px)}
+.h-chip{margin-top:30px;display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;padding:7px 20px 7px 7px;border-radius:999px;font-size:16px;color:var(--muted);border:1px solid var(--glass-border);box-shadow:0 10px 30px rgba(30,40,100,.10)}
+.h-chip[hidden]{display:none}
+.h-chip .ci{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.h-chip .ci svg{width:16px;height:16px}.h-chip .ci.ok{color:var(--done);background:var(--done-soft)}
+.h-chip .okt{color:var(--done);font-weight:700}
+.h-chip .lb{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.h-chip b{color:var(--ink);font-family:var(--display);font-weight:600}
+.h-chip .t{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.h-chip .sp{width:1px;height:18px;background:color-mix(in srgb,var(--muted) 45%,transparent)}
+.h-upill,.h-tpill{margin:0;display:inline-flex;align-items:center;gap:9px;padding:8px 18px;border-radius:999px;font-weight:700;font-size:15px;letter-spacing:.09em;text-transform:uppercase;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.h-upill{color:var(--accent);border:1.5px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.h-upill svg{width:17px;height:17px}
+#hUp{margin-top:40px}
+.h-utask,.h-ttask{margin:30px 0 0;font-family:var(--display);font-weight:600;font-size:clamp(30px,3.8vw,50px);line-height:1.15;letter-spacing:-.035em;padding:0 8px}
+.h-ustart{margin:22px 0 0;font-family:var(--display);font-weight:600;font-size:clamp(22px,2.4vw,30px);color:var(--accent);font-variant-numeric:tabular-nums}
+.h-ustart span{font-family:var(--body);font-weight:400;font-size:clamp(16px,1.7vw,21px);color:var(--muted)}
+.h-ubar,.h-tbar{margin-top:18px;width:270px;max-width:70vw;height:7px;border-radius:7px;background:color-mix(in srgb,var(--accent) 16%,transparent);overflow:hidden}
+.h-ubar i,.h-tbar i{display:block;height:100%;border-radius:7px;background:var(--accent);transition:width 1s linear}
+.h-tbar[hidden]{display:none}
+.h-unext{margin:22px 0 0;font-size:19px;color:var(--muted)}.h-unext b{color:var(--ink)}
+.h-btn{margin-top:36px;display:inline-flex;align-items:center;gap:14px;padding:6px 24px 6px 6px;border-radius:999px;font-weight:700;font-size:17px;color:var(--ink);border:1px solid var(--glass-border);cursor:pointer;box-shadow:0 12px 30px rgba(40,60,140,.14);--tc:var(--accent);--tc2:#7A5CF0}
+.h-btn .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--tc),var(--tc2));box-shadow:0 6px 16px color-mix(in srgb,var(--tc2) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+.h-btn .ico svg{width:16px;height:16px}
+.h-btn.ghost{background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-color:color-mix(in srgb,var(--ink) 14%,transparent)}
+.h-btn.ghost .ico{background:transparent;box-shadow:none;border:1.5px solid color-mix(in srgb,var(--tc) 60%,transparent);color:var(--tc)}
+.h-btn.ghost .ico svg *{stroke:var(--tc)}
+/* big timer */
+#hTm{position:relative;margin-top:-30px}
+#hTm::before{content:"";position:absolute;left:50%;top:44%;width:min(820px,90vw);height:320px;translate:-50% -50%;border-radius:50%;background:radial-gradient(ellipse at center,color-mix(in srgb,var(--tc2) 22%,transparent),transparent 70%);filter:blur(20px);z-index:-1;pointer-events:none}
+.h-tpill{color:var(--tc);border:1.5px solid color-mix(in srgb,var(--tc) 45%,transparent)}
+.h-tpill i{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--tc),var(--tc2));box-shadow:0 0 10px var(--tc2)}
+.h-tpill i.pulse{animation:hpulse 1.6s ease-in-out infinite}@keyframes hpulse{50%{opacity:.35;transform:scale(.8)}}
+.h-ttask{margin-top:26px}
+.h-tlab{margin:22px 0 0;font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.h-tbig{margin-top:6px;font-size:clamp(84px,12vw,168px)!important;letter-spacing:-.03em;color:var(--tc);--tg:linear-gradient(170deg,color-mix(in srgb,var(--tc) 80%,#fff) 0%,var(--tc) 45%,var(--tc2) 100%);filter:drop-shadow(0 10px 28px color-mix(in srgb,var(--tc2) 35%,transparent))}
+/* the digits roll in nested spans, so each digit carries the gradient itself (a parent background-clip can't paint them) */
+.h-tbig,.h-tbig *{text-shadow:none!important}
+.h-tbig .v{background:var(--tg);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+:root[data-theme="light"] .h-tbig{--tg:linear-gradient(175deg,#1A2140 0%,color-mix(in srgb,#1A2140 50%,var(--tc)) 50%,color-mix(in srgb,var(--tc) 80%,var(--tc2)) 100%);filter:drop-shadow(0 12px 30px color-mix(in srgb,var(--tc2) 28%,transparent))}
+.h-tbig .d.sep{opacity:.5}
+.h-tbar{width:300px;background:color-mix(in srgb,var(--tc) 18%,transparent)}
+.h-tbar i{background:linear-gradient(90deg,var(--tc),var(--tc2));box-shadow:0 0 12px color-mix(in srgb,var(--tc2) 55%,transparent)}
+.h-tsub{margin:14px 0 0;font-size:18px;color:var(--muted);padding:0 12px}.h-tsub b{color:var(--ink)}
+.h-tacts{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.h-tacts .h-btn{margin-top:0}
+/* the task card: a sheet that slides up over the timer ("Back to my task") */
+body.in-room .intro{opacity:1;filter:none;transform:none;pointer-events:none}
+.room{position:fixed;inset:auto 0 0 50%;top:auto;width:min(780px,100%);height:min(86vh,860px);translate:-50% 104%;opacity:1;pointer-events:none;z-index:85;display:grid;grid-template-rows:minmax(0,1fr) auto;padding:26px 22px 18px;border-radius:30px 30px 0 0;
+  background:color-mix(in srgb,var(--sky1) 70%,var(--glass));-webkit-backdrop-filter:blur(30px) saturate(140%);backdrop-filter:blur(30px) saturate(140%);border:1px solid var(--glass-border);border-bottom:0;box-shadow:0 -20px 60px rgba(20,30,80,.22);transition:translate .7s cubic-bezier(.65,0,.25,1)}
+body.in-room .room{translate:-50% 0;pointer-events:auto;opacity:1}
+.room::before{content:"";position:absolute;left:50%;top:10px;translate:-50% 0;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+.room .bar{display:none}
+.room .stage{padding:8px 0 0;place-items:start center;overflow:auto}
+.room .card{width:100%;max-height:none;box-shadow:none}
+.room .quote,.room .today-pct{display:none}
+.room .foot{justify-content:center;padding-top:10px}
+.sh-x{position:absolute;top:14px;right:16px;z-index:5;width:38px;height:38px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);color:var(--ink);font-size:15px;cursor:pointer}
+.rscrim{position:fixed;inset:0;z-index:84;background:rgba(10,14,40,.22);opacity:0;pointer-events:none;transition:opacity .5s}
+body.in-room .rscrim{opacity:1;pointer-events:auto}
+.helpmenu{z-index:90}
+/* phones */
+@media (max-width:760px){
+  .dashbtn{padding:0 14px 0 11px;font-size:14px;height:40px}
+  .accbtn,.accbtn.signed{width:40px;height:40px}
+  .h-top{right:calc(max(16px,env(safe-area-inset-right)) + 50px)}
+  .h-full{width:40px;height:40px;padding:0;justify-content:center}.h-full span{display:none}
+  .h-stack{flex-direction:row;top:max(16px,env(safe-area-inset-top));right:calc(max(16px,env(safe-area-inset-right)) + 100px)}
+  .h-ib{width:40px;height:40px}
+  .moon{right:auto!important;left:9vw;top:calc(84px + env(safe-area-inset-top,0px))!important;width:46px!important;height:46px!important}
+  .sund{width:52px;height:52px}
+  body:not(.noplan) .intro-inner{padding:96px 20px 120px}
+  #hFree,#hUp,#hTm{margin-top:9vh}
+  .h-greet{font-size:11px;letter-spacing:.26em}
+  .h-qwrap{--qf:clamp(28px,8.6vw,36px);height:calc(var(--qf) * .95 * 1.15 * 4);margin-top:22px}
+  .h-q{font-size:calc(var(--qf) * .95)}
+  .h-chip{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:2px;text-align:left;justify-items:start;padding:10px 18px 10px 10px;border-radius:22px;margin-top:22px;max-width:100%}
+  .h-chip .ci{grid-row:span 3}.h-chip .sp,.h-chip .lb{display:none}
+  .h-chip>*{grid-column:2}.h-chip .ci{grid-column:1}
+  .h-chip b{font-size:17px}.h-chip .t,.h-chip .in{font-size:14px}
+  .h-utask,.h-ttask{font-size:clamp(28px,8.6vw,36px);margin-top:20px}
+  .h-ustart{font-size:22px}
+  .h-tbig{font-size:clamp(56px,17.5vw,84px)!important;letter-spacing:-.02em}
+  .h-tlab{margin-top:16px}
+  .h-tsub{font-size:15px;max-width:330px;line-height:1.45}
+  .h-tbar{width:240px}
+  .h-tacts{margin-top:26px;gap:10px}
+  .h-btn{font-size:16px;padding:5px 18px 5px 5px}.h-btn .ico{width:34px;height:34px}
+  #hTm::before{height:220px}
+  .h-dock{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  .h-db{padding:0 16px 0 6px;font-size:16px;height:46px}
+  body.timer-on .h-dock,body.in-room .h-dock{left:calc(100% - 16px)}
+  .room{width:100%;height:auto;max-height:88svh;inset:auto 0 0 0;translate:0 104%;padding:26px 12px calc(14px + env(safe-area-inset-bottom,0px));border-radius:26px 26px 0 0}
+  body.in-room .room{translate:0 0}
+  body:not(.in-room) .room{display:grid}
+  .room .card{height:auto!important;min-height:0!important}
+}
+/* v2 polish: toast above the dock, indigo actions in the task sheet, popups and the Full day drawer in the new glass style */
+.toast{bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+body.timer-on .toast,body.in-room .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+.room .primary{background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);border-color:transparent;color:#fff;box-shadow:0 14px 30px -14px rgba(79,102,224,.85),inset 0 1px 0 rgba(255,255,255,.25)}
+.room .primary:hover{box-shadow:0 18px 40px -14px rgba(79,102,224,.9),inset 0 1px 0 rgba(255,255,255,.3)}
+.scrim{background:color-mix(in srgb,#0B1230 34%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal{background:color-mix(in srgb,var(--sky2) 72%,var(--glass));-webkit-backdrop-filter:blur(30px) saturate(150%);backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--glass-border);box-shadow:0 30px 80px -20px rgba(20,30,80,.45),inset 0 1px 0 rgba(255,255,255,.35)}
+:root[data-theme="dark"] .modal{background:color-mix(in srgb,var(--sky1) 82%,#fff 4%)}
+.modal h2,.modal h3{font-family:var(--display);letter-spacing:-.01em}
+.modal button:not(.primary){border-radius:999px}
+.modal .primary{border-radius:999px}
+.drawer{background:color-mix(in srgb,var(--sky2) 70%,var(--glass));-webkit-backdrop-filter:blur(30px) saturate(150%);backdrop-filter:blur(30px) saturate(150%);border:1px solid var(--glass-border);box-shadow:0 30px 80px -24px rgba(20,30,80,.45)}
+:root[data-theme="dark"] .drawer{background:color-mix(in srgb,var(--sky1) 84%,#fff 3%)}
+.halo,.halo2{display:none!important}   /* the old ring is replaced by the timer glow and the mountains */
+body.drawer-open .h-top,body.drawer-open .h-stack,body.drawer-open .h-dock,body.drawer-open .accwrap,body:has(#scrim.open) .h-top,body:has(#scrim.open) .h-stack,body:has(#scrim.open) .h-dock{opacity:0;pointer-events:none;transition:opacity .3s}
+.modal .actions{flex-wrap:wrap}
+.modal .actions button{white-space:nowrap}
+@media (max-width:760px){
+  .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  body.timer-on .toast,body.in-room .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true">
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
-  <div class="sun"></div><div class="stars"></div><div class="moon"></div>
+  <div class="sun"></div><div class="sund"></div><div class="stars"></div><div class="moon"></div>
   <div class="mist"></div>
+  <div class="glow"></div>
+  <svg class="mtn" viewBox="0 0 1440 600" preserveAspectRatio="none" id="mtn"><defs id="mdefs"></defs><g id="mlayers"></g></svg>
   <svg class="hills" viewBox="0 0 1440 360" preserveAspectRatio="none">
     <path d="M0 200 C160 150 300 170 440 140 C600 105 720 160 880 130 C1040 100 1180 150 1300 120 C1370 105 1410 110 1440 115 L1440 360 L0 360Z"/>
     <path d="M0 260 C200 220 330 250 520 215 C700 185 860 240 1040 210 C1200 185 1330 225 1440 205 L1440 360 L0 360Z"/>
@@ -979,22 +1170,55 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
     <button class="ob-skip" data-ob-skip>Skip</button>
   </div>
   <div class="intro-inner">
-    <p class="intro-date" id="introDate"></p>
-    <p class="intro-status" id="introStatus"></p>
-    <h2 class="intro-task" id="introTask"></h2>
-    <p class="intro-tlabel" id="introTLabel"></p>
-    <div class="bigtime" id="bigTime" role="timer" aria-live="off"></div>
-    <p class="intro-cap" id="introCap"></p>
-    <p class="intro-line" id="introLine" hidden></p>
-    <div class="intro-next" id="introNext"></div>
-    <button class="begin" id="beginBtn">Start</button>
-    <p class="intro-hint" id="introHint">or press Enter</p>
-    <div class="intro-links" id="introLinks"><button data-qadd>+ Add a task for today</button></div>
-    <div class="intro-sound"><button class="pill" data-look aria-label="Change look"></button><button class="pill" data-sound aria-label="Sound on or off"></button></div>
+    <div class="h-legacy" hidden aria-hidden="true">
+      <p class="intro-date" id="introDate"></p><p class="intro-status" id="introStatus"></p><h2 class="intro-task" id="introTask"></h2>
+      <p class="intro-tlabel" id="introTLabel"></p><p class="intro-cap" id="introCap"></p><p class="intro-line" id="introLine" hidden></p>
+      <div class="intro-next" id="introNext"></div><button class="begin" id="beginBtn">Start</button><p class="intro-hint" id="introHint"></p>
+      <div class="intro-links" id="introLinks"><button data-qadd>+ Add a task for today</button></div>
+    </div>
+    <!-- free day / all done: greeting, a quote that changes on its own, and the next task -->
+    <div class="h-box" id="hFree" hidden>
+      <p class="h-greet" id="hGreet"></p><i class="h-dash"></i>
+      <div class="h-qwrap" id="hQwrap" aria-live="polite"><p class="h-q" id="hQ"></p></div>
+      <div class="h-chip glass" id="hChip" hidden></div>
+    </div>
+    <!-- coming up (within the hour) -->
+    <div class="h-box" id="hUp" hidden>
+      <p class="h-upill"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8.5 14h2M13.5 14h2M8.5 17h2"/></svg><span id="hUpWhen"></span></p>
+      <h2 class="h-utask" id="hUpTask"></h2>
+      <p class="h-ustart" id="hUpIn"></p>
+      <div class="h-ubar" id="hUpBarW"><i id="hUpBar"></i></div>
+      <p class="h-unext" id="hUpNext"></p>
+      <button class="h-btn glass" data-home="start"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg></span>Start early</button>
+    </div>
+    <!-- the big timer: one colour per state -->
+    <div class="h-box" id="hTm" hidden>
+      <p class="h-tpill"><i id="hTDot"></i><span id="hTState"></span></p>
+      <h2 class="h-ttask" id="hTTask"></h2>
+      <p class="h-tlab" id="hTLab"></p>
+      <div class="bigtime h-tbig" id="bigTime" role="timer" aria-live="off"></div>
+      <div class="h-tbar" id="hTBarW"><i id="hTBar"></i></div>
+      <p class="h-tsub" id="hTSub"></p>
+      <div class="h-tacts" id="hTActs"></div>
+    </div>
   </div>
 </section>
 
-<div class="room" id="room">
+<div class="h-top" id="hTop">
+  <button class="pill glass h-full" data-open-drawer aria-label="Full day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span>Full day</span></button>
+</div>
+<div class="h-stack" id="hStack">
+  <button class="h-ib glass" data-sound aria-label="Focus music"></button>
+  <button class="h-ib glass" data-look aria-label="Change look"></button>
+</div>
+<div class="h-dock glass" id="hDock">
+  <button class="h-db" data-qadd aria-label="Add a task"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="dl">Add task</span></button>
+  <i class="h-sep"></i>
+  <button class="h-db" data-plan="ai" aria-label="HV AI"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8z" fill="#7C5CF0"/><path d="M18 13l.9 2.1L21 16l-2.1.9L18 19l-.9-2.1L15 16l2.1-.9z" fill="#A48CFF"/></svg></span><span class="dl">HV AI</span></button>
+</div>
+
+<div class="room" id="room" role="dialog" aria-label="Your task">
+  <button class="sh-x" id="shX" aria-label="Close">&#10005;</button>
   <header class="bar">
     <button class="pill mini" id="miniTime" title="Back to timer screen"><span id="miniVal">00:00:00</span> <small id="miniCap"></small></button>
     <div class="bar-right" id="barRight">
@@ -1020,6 +1244,7 @@ body .hvai .hvai-ttl b{font-family:var(--display)}
   </footer>
 </div>
 
+<div class="rscrim" id="rscrim"></div>
 <div class="dscrim" id="dscrim"></div>
 <aside class="drawer glass" id="drawer" aria-label="Full day">
   <div class="dr-head">
@@ -1513,8 +1738,7 @@ function accRender(){
     :'<div class="who"><span class="av">'+GLOGO.replace('<svg','<svg style="width:22px;height:22px;background:#fff;border-radius:50%;padding:3px"')+'</span><div><b>Not signed in</b><small>Try everything freely</small></div></div><p>Sign in with Google to save your plan and use it on your phone and laptop.</p><div class="row"><button data-gate="in">Continue with Google</button></div>';
 }
 /* The account button sits top-right on the start screen, and in the top bar inside the day. */
-new MutationObserver(()=>{ const w=$("accWrap"), room=document.body.classList.contains("in-room"), inBar=w.parentNode.id==="barRight";
-  if(room&&!inBar) $("barRight").appendChild(w); else if(!room&&inBar) document.body.insertBefore(w,$("intro")); }).observe(document.body,{attributes:true,attributeFilter:["class"]});
+/* v2: the account button stays top-right on every screen; the task card opens as a sheet below it */
 function accMenu(open){ $("accMenu").hidden=!open; $("accBtn").setAttribute("aria-expanded",open?"true":"false"); }
 function acctRow(){ accRender();
   $("acct").innerHTML=AC.uid?'<span>Signed in as <b>'+esc(AC.email)+'</b></span><button class="pill" data-gate="out">Sign out</button>'
@@ -1983,11 +2207,10 @@ function tickTimers(){
   { const tk=keyOf(new Date()); if(tk!==lastToday){ if(selKey===lastToday) selKey=tk; lastToday=tk; openTrack=null; render(false); } }   // a new day: follow it
   const i=timerInfo(); { const h=introNextHTML(), el=$("introNext"); if(el&&el.dataset.h!==h){ el.dataset.h=h; el.innerHTML=h; } }
   if(document.body.dataset.timer!==(i.st||"")) document.body.dataset.timer=i.st||"";
-  if(!document.body.classList.contains("in-room")) rollTo($("bigTime"),i.t); $("miniVal").textContent=i.none?"Free":i.t; $("miniCap").textContent=i.mini;
+  $("miniVal").textContent=i.none?"Free":i.t; $("miniCap").textContent=i.mini;
   setTxt("introStatus",i.status||""); $("introStatus").dataset.s=i.st||""; setTxt("introTask",i.task||""); setTxt("introTLabel",i.label||""); setTxt("introCap",i.sub||"");
-  $("bigTime").hidden=!!i.none;
   { const L=$("introLinks"); if(L){ L.querySelector("[data-qadd]").hidden=i.act==="add";  } } setTxt("beginBtn",i.btn||"Open"); setTxt("introHint",i.act==="start"?"The timer starts when you tap it":"or press Enter");
-  $("bigTime").setAttribute("aria-label",i.cap||""); tickCountdowns(); }
+  $("bigTime").setAttribute("aria-label",i.cap||""); renderHome(i); tickCountdowns(); }
 
 /* ---------- card ---------- */
 function cardView(){ const {plan,blocks}=timeline(selKey); return {plan,blocks,cur:currentBlock(blocks),today:isToday(selKey),nm:nowMin()}; }
@@ -2445,7 +2668,342 @@ function openMood(){ const cur=cardView().cur;
   modal('<h3>Not feeling it. That&#39;s okay.</h3><p>First, one question: does this task really need to be done?</p>'+(cur&&cur.core?'<p><b>Yes, this is a core block.</b> You don&#39;t drop it. You make it smaller.</p><p class="finish">'+esc(cur.minimum||"Just do the first step.")+'</p><p class="line">Mood comes after you start, not before.</p>':'<p>This is a flexible block. Do the minimum version or skip it today. Just don&#39;t skip the next core block.</p><p class="finish">'+esc(cur?cur.minimum||"":"")+'</p>')+'<div class="actions">'+(cur?'<button class="primary" data-startmin="'+cur.id+'">Start the minimum version</button>':'')+'</div>'); }
 function openLate(){ const cur=cardView().cur;
   modal('<h3>Running late. That&#39;s okay.</h3><p>Better to change the plan than pretend it still fits.</p><div class="lateopts"><button data-late="shift"><b>Shift the rest of the day from now</b>The current block starts now. Everything after moves forward.</button><button data-late="min"><b>Minimum version of the current block</b>Make it smaller and move on.</button>'+(cur&&!cur.core?'<button data-late="skip"><b>Move to tomorrow</b>It&#39;s a flexible block.</button>':'')+'</div><p class="line">Core tasks never drop. Meals are never skipped.</p>'); }
-function setDrawer(open){ $("drawer").classList.toggle("open",open); $("dscrim").classList.toggle("open",open); if(open){ renderDrawer(); $("drawerClose").focus(); } }
+function setDrawer(open){ $("drawer").classList.toggle("open",open); document.body.classList.toggle("drawer-open",open); $("dscrim").classList.toggle("open",open); if(open){ renderDrawer(); $("drawerClose").focus(); } }
+
+
+/* ---------- home screen (v2): free day, all done, coming up, and the big timer ----------
+   One question per screen: what is next, when does it start, what can I do now. */
+// HV Reset home-screen quotes. Two situations: "free" (no plan today, or a long gap before the next task)
+// and "done" (every task of the day finished). Each has a pool per profile (from the About-you step) and a
+// pool per time of day. The screen draws from both, from a shuffled deck that never repeats until every
+// line has been shown. {name} becomes the user's first name. One <b>word</b> per line is highlighted.
+const HV_QUOTES = {
+  free: {
+    profile: {
+      student: [
+        "One chapter today<br>beats <b>five</b> tomorrow.",
+        "Your exam won't wait.<br>But it <b>rewards</b> the ones who start early.",
+        "{name}, a free day is<br>the best day to get <b>ahead</b> of the syllabus.",
+        "Toppers aren't smarter.<br>They just <b>start</b> sooner.",
+        "Twenty minutes of revision now<br>saves a <b>panic</b> night later.",
+        "Pick the subject you avoid.<br>Give it <b>one</b> hour.",
+        "The notes you write today<br>are the marks you <b>keep</b>.",
+        "No class today?<br>Be your own <b>teacher</b> for an hour.",
+        "Small daily study<br>beats <b>all-night</b> cramming.",
+        "Future you is sitting that exam.<br>Help them out <b>today</b>.",
+        "Solve one question you couldn't<br>last week. That's <b>growth</b>.",
+        "A clear plan tonight<br>means a <b>calm</b> exam morning.",
+        "Open the book.<br>The hardest part is <b>page one</b>.",
+        "College is short.<br>Make this free day <b>count</b>."
+      ],
+      working: [
+        "No meetings today.<br>Do the work that <b>matters</b>.",
+        "{name}, this quiet day<br>is perfect for <b>deep</b> work.",
+        "Clear one thing<br>you've been <b>putting off</b>.",
+        "The best career moves<br>start on <b>quiet</b> days.",
+        "Learn one new skill today.<br>Your next role will <b>thank</b> you.",
+        "An empty calendar<br>is a <b>rare</b> gift. Use it well.",
+        "Plan the week ahead,<br>and Monday gets <b>easy</b>.",
+        "Do one thing today<br>your manager <b>didn't</b> ask for.",
+        "Rest is part of the job.<br>So is <b>growing</b>.",
+        "Tidy your inbox once,<br>then <b>protect</b> your focus.",
+        "Great work is mostly<br>showing up when <b>no one</b> is watching.",
+        "Use the calm to think<br>about the <b>big</b> picture.",
+        "Your best ideas need<br><b>space</b>. Today you have it.",
+        "Block an hour.<br>Build something <b>yours</b>."
+      ],
+      jobseeker: [
+        "{name}, one good application<br>beats ten <b>rushed</b> ones.",
+        "Your next job is out there.<br>Today, go <b>find</b> it.",
+        "Every no<br>is one step <b>closer</b> to yes.",
+        "Polish one line of your resume.<br>It might be the line that <b>wins</b>.",
+        "Send one message<br>to someone you <b>admire</b>.",
+        "Practice one interview answer<br>out <b>loud</b> today.",
+        "Free day, open road.<br>Apply to <b>three</b> roles you'd love.",
+        "Rejection is data,<br>not a <b>verdict</b>.",
+        "The search is a job too.<br>Show up for it <b>today</b>.",
+        "One new skill on your profile<br>can open a <b>new</b> door.",
+        "Follow up on that application.<br>Most people <b>don't</b>.",
+        "Keep going.<br>Your <b>offer letter</b> is being written.",
+        "Research one company deeply.<br>It shows in the <b>interview</b>.",
+        "Small steps, every day,<br>add up to a <b>job</b>."
+      ],
+      business: [
+        "{name}, a free day<br>is a day to build the <b>business</b>.",
+        "Call one client<br>just to say <b>hello</b>.",
+        "Work <b>on</b> your business today,<br>not just in it.",
+        "One idea, tested today,<br>beats ten <b>planned</b> forever.",
+        "Fix one small thing<br>that slows you <b>down</b>.",
+        "Your next big client<br>might be one <b>message</b> away.",
+        "Write down the numbers.<br>Clarity is <b>power</b>.",
+        "Make one thing simpler<br>for your <b>customers</b>.",
+        "Quiet days are for<br><b>strategy</b>. Think big.",
+        "Ship something small today.<br>Momentum <b>compounds</b>.",
+        "The best freelancers<br>plan their <b>pipeline</b> early.",
+        "Rest your hands,<br>sharpen your <b>mind</b>."
+      ],
+      other: [
+        "{name}, today is open.<br><b>You</b> choose what fills it.",
+        "One small step today<br>beats a <b>perfect</b> plan tomorrow.",
+        "Do one thing<br>you'll be <b>proud</b> of tonight.",
+        "A free day is still<br>a <b>chance</b> to move forward.",
+        "Start with five minutes.<br>Let the rest <b>follow</b>.",
+        "Pick one goal.<br>Give it your <b>best</b> hour.",
+        "Learn something new today,<br>just for <b>you</b>.",
+        "Tidy one corner of your life.<br>It feels <b>great</b>.",
+        "Little progress<br>is still <b>progress</b>.",
+        "Make today<br>a little <b>better</b> than yesterday."
+      ]
+    },
+    time: {
+      morning: [
+        "Fresh morning.<br>Fresh <b>start</b>.",
+        "Win the morning,<br>and the day <b>follows</b>.",
+        "The first hour sets the tone.<br>Make it <b>count</b>.",
+        "Good morning, {name}.<br>What's the <b>one</b> thing today?",
+        "Coffee first.<br>Then the <b>hard</b> thing.",
+        "Empty schedule.<br><b>Full</b> possibilities."
+      ],
+      afternoon: [
+        "Half the day is left.<br>That's plenty of <b>time</b>.",
+        "Afternoon slump?<br>Stand up, stretch, then <b>start</b>.",
+        "It's not too late<br>to make today <b>good</b>.",
+        "A quiet afternoon<br>is a good time to <b>plan ahead</b>.",
+        "Free time, well used,<br>is <b>progress</b> too.",
+        "One focused hour now<br>beats a <b>busy</b> evening."
+      ],
+      evening: [
+        "Take a moment<br>to <b>reflect</b> on your week.",
+        "Plan tomorrow tonight,<br>and wake up <b>ready</b>.",
+        "A calm evening<br>builds a <b>strong</b> tomorrow.",
+        "Wind down.<br>Tomorrow, <b>we go again</b>.",
+        "Write down three wins<br>from <b>today</b>.",
+        "Slow down, {name}.<br>You've <b>earned</b> it."
+      ],
+      night: [
+        "Let today go.<br>Tomorrow is a <b>new start</b>.",
+        "Good days start<br>the <b>night before</b>.",
+        "Phone down, lights low.<br><b>Sleep</b> is part of the plan.",
+        "Rest now, {name}.<br>Big things <b>tomorrow</b>.",
+        "Nothing left for today.<br>Rest, and <b>start fresh</b>.",
+        "Tomorrow's plan<br>is just one <b>tap</b> away."
+      ]
+    }
+  },
+  done: {
+    profile: {
+      student: [
+        "Study plan, <b>done</b>.<br>Your future self says thanks.",
+        "{name}, you did the work today.<br>The marks will <b>follow</b>.",
+        "Every chapter you finished today<br>is one less to <b>fear</b>.",
+        "That's how toppers<br><b>actually</b> do it.",
+        "You chose books over scrolling.<br>That's <b>rare</b>.",
+        "Revision done.<br>Now <b>rest</b>, so it sticks.",
+        "Consistency beats talent.<br>You proved it <b>today</b>.",
+        "Today's effort<br>is tomorrow's <b>confidence</b>.",
+        "Exam-ready, one day<br>at a <b>time</b>.",
+        "You showed up for your goals.<br>Be <b>proud</b>."
+      ],
+      working: [
+        "Work done, {name}.<br>Now go <b>live</b> a little.",
+        "Every task closed.<br>That's a <b>clean</b> day.",
+        "You kept your promises today.<br>That builds <b>trust</b>.",
+        "Deep work done.<br>Log off with a <b>clear</b> head.",
+        "Productive day.<br>Now protect your <b>evening</b>.",
+        "That's the kind of day<br>that builds a <b>career</b>.",
+        "Nothing left on the list.<br><b>Switch off</b> properly.",
+        "You did what you planned.<br>That's <b>rare</b> at work.",
+        "Great output today.<br>Rest is your next <b>task</b>.",
+        "Done and dusted.<br>Tomorrow starts <b>lighter</b>."
+      ],
+      jobseeker: [
+        "{name}, you showed up for your search.<br>That's how offers <b>happen</b>.",
+        "Applications sent, prep done.<br>Every day <b>counts</b>.",
+        "You moved closer<br>to your <b>next role</b> today.",
+        "Hard days in the search<br>make the offer <b>sweeter</b>.",
+        "Plan complete.<br>Your effort is <b>adding up</b>.",
+        "Recruiters see consistency.<br>You built it <b>today</b>.",
+        "You did the work most people <b>skip</b>.<br>Keep going.",
+        "One day closer<br>to <b>yes</b>.",
+        "Rest well tonight.<br>Interviews need a <b>fresh</b> mind.",
+        "The search is tough.<br>So are <b>you</b>."
+      ],
+      business: [
+        "Plan done, {name}.<br>The business moved <b>forward</b>.",
+        "Every task closed.<br>That's how brands get <b>built</b>.",
+        "You ran the day.<br>The day didn't run <b>you</b>.",
+        "Clients served, work shipped.<br><b>Good</b> day.",
+        "Momentum like this<br><b>compounds</b>.",
+        "Now step away.<br>Founders need <b>rest</b> too.",
+        "You built something today.<br>Be <b>proud</b> of it.",
+        "Clear list, clear mind.<br>See you <b>tomorrow</b>.",
+        "Done is better than perfect.<br>And today was <b>done</b>."
+      ],
+      other: [
+        "Everything on the list,<br><b>done</b>.",
+        "{name}, you did what you said<br>you'd do. That's <b>rare</b>.",
+        "Plan complete.<br>You <b>beat</b> the clock today.",
+        "You showed up<br>and <b>finished</b>.",
+        "That's what <b>progress</b><br>looks like.",
+        "A finished day<br>is a <b>peaceful</b> night.",
+        "Today: <b>complete</b>.<br>Tomorrow: ready.",
+        "You kept your word<br>to <b>yourself</b> today."
+      ]
+    },
+    time: {
+      morning: [
+        "Done before noon.<br>That's a <b>strong</b> start.",
+        "Plan complete already?<br>The rest of the day is <b>yours</b>.",
+        "Morning wins<br>feel the <b>best</b>.",
+        "Early finish.<br>Go enjoy the <b>sunshine</b>."
+      ],
+      afternoon: [
+        "Today's plan<br>is <b>complete</b>.",
+        "Done by the afternoon.<br>Treat <b>yourself</b>.",
+        "Every task, finished.<br>Take a real <b>break</b>.",
+        "You beat the<br>afternoon <b>slump</b>."
+      ],
+      evening: [
+        "Plan done.<br>Enjoy your <b>evening</b>.",
+        "All done.<br>Now <b>switch off</b>.",
+        "You showed up today.<br>That's the <b>win</b>.",
+        "Dinner tastes better<br>after a <b>good</b> day."
+      ],
+      night: [
+        "Every task done.<br><b>Sleep well</b>, you earned it.",
+        "A finished day<br>is a <b>peaceful</b> night.",
+        "Rest now, {name}.<br>Tomorrow's plan is <b>ready</b>.",
+        "Lights out.<br>You were <b>great</b> today."
+      ]
+    }
+  }
+};
+
+const LATE_AFTER=15;            /* a slot that started this many minutes ago without Start turns "Running late" */
+const UP_WINDOW=60;             /* within this many minutes of the next task, the coming-up screen replaces the quote */
+const HPH=()=>document.documentElement.dataset.phase||"morning";
+const isBreakB=b=>!!b&&(b.kind==="rest"||b.kind==="meal");
+function homeState(i){
+  const tk=keyOf(new Date()), nm=nowMin();
+  if(i.none) return {st:i.status==="Done for today"?"done":"free"};
+  if(!i.cur) return {st:"free", later:i};                      /* the next plan is on a later day */
+  const cur=i.cur, sm=startedMin(tk,cur.id);
+  if(i.st==="before") return cur.s-nm>UP_WINDOW?{st:"free",cur}:{st:"up",cur};
+  if(isBreakB(cur)) return {st:"brk",cur};
+  if(i.st==="paused") return {st:"pause",cur};
+  if(i.st==="late") return {st:sm!=null?"over":"late",cur};
+  if(sm!=null) return {st:"run",cur};
+  return {st:nm-cur.s>LATE_AFTER?"late":"ready",cur};
+}
+/* quote deck: profile lines + time-of-day lines, shuffled; nothing repeats until the whole deck was shown */
+const QDECK={}; let hqKey="", hqAt=0;
+function hName(){ const n=(AC.uid&&aboutFirst())||""; return n; }
+function nextQuote(sit){
+  const occ=(ABOUT.data&&ABOUT.data.occupation)||"other", prof=HV_QUOTES[sit].profile[occ]?occ:"other", ph=HPH(), key=sit+"|"+prof+"|"+ph;
+  let d=QDECK[key]; if(!d||!d.length){ d=[...HV_QUOTES[sit].profile[prof],...HV_QUOTES[sit].time[ph]];
+    for(let k=d.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [d[k],d[j]]=[d[j],d[k]]; }
+    if(d[0]===QDECK[key+"_l"]&&d.length>1) d.push(d.shift()); QDECK[key]=d; }
+  const line=d.shift(); QDECK[key+"_l"]=line; const n=hName();
+  return n?line.replace(/\{name\}/g,esc(n)):line.replace(/\{name\}, /g,"").replace(/, \{name\}/g,"").replace(/\{name\}/g,"");
+}
+function hQuote(sit,force){
+  const k=sit+HPH()+((ABOUT.data&&ABOUT.data.occupation)||""); if(!force&&k===hqKey&&Date.now()-hqAt<9000) return;
+  const first=k!==hqKey; hqKey=k; hqAt=Date.now(); const q=$("hQ"), line=nextQuote(sit);
+  if(first||matchMedia("(prefers-reduced-motion: reduce)").matches){ q.innerHTML=line; q.classList.remove("fade"); return; }
+  q.classList.add("fade"); setTimeout(()=>{ q.innerHTML=line; q.classList.remove("fade"); },600);
+}
+function hClock(sec){ sec=Math.max(0,Math.ceil(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec/60)%60, s=sec%60; return (h?h+":"+pad(m):m)+":"+pad(s); }
+const HICO={play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  arw:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>'};
+/* state colours: two stops each, light and dark looks */
+const HCOL={ready:["#A8741F","#D6A048","#F0C987","#FFE2B0"],run:["#3A47C4","#7A5CF0","#AFB8FF","#D2C2FF"],brk:["#2F6FB0","#5FA3DA","#9CCBF2","#C9E6FF"],
+  pause:["#59607C","#8A90AA","#B8BDD4","#D8DBEA"],late:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],over:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"]};
+function hBtn(act,label,ico,ghost){ return '<button class="h-btn glass'+(ghost?' ghost':'')+'" data-home="'+act+'"><span class="ico">'+HICO[ico]+'</span>'+label+'</button>'; }
+function nextChip(h){
+  const tk=keyOf(new Date()), nm=nowMin(); let title="", when="", mins=null;
+  if(h.cur){ title=h.cur.title; when="Today, "+fmt(h.cur.s); mins=h.cur.s-nm; }
+  else { const nk=nextPlanDay(tk), nb=nk?timeline(nk).blocks[0]:null; if(nb){ title=nb.title; const tm=nk===addDays(tk,1); when=(tm?"Tomorrow":niceDate(nk))+", "+fmt(nb.s);
+    const [y,m,dd]=nk.split("-").map(Number); mins=(atMin(new Date(y,m-1,dd),nb.s)-new Date())/60000; } }
+  const done=h.st==="done", dn=done?timeline(tk).blocks.filter(b=>b.done).length:0;
+  if(!title) return done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">All '+dn+' done today</span>':"";
+  return (done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">All '+dn+' done</span><i class="sp"></i>':'<span class="ci">'+HICO.cal+'</span>')+
+    '<span class="lb">Next</span><b>'+esc(title)+'</b>'+(done?'':'<i class="sp"></i>')+'<span class="t">'+esc(when)+'</span>'+(!done&&mins>0?'<span class="in">in '+inTxt(Math.round(mins))+'</span>':'');
+}
+let hLastSt="";
+function renderHome(i){
+  if(document.body.classList.contains("noplan")) return;
+  const h=homeState(i), tk=keyOf(new Date()), nm=nowMin(), dark=document.documentElement.dataset.theme==="dark";
+  const TS=["ready","run","brk","pause","late","over"], tm=TS.includes(h.st);
+  $("hFree").hidden=!(h.st==="free"||h.st==="done"); $("hUp").hidden=h.st!=="up"; $("hTm").hidden=!tm;
+  document.body.classList.toggle("timer-on",tm); document.body.dataset.home=h.st;
+  if(h.st!==hLastSt){ hLastSt=h.st; hqKey=""; }
+  if(h.st==="free"||h.st==="done"){
+    const greet={morning:"Good morning",afternoon:"Good afternoon",evening:"Good evening",night:"Good evening"}[HPH()], n=hName();
+    setTxt("hGreet",greet+(n?", "+n:"")); hQuote(h.st==="done"?"done":"free");
+    const c=nextChip(h), el=$("hChip"); el.hidden=!c; if(el.dataset.h!==c){ el.dataset.h=c; el.innerHTML=c; }
+    return;
+  }
+  const cur=h.cur;
+  if(h.st==="up"){
+    const sec=(cur.s-nm)*60, nx=i.next;
+    setTxt("hUpWhen","Coming up · "+fmt(cur.s)); setTxt("hUpTask",cur.title);
+    $("hUpIn").innerHTML='Starts in '+hClock(sec)+' <span>· '+esc(inTxt(cur.d))+'</span>';
+    $("hUpBar").style.width=Math.min(100,(UP_WINDOW-sec/60)/UP_WINDOW*100)+"%";
+    $("hUpNext").innerHTML=nx?'Then <b>'+esc(nx.title)+'</b> at '+fmt(nextAt(tk,cur,nx)):'This is your last task today';
+    return;
+  }
+  const C=HCOL[h.st], box=$("hTm"); box.style.setProperty("--tc",C[dark?2:0]); box.style.setProperty("--tc2",C[dark?3:1]);
+  const sm=startedMin(tk,cur.id), ri=runInfo(tk,cur.id), nx=i.next;
+  let state="", lab="", t=i.t, bar=0, sub="", acts="";
+  const nxt=nx?' · Then <b>'+esc(nx.title)+'</b>':'';
+  if(h.st==="ready"){ state="Ready to start"; lab="Slot ends in"; bar=Math.min(100,(nm-cur.s)/cur.d*100); sub=fmt(cur.s)+" – "+fmt(cur.e)+" · Turns late if not started by "+fmt(cur.s+LATE_AFTER); acts=hBtn("start","Start this task","play"); }
+  if(h.st==="late"){ state="Running late"; lab="Late by"; t=hms((nm-cur.s)*60); sub="Was "+fmt(cur.s)+" – "+fmt(cur.e)+" · Start now and move the rest of your day"; acts=hBtn("start","Start this task","play"); }
+  if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Started "+fmt(sm)+" · ends "+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+hBtn("pause","Pause","pause",1); }
+  if(h.st==="pause"){ state="Paused"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Paused time isn&#39;t counted as work"+nxt; acts=hBtn("resume","Resume","play")+hBtn("card","Back to my task","arw",1); }
+  if(h.st==="over"){ state="Time&#39;s up"; lab="Over time by"; bar=100; sub="Was meant to end at "+fmt(cur.e)+" · Finish up and tap Done"; acts=hBtn("card","Back to my task","arw")+hBtn("done","Done","ok",1); }
+  if(h.st==="brk"){ state=cur.kind==="meal"?"Meal":"Break"; lab="Back to work in"; t=hms(Math.max(0,cur.e-nm)*60); bar=Math.min(100,(nm-cur.s)/cur.d*100); sub=(cur.kind==="meal"?"Eat slowly, away from the screen":"Stretch, drink water, look away from the screen")+(nx?' · Next: <b>'+esc(nx.title)+'</b>':''); acts=hBtn("done",cur.kind==="meal"?"Done eating":"End break early","ok"); }
+  $("hTState").innerHTML=state; $("hTDot").className=h.st==="pause"?"":"pulse"; setTxt("hTTask",cur.title); setTxt("hTLab",lab);
+  rollTo($("bigTime"),t); $("hTBarW").hidden=!bar; $("hTBar").style.width=bar+"%";
+  if($("hTSub").dataset.h!==sub){ $("hTSub").dataset.h=sub; $("hTSub").innerHTML=sub; }
+  if($("hTActs").dataset.h!==acts){ $("hTActs").dataset.h=acts; $("hTActs").innerHTML=acts; }
+}
+function homeAct(a){
+  const tk=keyOf(new Date()), i=timerInfo(), cur=i.cur; if(!cur) return;
+  selKey=tk;
+  audioInit(); if(Snd.ctx&&Snd.ctx.state==="suspended") Snd.ctx.resume();
+  if(a==="start"){ started=true; askStart(cur.id); setTimeout(()=>{ chime(); if(Snd.on) ambientStart(); },60); if(ACC) guestNudge(); return; }
+  if(a==="card"){ openCard(); return; }
+  if(a==="pause"){ sessPause(tk,cur.id); save(); renderCard(false); tickTimers(); toast("Paused. Take your time."); return; }
+  if(a==="resume"){ sessResume(tk,cur.id); save(); renderCard(false); tickTimers(); toast("Back to it."); return; }
+  if(a==="done"){ markDone(cur.id); tickTimers(); return; }
+}
+/* "Back to my task": the task card slides up over the timer */
+function openCard(){ const first=!started; started=true; document.body.classList.add("in-room"); if(first||!liveCard()) renderCard(true); else renderCard(false); if(ACC) guestNudge(); }
+function closeCard(){ document.body.classList.remove("in-room"); tickTimers(); }
+
+/* ---------- day mountains (morning/afternoon backdrop) ---------- */
+(function(){ const dEl=document.getElementById("mdefs"), gEl=document.getElementById("mlayers"); if(!dEl||!gEl) return;
+  let seed=11; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const C=["var(--m1)","var(--m2)","color-mix(in srgb,var(--m2),var(--m3))","var(--m3)","var(--m4)","var(--m5)","var(--tree)"];
+  let defs="", g="";
+  for(let k=0;k<7;k++){ const base=120+k*56, amp=64-k*5, ph=1.1+k*1.7, f1=4.6+k*.9, f2=10.3+k*1.4;
+    const y=x=>{ const t=x/1440; return base-amp*(0.62*Math.sin(t*f1+ph)+0.28*Math.sin(t*f2+ph*1.9)+0.1*Math.sin(t*23+ph*3.1)); };
+    let p="M0 600 "; for(let x=0;x<=1440;x+=6) p+="L"+x+" "+y(x).toFixed(1)+" "; p+="L1440 600 Z";
+    const mist=k<5?55-k*8:18;
+    defs+=`<linearGradient id="mg${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${C[k]}"/><stop offset="1" style="stop-color:color-mix(in srgb,${C[k]} ${100-mist}%,var(--hazeC))"/></linearGradient>`;
+    const blur=k<5?((5-k)*.45).toFixed(2):0;
+    g+=`<path fill="url(#mg${k})" d="${p}"${blur?` style="filter:blur(${blur}px)"`:""}/>`;
+    if(k<5) g+=`<rect x="0" y="${base+18}" width="1440" height="70" fill="url(#fog)" opacity="${(0.75-k*0.12).toFixed(2)}"/>`;
+    if(k>=5){ let d="", x=0; const big=k===6;
+      while(x<1440){ const w=(big?7:4)+rnd()*(big?9:5), yy=y(x+w/2)+3, h=(big?14:7)+rnd()*(big?26:12);
+        if(rnd()>(big?.12:.35)) d+=`M${x.toFixed(1)} ${yy.toFixed(1)} L${(x+w/2).toFixed(1)} ${(yy-h).toFixed(1)} L${(x+w).toFixed(1)} ${yy.toFixed(1)} Z `;
+        x+=w*(0.5+rnd()*0.4); }
+      g+=`<path d="${d}" style="fill:${C[k]}"/>`; } }
+  defs+='<linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hazeC);stop-opacity:0"/><stop offset=".5" style="stop-color:var(--hazeC);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--hazeC);stop-opacity:0"/></linearGradient>';
+  dEl.innerHTML=defs; gEl.innerHTML=g; })();
 
 /* ---------- begin ---------- */
 function begin(){
@@ -2465,6 +3023,7 @@ document.addEventListener("click",e=>{
   if(!e.target.closest("#accWrap")) accMenu(false);
   if($("tpop")&&!e.target.closest("#tpop,[data-pick]")) pickClose();
   if(!e.target.closest("#rescue")){ const hm=$("helpMenu"); if(hm) hm.classList.remove("open"); }
+  if(e.target.id==="rscrim") return closeCard();
   const t=e.target.closest("button"); if(!t) return;
   if(t.id==="accBtn"){ if(AC.uid||!$("accMenu").hidden) accMenu($("accMenu").hidden); else { accMenu(false); const c=HVC(); c.signIn().catch(err=>{ const m=gateError(err); if(m) toast(m); }); } return; }
   if(t.hasAttribute("data-gate")){ const k=t.getAttribute("data-gate"), c=HVC(); if(!c) return;
@@ -2476,6 +3035,8 @@ document.addEventListener("click",e=>{
     return; }
   if(t.classList.contains("primary")){ const r=t.getBoundingClientRect(), s=Math.max(r.width,r.height)*2; const sp=document.createElement("span"); sp.className="ripple"; sp.style.cssText="width:"+s+"px;height:"+s+"px;left:"+(e.clientX-r.left-s/2)+"px;top:"+(e.clientY-r.top-s/2)+"px"; t.appendChild(sp); setTimeout(()=>sp.remove(),800); }
   if(t.id==="beginBtn") return begin();
+  if(t.dataset.home) return homeAct(t.dataset.home);
+  if(t.id==="shX") return closeCard();
   if(t.id==="miniTime"){ document.body.classList.remove("in-room"); rollTo($("bigTime"),timerInfo().t); tickTimers(); return; }
   if(t.hasAttribute("data-sound")) return toggleSound();
   if(t.id==="drawerBtn") return setDrawer(true);
@@ -2557,7 +3118,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target&&(e.target.id==="abName"||e.target.id==="abOther")){ e.preventDefault(); aboutSubmit(); return; }
   if(e.key==="Enter"&&e.target&&e.target.closest&&(e.target.closest(".hvai,#tpop,#scrim")||/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName))) return;   // typing in HV AI or a form: Enter belongs there
   if(e.key==="Escape"&&$("tpop")){ pickClose(); return; }
-  if(e.key==="Escape"){ closeModal(); setDrawer(false); return; }
+  if(e.key==="Escape"){ if(!$("scrim").classList.contains("open")&&!$("drawer").classList.contains("open")&&document.body.classList.contains("in-room")){ closeCard(); return; } closeModal(); setDrawer(false); return; }
   if(document.body.classList.contains("noplan")&&!$("scrim").classList.contains("open")&&obStep<OB_LAST){
     if(e.key==="Enter"||e.key==="ArrowRight"){ e.preventDefault(); obShow(obStep+1,1); return; }
     if(e.key==="ArrowLeft"){ e.preventDefault(); obShow(obStep-1,-1); return; }
