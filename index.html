@@ -1320,7 +1320,10 @@ function sessList(key,id){ const ds=state.days[key]; return (ds&&ds.sess&&ds.ses
 function openSess(key,id){ const a=sessList(key,id), x=a[a.length-1]; return x&&!x.e?x:null; }
 function isPaused(key,id){ const x=openSess(key,id), q=x&&x.p[x.p.length-1]; return !!(q&&!q.b); }
 function sessActiveMs(x,now){ const e=x.e||now; let ms=e-x.s; (x.p||[]).forEach(q=>{ ms-=Math.max(0,Math.min(q.b||e,e)-q.a); }); return Math.max(0,ms); }
+/* Anonymous usage counts (HV analytics, /a.js): event names only, never task titles, notes or plans. */
+function track(n,first){ try{ if(window.hva) window.hva("event",n,first?{first:true}:undefined); }catch(e){} }
 function sessStart(key,id){
+  track("timer_start");
   const ds=dayState(key); ds.sess=ds.sess||{};
   Object.keys(ds.sess).forEach(o=>{ if(o!==id) sessEnd(key,o,"switched"); });     // one task at a time
   if(openSess(key,id)) return; const b=timeline(key).blocks.find(x=>x.id===id);
@@ -1433,6 +1436,7 @@ async function acOpen(u){
     if(!owner){ try{ localStorage.removeItem(LS); localStorage.removeItem(LS+"-sync"); }catch(e){} }   // the old shared plan isn't this account's
     const g=await HVC().getValue(AC_PATH), remote=g&&g.value?JSON.parse(g.value):null;
     if(u.uid!==AC.uid) return;
+    if(window.__hvaJustSignedIn){ window.__hvaJustSignedIn=false; track(remote?"sign_in":"signup"); }
     if(remote&&remote.days&&(remote.updatedAt||0)>(base.updatedAt||0)) base=remote;
     let push=(base.updatedAt||0)>((remote&&remote.updatedAt)||0);
     if(guest){
@@ -2165,6 +2169,7 @@ function completeCurrent(mutate,msg){
   setTimeout(()=>{ mutate(); save(); renderMeta(); renderCard(true); renderDrawer(); showQuote(true); if(msg) toast(msg); if(matchMedia("(max-width:900px)").matches) window.scrollTo({top:0,behavior:"smooth"}); setTimeout(()=>{ busy=false; },900); }, el?720:0);
 }
 function markDone(id){
+  track("task_done",true); track("activation",true);
   const ds=dayState(selKey); const v=cardView();
   const had=sessList(selKey,id).length>0;
   const mut=()=>{ sessEnd(selKey,id,"done"); ds.done[id]=Date.now(); delete ds.skipped[id]; if(openTrack===id) openTrack=null; if(had) setTimeout(()=>askFocus(selKey,id),1300); };
@@ -2316,7 +2321,7 @@ function openPlanner(mode){
 /* Add one task to today only (keeps the rest of today's plan and what's already done) */
 /* ---------- productivity dashboard (dashboard.js) ---------- */
 function firstDay(){ const ks=Object.keys(state.days||{}).filter(k=>{ const d=state.days[k]; return d&&((d.done&&Object.keys(d.done).length)||(d.started&&Object.keys(d.started).length)); }).sort(); return state.since||ks[0]||keyOf(new Date()); }
-function openReport(opts){ if(window.HRDash) return window.HRDash.open(opts||{}); toast("The dashboard is still loading. Try again in a second."); }
+function openReport(opts){ track("dashboard_view"); if(window.HRDash) return window.HRDash.open(opts||{}); toast("The dashboard is still loading. Try again in a second."); }
 /* go to one task in the day view (used by the dashboard's "Open task" buttons) */
 function goTask(key,id){ selKey=key; openTrack=id||null; closeModal(); started=true; document.body.classList.add("in-room"); render(false); setDrawer(true); renderDrawer();
   const el=id&&document.querySelector('#track [data-open="'+id+'"]'); if(el) el.scrollIntoView({block:"center"}); }
@@ -2362,7 +2367,7 @@ function changeTask(key,id,scope,fn){                                  // fn(blo
 }
 function taskAct(op,key,id){
   const b=dayBlocks(key).find(x=>x.id===id); if(!b) return; const snap=taskSnapshot(), ds=dayState(key);
-  if(op==="skip"){ sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"skip"}; save(); render(false); tickTimers(); return undoToast("Skipped "+b.title+" for "+(isToday(key)?"today":niceDate(key))+".",snap); }
+  if(op==="skip"){ track("task_skip"); sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"skip"}; save(); render(false); tickTimers(); return undoToast("Skipped "+b.title+" for "+(isToday(key)?"today":niceDate(key))+".",snap); }
   if(op==="move"){ const nk=addDays(key,1);
     sessEnd(key,id,"skipped"); ds.skipped[id]="skip"; (ds.mv=ds.mv||{})[id]={at:Date.now(),why:"tomorrow"};
     const nb=dayBlocks(nk), there=nb.some(x=>x.title.trim().toLowerCase()===b.title.trim().toLowerCase()&&x.t===b.t);   // a daily task is already on tomorrow's plan
@@ -2425,6 +2430,7 @@ function pbSave(){
   else { state.routine={blocks}; delete state.custom[tk]; }
   if(day===tk){ const nm=nowMin(), ds=dayState(tk);                   // blocks that were already over when the plan was made don't count as late
     if(PB.when!=="every"||!ds.done||!Object.keys(ds.done).length) blocks.forEach(b=>{ if(toMin(b.t)+b.d<=nm&&!(ds.done&&ds.done[b.id])) ds.skipped[b.id]="before"; }); }
+  track("plan_saved",true); track("tasks_planned_"+(rows.length<=3?"1_3":rows.length<=6?"4_6":"7_plus"));
   selKey=day; save(); closeModal(); render(false); rollTo($("bigTime"),timerInfo().t); tickTimers();
   const live=currentBlock(timeline(tk).blocks);
   const nk=nextPlanDay(tk), nb=nk?timeline(nk).blocks[0]:null;
