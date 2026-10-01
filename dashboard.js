@@ -48,6 +48,7 @@ function recsOf(k){
   Object.keys(ds.done||{}).forEach(id=>addX(id,{}));
   return cache[k]=bl.concat(extra).filter(b=>b.kind!=="free").map(b=>mkRec(k,b,ds,t,nm,base));
 }
+const SHORT_PAUSE=2*60000, LONG_PAUSE=15*60000;
 function mkRec(k,b,ds,t,nm,base){
   const sk=(ds.skipped||{})[b.id]||null, st=(ds.started||{})[b.id]||null, sess=(ds.sess||{})[b.id]||[];
   const r={key:k,id:b.id,title:b.title||"Untitled",kind:b.kind,cat:CAT[b.kind]||"work",core:!!b.core,est:+b.d||0,s:b.s,e:b.e,removed:!!b.removed,
@@ -61,13 +62,18 @@ function mkRec(k,b,ds,t,nm,base){
   else r.status="pending";
   r.isDone=r.status==="done"||r.status==="short"; r.counted=r.status!=="added";
   r.due=r.isDone||r.status==="missed"||r.status==="overdue"||r.status==="moved";
-  const now=Date.now(); let act=0,paused=0,pauses=0; const segs=[];
+  /* a pause shorter than SHORT_PAUSE (water, a quick message) is not counted as a pause and doesn't break the focus stretch;
+     its minutes still stay out of time worked. A pause of LONG_PAUSE or more is also listed on its own. */
+  const now=Date.now(); let act=0,paused=0,pauses=0,longP=0; const segs=[];
   sess.forEach(x=>{ const e=x.e||now; act+=A.sessActiveMs(x,now);
     const ps=(x.p||[]).slice().sort((p,q)=>p.a-q.a); let cur=x.s;
-    ps.forEach(q=>{ const qb=Math.min(q.b||e,e); paused+=Math.max(0,qb-q.a); pauses++; if(q.a>cur) segs.push({a:cur,b:Math.min(q.a,e)}); cur=Math.max(cur,qb); });
+    ps.forEach(q=>{ const qb=Math.min(q.b||e,e), len=Math.max(0,qb-q.a); paused+=len;
+      if(q.b&&len<SHORT_PAUSE) return;
+      pauses++; if(len>=LONG_PAUSE) longP++;
+      if(q.a>cur) segs.push({a:cur,b:Math.min(q.a,e)}); cur=Math.max(cur,qb); });
     if(e>cur) segs.push({a:cur,b:e}); });
-  if(sess.length){ r.src="timer"; r.active=act/60000; r.paused=paused/60000; r.pauses=pauses; r.segs=segs; r.running=sess.some(x=>!x.e); }
-  else if(st&&r.doneAt&&r.doneAt>st&&r.doneAt-st<16*3600000){ r.src="startfinish"; r.active=(r.doneAt-st)/60000; r.paused=null; r.pauses=null; r.segs=[{a:st,b:r.doneAt}]; }
+  if(sess.length){ r.src="timer"; r.active=act/60000; r.paused=paused/60000; r.pauses=pauses; r.longPauses=longP; r.segs=segs; r.running=sess.some(x=>!x.e); }
+  else if(st&&r.doneAt&&r.doneAt>st&&r.doneAt-st<16*3600000){ r.src="startfinish"; r.active=(r.doneAt-st)/60000; r.paused=null; r.pauses=null; r.longPauses=null; r.segs=[{a:st,b:r.doneAt}]; }
   else { r.src=null; r.active=null; r.segs=[]; }
   r.startAt=sess.length?sess[0].s:st;
   r.startDelay=r.startAt&&r.pAt?(r.startAt-r.pAt)/60000:null;     // against the time you first planned
@@ -116,13 +122,13 @@ const recsIn=(keys,all)=>{ const o=[]; keys.forEach(k=>recsOf(k).forEach(r=>{ if
 function agg(recs){
   const o={n:recs.length,done:0,short:0,missed:0,overdue:0,moved:0,pending:0,due:0,worked:0,timer:0,measuredN:0,timedN:0,verified:0,partly:0,ratedMin:0,ratedScore:0,ratedN:0,
     dlEarly:0,dlOn:0,dlLate:0,dlN:0,dlLateSum:0,sEarly:0,sOn:0,sLate:0,sN:0,sLateSum:0,movedBefore:0,movedAfter:0,movedUnknown:0,
-    accSum:0,accN:0,within:0,over:0,overBig:0,under:0,estSum:0,actSum:0,pauses:0,intr:0,sessions:0,segs:[],plannedMin:0,doneMin:0};
+    accSum:0,accN:0,within:0,over:0,overBig:0,under:0,estSum:0,actSum:0,pauses:0,longPauses:0,intr:0,sessions:0,segs:[],plannedMin:0,doneMin:0};
   recs.forEach(r=>{
     o.plannedMin+=r.est; if(r.isDone){ o.done++; o.doneMin+=r.est; } if(r.status==="short") o.short++;
     if(r.status==="missed") o.missed++; if(r.status==="overdue") o.overdue++; if(r.status==="pending") o.pending++; if(r.due) o.due++;
     if(r.status==="moved"){ o.moved++; if(!r.mv) o.movedUnknown++; else if(r.eAt&&r.mv.at<=r.eAt) o.movedBefore++; else o.movedAfter++; }
     if(r.active!=null){ o.worked+=r.active; o.measuredN++; }
-    if(r.src==="timer"){ o.timer+=r.active; o.timedN++; o.pauses+=r.pauses; o.sessions+=r.sess.length; r.segs.forEach(s=>o.segs.push(s));
+    if(r.src==="timer"){ o.timer+=r.active; o.timedN++; o.pauses+=r.pauses; o.longPauses+=r.longPauses||0; o.sessions+=r.sess.length; r.segs.forEach(s=>o.segs.push(s));
       if(r.focus){ o.ratedN++; o.ratedMin+=r.active; o.ratedScore+=r.active*(r.focus===3?1:r.focus===2?.5:0); if(r.focus===3) o.verified+=r.active; if(r.focus===2) o.partly+=r.active; } }
     o.intr+=r.intr;
     if(r.isDone&&r.dlDelta!=null){ o.dlN++; if(r.dlDelta< -5) o.dlEarly++; else if(r.dlDelta<=5) o.dlOn++; else { o.dlLate++; o.dlLateSum+=r.dlDelta; } }
@@ -332,7 +338,7 @@ function secTime(){
   return '<div class="kpis k6">'+
     kpi({label:"Time worked",value:m.worked?dur(m.worked):"–",sub:"Timer plus start and finish times",tag:"measured",drill:"tracked",delta:delta(m.worked,pm.worked,"min",null)})+
     kpi({label:"Timer sessions",value:sessAll.length,sub:sessAll.length?"Average "+dur(sessAll.reduce((a,s)=>a+s.act,0)/sessAll.length)+" each":"Press Start on a task to begin one",tag:"measured",drill:"timer"})+
-    kpi({label:"Active vs paused",value:m.timer?dur(m.timer):"–",sub:m.timer?"Paused: "+dur(m.recs.reduce((a,r)=>a+(r.paused||0),0))+" across "+plural(m.pauses,"pause"):"Pause data comes from the timer",drill:"timer"})+
+    kpi({label:"Active vs paused",value:m.timer?dur(m.timer):"–",sub:m.timer?"Paused: "+dur(m.recs.reduce((a,r)=>a+(r.paused||0),0))+" across "+plural(m.pauses,"pause")+(m.longPauses?" ("+m.longPauses+" long, 15 min+)":"")+". Pauses under 2 min aren't counted.":"Pause data comes from the timer",drill:"timer"})+
     kpi({label:"Within estimate",value:m.accN?m.within+'<small> of '+m.accN+'</small>':"–",sub:"Finished in the planned time (10% leeway)",drill:"within"})+
     kpi({label:"Took much longer",value:m.accN?m.overBig:"–",sub:"50% or more over, and at least 10 min",drill:"over"})+
     kpi({label:"Time accuracy score",value:m.accN>=3?m.accuracy:"–",sub:m.accN>=3?"Based on "+plural(m.accN,"task"):"Needs 3 finished tasks with measured time",tag:"calc"})+'</div>'+
@@ -362,7 +368,7 @@ function secFocus(){
     kpi({label:"Focus sessions",value:m.segN,sub:"Uninterrupted stretches of 1 min or more",tag:"measured"})+
     kpi({label:"Average stretch",value:dur(m.segAvg),sub:"Longest: "+dur(m.segMax)})+
     kpi({label:"Deep work",value:m.deepN,sub:"Stretches of "+c.deep+" min or more · "+dur(m.deepMin)})+
-    kpi({label:"Interruptions",value:m.pauses+m.intr,sub:plural(m.pauses,"pause")+" · "+m.intr+" “Got distracted”"})+'</div>'+
+    kpi({label:"Interruptions",value:m.pauses+m.intr,sub:plural(m.pauses,"pause")+(m.longPauses?" ("+m.longPauses+" long)":"")+" · "+m.intr+" “Got distracted”"})+'</div>'+
     card("Timer time is not the same as focus",'<p class="expl">A running timer only proves the task was open. So we split timer time by what you told us after each task. Only <b>Fully focused</b> counts as verified focus.</p>'+
       '<div class="fbar">'+bar(m.verified,"Fully focused","f3")+bar(m.partly,"Partly focused","f2")+bar(low,"Not really focused","f1")+bar(notRated,"Not rated","f0")+'</div>'+
       '<div class="ch-leg"><span><i class="sq" style="--c:var(--c1)"></i>Fully '+dur(m.verified)+'</span><span><i class="sq" style="--c:var(--c3)"></i>Partly '+dur(m.partly)+'</span><span><i class="sq" style="--c:var(--c2)"></i>Not really '+dur(low)+'</span><span><i class="sq" style="--c:var(--neutral)"></i>Not rated '+dur(notRated)+'</span></div>'+
@@ -643,7 +649,7 @@ function secHistory(){
   return '<div class="two wide-l">'+card("Timer sessions",'<input class="dsearch" data-dhistq placeholder="Search by task name" value="'+esc(D.histQ)+'" aria-label="Search sessions">'+body+(legacy.length?'<p class="fine">'+plural(legacy.length,"older task")+' in this period only have start and finish times (no sessions). They count in time worked, marked with *.</p>':''),{sub:plural(rows.length,"session")+" · "+periodName(),tag:"measured"})+
     card("Total per task",Object.keys(tot).length?'<table class="dt small"><thead><tr><th>Task</th><th>Sessions</th><th>Total</th></tr></thead><tbody>'+Object.values(tot).sort((a,b)=>b.min-a.min).map(t=>'<tr><td class="tn">'+esc(t.title)+'</td><td>'+t.n+'</td><td><b>'+dur(t.min)+'</b></td></tr>').join("")+'</tbody></table>':empty("Nothing yet."))+'</div>'; }
 function sessDetail(o,act){ const x=o.x;
-  return '<div class="sd"><div><b>Pauses</b>'+(x.p&&x.p.length?'<ul class="plain">'+x.p.map(q=>'<li>'+hm(q.a)+' – '+(q.b?hm(q.b):"still paused")+(q.b?' ('+dur((q.b-q.a)/60000)+')':'')+'</li>').join("")+'</ul>':'<p class="fine">No pauses.</p>')+
+  return '<div class="sd"><div><b>Pauses</b>'+(x.p&&x.p.length?'<ul class="plain">'+x.p.map(q=>'<li>'+hm(q.a)+' – '+(q.b?hm(q.b):"still paused")+(q.b?' ('+dur((q.b-q.a)/60000)+(q.b-q.a<SHORT_PAUSE?', short, not counted':q.b-q.a>=LONG_PAUSE?', long pause':'')+')':'')+'</li>').join("")+'</ul>':'<p class="fine">No pauses.</p>')+
     (x.fix?'<p class="fine">Corrected on '+esc(new Date(x.fix.at).toLocaleString())+'. Original end: '+(x.fix.e0?hm(x.fix.e0):"still running")+' ('+dur(x.fix.a0)+' active). <button class="dlink" data-dsessundo="'+esc(o.r.key+"|"+o.r.id+"|"+o.j)+'">Restore original</button></p>':'')+'</div>'+
     '<div class="sfix"><b>Fix this session</b><p class="fine">Left the timer running, or forgot to stop it? Set how long you really worked. The original record is kept.</p><label>Active time <input type="number" min="1" max="960" id="dFix" value="'+Math.max(1,Math.round(act))+'"> min</label><button class="dbtn pri" data-dsessfix="'+esc(o.r.key+"|"+o.r.id+"|"+o.j)+'">Save correction</button></div></div>'; }
 function findSess(v){ const [k,id,j]=v.split("|"), ds=ST().days[k]; return ds&&ds.sess&&ds.sess[id]&&ds.sess[id][+j]; }
