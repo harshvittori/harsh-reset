@@ -1059,6 +1059,54 @@ body.drawer-open .h-top,body.drawer-open .h-stack,body.drawer-open .h-dock,body.
   .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
   body.timer-on .toast,body.in-room .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 }
+/* v2 phone pass: fewer things on screen, the task and the time first */
+.room .run-row,.room .upnext,.room .s-meta{display:none}
+.room{height:auto;max-height:86vh}
+.room .stepzone{min-height:0!important;flex:0 0 auto}
+.room .card{height:auto!important;min-height:0!important}
+body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-events:none}
+@media (max-width:760px){
+  .h-stack{display:none}
+  :root[data-phase="morning"]{--sun-y:67vh;--sun-x:20vw}
+  :root[data-phase="afternoon"]{--sun-y:17vh;--sun-x:16vw}
+  .h-top{right:calc(max(16px,env(safe-area-inset-right)) + 52px)}
+  .mtn{height:32vh}
+  body:not(.noplan) .intro-inner{min-height:100svh;box-sizing:border-box;justify-content:center;padding:84px 22px 128px}
+  #hFree,#hUp,#hTm{margin-top:0}
+  .h-tpill{font-size:12px;padding:7px 14px;letter-spacing:.14em}
+  .h-ttask,.h-utask{font-size:clamp(30px,9vw,38px);margin-top:18px;line-height:1.12;max-width:330px}
+  .h-tlab{margin-top:20px;font-size:11px}
+  .h-tbig{font-size:clamp(84px,27vw,120px)!important;font-weight:300;margin-top:2px;letter-spacing:-.03em}
+  .h-tbig .d.sep{opacity:.35}
+  .h-tbar{width:min(260px,70vw);height:5px;margin-top:6px}
+  .h-tsub{font-size:15px;margin-top:14px;white-space:nowrap;max-width:none}
+  .h-tsub .opt{display:none}
+  .h-tacts{margin-top:28px;flex-direction:column;align-items:center;flex-wrap:nowrap;width:100%;gap:10px}
+  .h-tacts .h-btn{width:min(290px,100%);box-sizing:border-box;justify-content:center;white-space:nowrap;font-size:16px;height:54px;padding:5px 22px 5px 5px;position:relative}
+  .h-tacts .h-btn .ico{position:absolute;left:6px;top:50%;translate:0 -50%}
+  .h-chip{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;text-align:center;gap:3px 8px;padding:11px 22px;border-radius:20px;max-width:270px;margin-top:26px}
+  .h-chip>*{grid-column:auto}
+  .h-chip .ci,.h-chip .lb{display:none}
+  .h-chip .ci.ok{display:inline-grid;width:22px;height:22px}
+  .h-chip .sp{display:block;flex-basis:100%;height:0;width:0;margin:0;border:0;background:none}
+  .h-chip b{font-size:17px}.h-chip .t,.h-chip .in{font-size:14px}
+  .focus-ask{bottom:calc(96px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:360px}
+  .room{min-height:0!important;height:auto!important;max-height:88svh}
+  .room .stage{overflow:auto}
+  .room .stepzone{min-height:0!important}
+  .room .s-meta{display:none}
+}
+@media (max-width:370px){
+  .h-tsub{font-size:14px}
+  .h-tbig{font-size:clamp(72px,25vw,100px)!important}
+}
+@media (max-width:760px) and (max-height:700px){
+  body:not(.noplan) .intro-inner{padding:72px 20px 104px}
+  .h-ttask,.h-utask{font-size:28px;margin-top:12px}
+  .h-tbig{font-size:clamp(68px,22vw,96px)!important}
+  .h-tacts{margin-top:18px}
+  .h-tacts .h-btn{height:48px}
+}
 </style>
 </head>
 <body>
@@ -1276,6 +1324,7 @@ body.drawer-open .h-top,body.drawer-open .h-stack,body.drawer-open .h-dock,body.
   </div>
   <div class="dr-foot">
     <button class="pill" data-look aria-label="Change look"></button>
+    <button class="pill" data-sound aria-label="Sound on or off"></button>
     <button class="pill" data-report>Dashboard</button>
     <button class="pill userplan" data-qadd>+ Add a task</button>
     <button class="pill userplan" data-plan="edit">Edit my plan</button>
@@ -2912,6 +2961,7 @@ function hQuote(sit,force){
   if(first||matchMedia("(prefers-reduced-motion: reduce)").matches){ q.innerHTML=line; q.classList.remove("fade"); return; }
   q.classList.add("fade"); setTimeout(()=>{ q.innerHTML=line; q.classList.remove("fade"); },600);
 }
+const tShort=t=>String(t).replace(/^00:/,"").replace(/^0(\d:)/,"$1");
 function hClock(sec){ sec=Math.max(0,Math.ceil(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec/60)%60, s=sec%60; return (h?h+":"+pad(m):m)+":"+pad(s); }
 const HICO={play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>',
   pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>',
@@ -2959,14 +3009,14 @@ function renderHome(i){
   const sm=startedMin(tk,cur.id), ri=runInfo(tk,cur.id), nx=i.next;
   let state="", lab="", t=i.t, bar=0, sub="", acts="";
   const nxt=nx?' · Then <b>'+esc(nx.title)+'</b>':'';
-  if(h.st==="ready"){ state="Ready to start"; lab="Slot ends in"; bar=Math.min(100,(nm-cur.s)/cur.d*100); sub=fmt(cur.s)+" – "+fmt(cur.e)+" · Turns late if not started by "+fmt(cur.s+LATE_AFTER); acts=hBtn("start","Start this task","play"); }
-  if(h.st==="late"){ state="Running late"; lab="Late by"; t=hms((nm-cur.s)*60); sub="Was "+fmt(cur.s)+" – "+fmt(cur.e)+" · Start now and move the rest of your day"; acts=hBtn("start","Start this task","play"); }
-  if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Started "+fmt(sm)+" · ends "+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+hBtn("pause","Pause","pause",1); }
-  if(h.st==="pause"){ state="Paused"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Paused time isn&#39;t counted as work"+nxt; acts=hBtn("resume","Resume","play")+hBtn("card","Back to my task","arw",1); }
-  if(h.st==="over"){ state="Time&#39;s up"; lab="Over time by"; bar=100; sub="Was meant to end at "+fmt(cur.e)+" · Finish up and tap Done"; acts=hBtn("card","Back to my task","arw")+hBtn("done","Done","ok",1); }
-  if(h.st==="brk"){ state=cur.kind==="meal"?"Meal":"Break"; lab="Back to work in"; t=hms(Math.max(0,cur.e-nm)*60); bar=Math.min(100,(nm-cur.s)/cur.d*100); sub=(cur.kind==="meal"?"Eat slowly, away from the screen":"Stretch, drink water, look away from the screen")+(nx?' · Next: <b>'+esc(nx.title)+'</b>':''); acts=hBtn("done",cur.kind==="meal"?"Done eating":"End break early","ok"); }
+  if(h.st==="ready"){ state="Ready to start"; lab="Slot ends in"; bar=Math.min(100,(nm-cur.s)/cur.d*100); sub='<span class="opt">'+fmt(cur.s)+" – "+fmt(cur.e)+' · </span>Start by '+fmt(cur.s+LATE_AFTER)+" to stay on time"; acts=hBtn("start","Start this task","play"); }
+  if(h.st==="late"){ state="Running late"; lab="Late by"; t=hms((nm-cur.s)*60); sub="Planned for "+fmt(cur.s)+'<span class="opt"> · Start now and move the rest of your day</span>'; acts=hBtn("start","Start this task","play"); }
+  if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub='<span class="opt">Started '+fmt(sm)+' · </span>Ends '+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+hBtn("pause","Pause","pause",1); }
+  if(h.st==="pause"){ state="Paused"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Paused time isn&#39;t counted"+'<span class="opt">'+nxt+'</span>'; acts=hBtn("resume","Resume","play")+hBtn("card","Back to my task","arw",1); }
+  if(h.st==="over"){ state="Time&#39;s up"; lab="Over time by"; bar=100; sub="Was meant to end at "+fmt(cur.e)+'<span class="opt"> · Finish up and tap Done</span>'; acts=hBtn("card","Back to my task","arw")+hBtn("done","Done","ok",1); }
+  if(h.st==="brk"){ state=cur.kind==="meal"?"Meal":"Break"; lab="Back to work in"; t=hms(Math.max(0,cur.e-nm)*60); bar=Math.min(100,(nm-cur.s)/cur.d*100); sub='<span class="opt">'+(cur.kind==="meal"?"Eat slowly, away from the screen":"Stretch, drink water, look away from the screen")+(nx?' · </span>Next: <b>'+esc(nx.title)+'</b>':'</span>'); acts=hBtn("done",cur.kind==="meal"?"Done eating":"End break early","ok"); }
   $("hTState").innerHTML=state; $("hTDot").className=h.st==="pause"?"":"pulse"; setTxt("hTTask",cur.title); setTxt("hTLab",lab);
-  rollTo($("bigTime"),t); $("hTBarW").hidden=!bar; $("hTBar").style.width=bar+"%";
+  rollTo($("bigTime"),tShort(t)); $("hTBarW").hidden=!bar; $("hTBar").style.width=bar+"%";
   if($("hTSub").dataset.h!==sub){ $("hTSub").dataset.h=sub; $("hTSub").innerHTML=sub; }
   if($("hTActs").dataset.h!==acts){ $("hTActs").dataset.h=acts; $("hTActs").innerHTML=acts; }
 }
