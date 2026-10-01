@@ -2311,7 +2311,7 @@ function pbEdit(){
   const first=document.querySelector("#pbList .pn"); if(first&&!first.value) first.focus({preventScroll:true});
 }
 function openPlanner(mode){
-  if(mode==="ai"){ if(hvai&&hvai.open){ hvai.open(); } else toast("HV AI is loading. Try again in a moment."); return; }
+  if(mode==="ai"){ if($("scrim").classList.contains("open")) closeModal(); if(hvai&&hvai.open){ hvai.open(); } else toast("HV AI is loading. Try again in a moment."); return; }
   if(mode==="edit"){
     const tk=selKey>=keyOf(new Date())?selKey:keyOf(new Date()), c=state.custom&&state.custom[tk], src=(c&&c.blocks&&c.blocks.length)?c:state.routine;   // the day open in Full day
     if(src&&src.blocks&&src.blocks.length){ PB={editing:true,when:src===c?"day":"every",day:tk,rows:src.blocks.slice().sort((a,b)=>a.t<b.t?-1:1).map(b=>({id:b.id,core:b.core,t:b.t,title:b.title,d:b.d,kind:PB_KINDS.some(k=>k[0]===b.kind)?b.kind:"work"}))}; return pbEdit(); }
