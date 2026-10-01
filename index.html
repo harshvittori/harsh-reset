@@ -1059,6 +1059,8 @@ body.drawer-open .h-top,body.drawer-open .h-stack,body.drawer-open .h-dock,body.
   .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
   body.timer-on .toast,body.in-room .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 }
+body[data-home="missed"] .h-tsub{margin-top:20px;font-size:18px}
+body[data-home="missed"] .h-tacts{margin-top:26px}
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
@@ -2928,7 +2930,7 @@ const HV_QUOTES = {
   }
 };
 
-const LATE_AFTER=15;            /* a slot that started this many minutes ago without Start turns "Running late" */
+const MISSED_AFTER=60, LATE_AFTER=15;            /* a slot that started this many minutes ago without Start turns "Running late" */
 const UP_WINDOW=60;             /* within this many minutes of the next task, the coming-up screen replaces the quote */
 const HPH=()=>document.documentElement.dataset.phase||"morning";
 const isBreakB=b=>!!b&&(b.kind==="rest"||b.kind==="meal");
@@ -2940,9 +2942,9 @@ function homeState(i){
   if(i.st==="before") return cur.s-nm>UP_WINDOW?{st:"free",cur}:{st:"up",cur};
   if(isBreakB(cur)) return {st:"brk",cur};
   if(i.st==="paused") return {st:"pause",cur};
-  if(i.st==="late") return {st:sm!=null?"over":"late",cur};
+  if(i.st==="late") return {st:sm!=null?"over":nm-cur.s>MISSED_AFTER?"missed":"late",cur};
   if(sm!=null) return {st:"run",cur};
-  return {st:nm-cur.s>LATE_AFTER?"late":"ready",cur};
+  return {st:nm-cur.s>MISSED_AFTER?"missed":nm-cur.s>LATE_AFTER?"late":"ready",cur};
 }
 /* quote deck: profile lines + time-of-day lines, shuffled; nothing repeats until the whole deck was shown */
 const QDECK={}; let hqKey="", hqAt=0;
@@ -2970,7 +2972,7 @@ const HICO={play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15
   cal:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>'};
 /* state colours: two stops each, light and dark looks */
 const HCOL={ready:["#A8741F","#D6A048","#F0C987","#FFE2B0"],run:["#3A47C4","#7A5CF0","#AFB8FF","#D2C2FF"],brk:["#2F6FB0","#5FA3DA","#9CCBF2","#C9E6FF"],
-  pause:["#59607C","#8A90AA","#B8BDD4","#D8DBEA"],late:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],over:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"]};
+  pause:["#59607C","#8A90AA","#B8BDD4","#D8DBEA"],late:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],over:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],missed:["#6E5A8E","#A07FBF","#C9B5E2","#E4D8F2"]};
 function hBtn(act,label,ico,ghost){ return '<button class="h-btn glass'+(ghost?' ghost':'')+'" data-home="'+act+'"><span class="ico">'+HICO[ico]+'</span>'+label+'</button>'; }
 function nextChip(h){
   const tk=keyOf(new Date()), nm=nowMin(); let title="", when="", mins=null;
@@ -2985,8 +2987,12 @@ function nextChip(h){
 let hLastSt="";
 function renderHome(i){
   if(document.body.classList.contains("noplan")) return;
-  const h=homeState(i), tk=keyOf(new Date()), nm=nowMin(), dark=document.documentElement.dataset.theme==="dark";
-  const TS=["ready","run","brk","pause","late","over"], tm=TS.includes(h.st);
+  let h=homeState(i); const tk=keyOf(new Date()), nm=nowMin(), dark=document.documentElement.dataset.theme==="dark";
+  /* a break whose time is already over closes by itself, so the next task shows (never a break stuck at 0:00) */
+  for(let n=0;n<8&&h.st==="brk"&&h.cur&&nm>=h.cur.e;n++){ const ds=dayState(tk), id=h.cur.id;
+    if(startedMin(tk,id)!=null){ sessEnd(tk,id,"done"); ds.done[id]=Date.now(); } else ds.skipped[id]="before";   /* an untouched break isn't counted either way */
+    save(); i=timerInfo(); h=homeState(i); }
+  const TS=["ready","run","brk","pause","late","over","missed"], tm=TS.includes(h.st);
   $("hFree").hidden=!(h.st==="free"||h.st==="done"); $("hUp").hidden=h.st!=="up"; $("hTm").hidden=!tm;
   document.body.classList.toggle("timer-on",tm); document.body.dataset.home=h.st;
   if(h.st!==hLastSt){ hLastSt=h.st; hqKey=""; }
@@ -3011,12 +3017,15 @@ function renderHome(i){
   const nxt=nx?' · Then <b>'+esc(nx.title)+'</b>':'';
   if(h.st==="ready"){ state="Ready to start"; lab="Slot ends in"; bar=Math.min(100,(nm-cur.s)/cur.d*100); sub='<span class="opt">'+fmt(cur.s)+" – "+fmt(cur.e)+' · </span>Start by '+fmt(cur.s+LATE_AFTER)+" to stay on time"; acts=hBtn("start","Start this task","play"); }
   if(h.st==="late"){ state="Running late"; lab="Late by"; t=hms((nm-cur.s)*60); sub="Planned for "+fmt(cur.s)+'<span class="opt"> · Start now and move the rest of your day</span>'; acts=hBtn("start","Start this task","play"); }
+  /* more than an hour late and never started: no ticking "late by" clock, just a calm choice */
+  if(h.st==="missed"){ state="Missed"; lab=""; sub="Planned for "+fmt(cur.s)+" – "+fmt(cur.e)+'<span class="opt"> · '+esc(inTxt(nm-cur.s))+' ago</span>'; acts=hBtn("start","Start it now","play")+hBtn("move","Move to tomorrow","arw",1); }
   if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub='<span class="opt">Started '+fmt(sm)+' · </span>Ends '+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+hBtn("pause","Pause","pause",1); }
   if(h.st==="pause"){ state="Paused"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Paused time isn&#39;t counted"+'<span class="opt">'+nxt+'</span>'; acts=hBtn("resume","Resume","play")+hBtn("card","Back to my task","arw",1); }
   if(h.st==="over"){ state="Time&#39;s up"; lab="Over time by"; bar=100; sub="Was meant to end at "+fmt(cur.e)+'<span class="opt"> · Finish up and tap Done</span>'; acts=hBtn("card","Back to my task","arw")+hBtn("done","Done","ok",1); }
   if(h.st==="brk"){ state=cur.kind==="meal"?"Meal":"Break"; lab="Back to work in"; t=hms(Math.max(0,cur.e-nm)*60); bar=Math.min(100,(nm-cur.s)/cur.d*100); sub='<span class="opt">'+(cur.kind==="meal"?"Eat slowly, away from the screen":"Stretch, drink water, look away from the screen")+(nx?' · </span>Next: <b>'+esc(nx.title)+'</b>':'</span>'); acts=hBtn("done",cur.kind==="meal"?"Done eating":"End break early","ok"); }
-  $("hTState").innerHTML=state; $("hTDot").className=h.st==="pause"?"":"pulse"; setTxt("hTTask",cur.title); setTxt("hTLab",lab);
-  rollTo($("bigTime"),tShort(t)); $("hTBarW").hidden=!bar; $("hTBar").style.width=bar+"%";
+  $("hTState").innerHTML=state; $("hTDot").className=h.st==="pause"||h.st==="missed"?"":"pulse"; setTxt("hTTask",cur.title); setTxt("hTLab",lab);
+  const noClock=h.st==="missed"; $("bigTime").hidden=noClock; $("hTLab").hidden=noClock;
+  if(noClock) bar=0; else rollTo($("bigTime"),tShort(t)); $("hTBarW").hidden=!bar; $("hTBar").style.width=bar+"%";
   if($("hTSub").dataset.h!==sub){ $("hTSub").dataset.h=sub; $("hTSub").innerHTML=sub; }
   if($("hTActs").dataset.h!==acts){ $("hTActs").dataset.h=acts; $("hTActs").innerHTML=acts; }
 }
@@ -3029,6 +3038,7 @@ function homeAct(a){
   if(a==="pause"){ sessPause(tk,cur.id); save(); renderCard(false); tickTimers(); toast("Paused. Take your time."); return; }
   if(a==="resume"){ sessResume(tk,cur.id); save(); renderCard(false); tickTimers(); toast("Back to it."); return; }
   if(a==="done"){ markDone(cur.id); tickTimers(); return; }
+  if(a==="move"){ taskAct("move",tk,cur.id); return; }
 }
 /* "Back to my task": the task card slides up over the timer */
 function openCard(){ const first=!started; started=true; document.body.classList.add("in-room"); if(first||!liveCard()) renderCard(true); else renderCard(false); if(ACC) guestNudge(); }
