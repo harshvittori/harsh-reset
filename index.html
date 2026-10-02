@@ -102,7 +102,7 @@
 :root[data-phase="night"]{--sky1:#060B18;--sky2:#101632;--sky3:#241E38;--orb1:#2A3B8A;--orb2:#4A3969;--orb3:#1B5864;--stars:1;--sun-op:0;--moon-op:1}
 *,*::before,*::after{box-sizing:inherit}
 html,body{height:100%}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--sky1) 22%,#36427c);overscroll-behavior:none}   /* what shows if iOS shifts the page for the keyboard: the colour of the ridges, never a light band */
 body{margin:0;background:var(--sky1);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
@@ -1169,6 +1169,12 @@ body.in-room #hTActs,body.in-room #hTm::after{opacity:0;pointer-events:none;tran
 @media (max-width:760px){ body.in-room .h-dock{opacity:0;pointer-events:none} }
 .room .sh-x{background:color-mix(in srgb,#fff 60%,transparent);border-color:color-mix(in srgb,#fff 70%,transparent);top:16px;right:16px}
 :root[data-theme="dark"] .room .sh-x{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+/* phones: popups sit just above the on-screen keyboard (sized to the visible part of the screen) */
+@media (max-width:760px){
+  .scrim{top:var(--vvt,0px);bottom:auto;height:var(--vvh,100%);align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px))}
+  body.kb-open .scrim{padding-bottom:10px}
+  .modal{max-height:calc(var(--vvh,100svh) - 20px)}
+}
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
@@ -3154,6 +3160,10 @@ function homeAct(a){
 function openCard(){ const first=!started; started=true; document.body.classList.add("in-room"); if(first||!liveCard()) renderCard(true); else renderCard(false); if(ACC) guestNudge(); }
 function sameTitle(){ const r=$("room"), a=r.querySelector(".c-title"), b=r.querySelector(".s-head"); r.classList.toggle("same-title",!!(a&&b&&a.textContent.trim().toLowerCase()===b.textContent.trim().toLowerCase())); }
 new MutationObserver(sameTitle).observe(document.getElementById("stage")||document.body,{childList:true,subtree:true});
+/* keep popups inside the visible part of the screen when the keyboard opens (iOS shrinks only the visual viewport) */
+if(window.visualViewport){ const vv=window.visualViewport, R=document.documentElement;
+  const fit=()=>{ R.style.setProperty("--vvh",vv.height+"px"); R.style.setProperty("--vvt",vv.offsetTop+"px"); document.body.classList.toggle("kb-open",innerHeight-vv.height>120); };
+  vv.addEventListener("resize",fit); vv.addEventListener("scroll",fit); fit(); }
 function closeCard(){ document.body.classList.remove("in-room"); $("room").style.translate=""; tickTimers(); }
 /* phone gestures: slide the knob to pause; swipe up on the timer for the task card; pull the card down to close it */
 { let sl=null;
