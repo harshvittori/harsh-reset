@@ -1061,6 +1061,25 @@ body.drawer-open .h-top,body.drawer-open .h-stack,body.drawer-open .h-dock,body.
 }
 body[data-home="missed"] .h-tsub{margin-top:20px;font-size:18px}
 body[data-home="missed"] .h-tacts{margin-top:26px}
+/* smaller dock; HV AI wears its own logo */
+.h-dock{padding:6px;gap:8px}
+.h-db{height:44px;font-size:15.5px;gap:9px;padding:0 18px 0 5px}
+.h-db .ic{width:34px;height:34px}
+.h-db svg{width:18px;height:18px}
+.h-db .ic-logo{background:none;box-shadow:none}
+.h-db .ic-logo svg.hvlogo{width:34px;height:34px;border-radius:50%;box-shadow:0 4px 12px rgba(81,70,200,.35)}
+body.timer-on .h-db,body.in-room .h-db{padding:0 5px}
+@media (max-width:760px){
+  .h-dock{padding:5px;gap:6px}
+  .h-db{height:40px;font-size:14.5px;gap:8px;padding:0 15px 0 4px}
+  .h-db .ic,.h-db .ic-logo svg.hvlogo{width:32px;height:32px}
+  .h-db svg{width:17px;height:17px}
+  body.timer-on .h-db,body.in-room .h-db{padding:0 4px}
+}
+/* while HV AI is open its panel owns the screen: the dock steps away (it would sit on the message box) */
+body:has(.hvai:not([hidden])) .h-dock{opacity:0;pointer-events:none;transition:opacity .25s}
+@media (max-width:760px){ body:has(.hvai:not([hidden])) .h-top,body:has(.hvai:not([hidden])) .dashbtn{opacity:0;pointer-events:none} }
+body .hvai .hvai-send{background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);box-shadow:0 6px 16px -8px rgba(79,102,224,.9)}
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
@@ -1264,7 +1283,7 @@ body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-event
 <div class="h-dock glass" id="hDock">
   <button class="h-db" data-qadd aria-label="Add a task"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="dl">Add task</span></button>
   <i class="h-sep"></i>
-  <button class="h-db" data-plan="ai" aria-label="HV AI"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8z" fill="#7C5CF0"/><path d="M18 13l.9 2.1L21 16l-2.1.9L18 19l-.9-2.1L15 16l2.1-.9z" fill="#A48CFF"/></svg></span><span class="dl">HV AI</span></button>
+  <button class="h-db" data-plan="ai" aria-label="HV AI"><span class="ic ic-logo"><svg class="hvlogo" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="hvdkD1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241F5C"/><stop offset=".55" stop-color="#5146C8"/><stop offset="1" stop-color="#8E67E6"/></linearGradient><radialGradient id="hvdkD2" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E4DDFF"/><stop offset="1" stop-color="#B7A6FF" stop-opacity="0"/></radialGradient></defs><circle cx="24" cy="24" r="24" fill="url(#hvdkD1)"/><circle cx="24" cy="24" r="15" fill="url(#hvdkD2)" opacity=".6"/><circle cx="24" cy="24" r="7.5" fill="#fff"/><circle cx="24" cy="11.5" r="3" fill="#34C77B"/><circle cx="34.8" cy="30.2" r="3" fill="#F2C063"/><circle cx="13.2" cy="30.2" r="3" fill="#5B86D6"/></svg></span><span class="dl">HV AI</span></button>
 </div>
 
 <div class="room" id="room" role="dialog" aria-label="Your task">
@@ -2980,8 +2999,8 @@ function nextChip(h){
   else { const nk=nextPlanDay(tk), nb=nk?timeline(nk).blocks[0]:null; if(nb){ title=nb.title; const tm=nk===addDays(tk,1); when=(tm?"Tomorrow":niceDate(nk))+", "+fmt(nb.s);
     const [y,m,dd]=nk.split("-").map(Number); mins=(atMin(new Date(y,m-1,dd),nb.s)-new Date())/60000; } }
   const done=h.st==="done", dn=done?timeline(tk).blocks.filter(b=>b.done).length:0;
-  if(!title) return done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">All '+dn+' done today</span>':"";
-  return (done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">All '+dn+' done</span><i class="sp"></i>':'<span class="ci">'+HICO.cal+'</span>')+
+  if(!title) return done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">'+(dn===1?"Today&#39;s task done":"All "+dn+" done today")+'</span>':"";
+  return (done?'<span class="ci ok">'+HICO.ok+'</span><span class="okt">'+(dn===1?"Today&#39;s task done":"All "+dn+" done")+'</span><i class="sp"></i>':'<span class="ci">'+HICO.cal+'</span>')+
     '<span class="lb">Next</span><b>'+esc(title)+'</b>'+(done?'':'<i class="sp"></i>')+'<span class="t">'+esc(when)+'</span>'+(!done&&mins>0?'<span class="in">in '+inTxt(Math.round(mins))+'</span>':'');
 }
 let hLastSt="";
