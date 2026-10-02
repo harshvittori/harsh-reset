@@ -1128,6 +1128,17 @@ body .hvai .hvai-typing::before{content:"";flex:none;width:22px;height:22px;bord
 @media (max-width:760px){
   body .hvai{left:0;right:0;bottom:0;width:100%;height:calc(100svh - 64px);border-radius:28px 28px 0 0;border-bottom:0}
 }
+/* slide to pause (phones) and the swipe-up hint */
+.h-slide{position:relative;width:min(290px,100%);height:54px;border-radius:999px;box-sizing:border-box;border:1px solid var(--glass-border);background:color-mix(in srgb,var(--glass) 70%,transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;--p:0}
+.h-slide::before{content:"";position:absolute;inset:0;width:calc(54px + (100% - 54px) * var(--p));border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 22%,transparent),color-mix(in srgb,var(--tc2) 30%,transparent))}
+.h-slide .sl-l{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;padding-left:40px;font-weight:700;font-size:16px;color:var(--ink);opacity:calc(1 - var(--p) * 1.4);pointer-events:none}
+.h-slide .sl-l b{color:var(--tc);letter-spacing:-2px;animation:slNudge 1.6s ease-in-out infinite;display:inline-block}
+@keyframes slNudge{50%{transform:translateX(4px);opacity:.5}}
+.h-slide .knob{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--tc),var(--tc2));box-shadow:0 6px 16px -6px var(--tc2);cursor:grab;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.h-slide.drag .knob{transition:none;cursor:grabbing}
+.h-slide .knob svg{width:18px;height:18px}
+@media (max-width:760px){ body[data-home="run"] #hTm::after{content:"Swipe up for your task";display:block;margin-top:14px;font-size:12.5px;letter-spacing:.04em;color:var(--muted);opacity:.85} }
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
@@ -3040,6 +3051,8 @@ const HICO={play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15
 /* state colours: two stops each, light and dark looks */
 const HCOL={ready:["#A8741F","#D6A048","#F0C987","#FFE2B0"],run:["#3A47C4","#7A5CF0","#AFB8FF","#D2C2FF"],brk:["#2F6FB0","#5FA3DA","#9CCBF2","#C9E6FF"],
   pause:["#59607C","#8A90AA","#B8BDD4","#D8DBEA"],late:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],over:["#B23F62","#E07A8F","#F5A3B5","#FFC9D3"],missed:["#6E5A8E","#A07FBF","#C9B5E2","#E4D8F2"]};
+const PHONE=matchMedia("(max-width:760px)");
+function hSlide(act,label){ return '<div class="h-slide" role="button" tabindex="0" aria-label="'+label+'" data-slide="'+act+'"><span class="sl-l">'+label+' <b>&#8250;&#8250;</b></span><span class="knob">'+HICO.pause+'</span></div>'; }
 function hBtn(act,label,ico,ghost){ return '<button class="h-btn glass'+(ghost?' ghost':'')+'" data-home="'+act+'"><span class="ico">'+HICO[ico]+'</span>'+label+'</button>'; }
 function nextChip(h){
   const tk=keyOf(new Date()), nm=nowMin(); let title="", when="", mins=null;
@@ -3086,7 +3099,7 @@ function renderHome(i){
   if(h.st==="late"){ state="Running late"; lab="Late by"; t=hms((nm-cur.s)*60); sub="Planned for "+fmt(cur.s)+'<span class="opt"> · Start now and move the rest of your day</span>'; acts=hBtn("start","Start this task","play"); }
   /* more than an hour late and never started: no ticking "late by" clock, just a calm choice */
   if(h.st==="missed"){ state="Missed"; lab=""; sub="Planned for "+fmt(cur.s)+" – "+fmt(cur.e)+'<span class="opt"> · '+esc(inTxt(nm-cur.s))+' ago</span>'; acts=hBtn("start","Start it now","play")+hBtn("move","Move to tomorrow","arw",1); }
-  if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub='<span class="opt">Started '+fmt(sm)+' · </span>Ends '+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+hBtn("pause","Pause","pause",1); }
+  if(h.st==="run"){ state="In progress"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub='<span class="opt">Started '+fmt(sm)+' · </span>Ends '+fmt(taskEndM(tk,cur))+nxt; acts=hBtn("card","Back to my task","arw")+(PHONE.matches?hSlide("pause","Slide to pause"):hBtn("pause","Pause","pause",1)); }
   if(h.st==="pause"){ state="Paused"; lab="Time left"; bar=ri?Math.min(100,ri.activeMin/cur.d*100):0; sub="Paused time isn&#39;t counted"+'<span class="opt">'+nxt+'</span>'; acts=hBtn("resume","Resume","play")+hBtn("card","Back to my task","arw",1); }
   if(h.st==="over"){ state="Time&#39;s up"; lab="Over time by"; bar=100; sub="Was meant to end at "+fmt(cur.e)+'<span class="opt"> · Finish up and tap Done</span>'; acts=hBtn("card","Back to my task","arw")+hBtn("done","Done","ok",1); }
   if(h.st==="brk"){ state=cur.kind==="meal"?"Meal":"Break"; lab="Back to work in"; t=hms(Math.max(0,cur.e-nm)*60); bar=Math.min(100,(nm-cur.s)/cur.d*100); sub='<span class="opt">'+(cur.kind==="meal"?"Eat slowly, away from the screen":"Stretch, drink water, look away from the screen")+(nx?' · </span>Next: <b>'+esc(nx.title)+'</b>':'</span>'); acts=hBtn("done",cur.kind==="meal"?"Done eating":"End break early","ok"); }
@@ -3109,7 +3122,28 @@ function homeAct(a){
 }
 /* "Back to my task": the task card slides up over the timer */
 function openCard(){ const first=!started; started=true; document.body.classList.add("in-room"); if(first||!liveCard()) renderCard(true); else renderCard(false); if(ACC) guestNudge(); }
-function closeCard(){ document.body.classList.remove("in-room"); tickTimers(); }
+function closeCard(){ document.body.classList.remove("in-room"); $("room").style.translate=""; tickTimers(); }
+/* phone gestures: slide the knob to pause; swipe up on the timer for the task card; pull the card down to close it */
+{ let sl=null;
+  document.addEventListener("pointerdown",e=>{ const k=e.target.closest(".h-slide .knob"); if(!k) return; const tr=k.parentElement, max=tr.clientWidth-k.offsetWidth-8;
+    sl={k,tr,x0:e.clientX,max,dx:0}; k.setPointerCapture(e.pointerId); tr.classList.add("drag"); });
+  document.addEventListener("pointermove",e=>{ if(!sl) return; sl.dx=Math.max(0,Math.min(sl.max,e.clientX-sl.x0)); sl.k.style.transform="translateX("+sl.dx+"px)"; sl.tr.style.setProperty("--p",(sl.dx/sl.max).toFixed(3)); });
+  const end=()=>{ if(!sl) return; const done=sl.dx>sl.max*.8, s0=sl; sl=null; s0.tr.classList.remove("drag");
+    if(done){ s0.k.style.transform="translateX("+s0.max+"px)"; if(navigator.vibrate) navigator.vibrate(12); homeAct(s0.tr.dataset.slide); }
+    else { s0.k.style.transform=""; s0.tr.style.setProperty("--p",0); } };
+  document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+  document.addEventListener("keydown",e=>{ const t=e.target.closest&&e.target.closest(".h-slide"); if(t&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); homeAct(t.dataset.slide); } });
+  let sw=null;
+  document.addEventListener("touchstart",e=>{ if(!PHONE.matches||e.touches.length>1) return; const t=e.touches[0], b=document.body;
+    if(b.classList.contains("in-room")){ const st=$("stage"); if(e.target.closest("#room")&&(!st||st.scrollTop<=0)) sw={m:"down",y0:t.clientY,x0:t.clientX,dy:0}; return; }
+    if(b.classList.contains("timer-on")&&e.target.closest("#hTm")&&!e.target.closest(".h-slide,button")) sw={m:"up",y0:t.clientY,x0:t.clientX,dy:0}; },{passive:true});
+  document.addEventListener("touchmove",e=>{ if(!sw) return; const t=e.touches[0]; sw.dy=t.clientY-sw.y0; const dx=Math.abs(t.clientX-sw.x0);
+    if(dx>Math.abs(sw.dy)){ sw=null; $("room").style.translate=""; return; }
+    if(sw.m==="down"&&sw.dy>0){ $("room").style.transition="none"; $("room").style.translate="0 "+sw.dy+"px"; } },{passive:true});
+  document.addEventListener("touchend",()=>{ if(!sw) return; const s0=sw; sw=null; const r=$("room"); r.style.transition="";
+    if(s0.m==="up"&&s0.dy<-60) homeAct("card");
+    else if(s0.m==="down"){ if(s0.dy>110) closeCard(); else r.style.translate=""; } });
+}
 
 /* ---------- day mountains (morning/afternoon backdrop) ---------- */
 (function(){ const dEl=document.getElementById("mdefs"), gEl=document.getElementById("mlayers"); if(!dEl||!gEl) return;
