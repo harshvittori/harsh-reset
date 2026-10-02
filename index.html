@@ -1067,13 +1067,12 @@ body[data-home="missed"] .h-tacts{margin-top:26px}
 .h-db .ic{width:34px;height:34px}
 .h-db svg{width:18px;height:18px}
 .h-db .ic-logo{background:none;box-shadow:none}
-.h-db .ic-logo svg.hvlogo{width:34px;height:34px;border-radius:11px;box-shadow:0 4px 12px rgba(81,70,200,.35)}
+.h-db .ic-logo svg.hvlogo{width:34px;height:34px;border-radius:50%;box-shadow:0 4px 12px rgba(81,70,200,.35)}
 body.timer-on .h-db,body.in-room .h-db{padding:0 5px}
 @media (max-width:760px){
   .h-dock{padding:5px;gap:6px}
   .h-db{height:40px;font-size:14.5px;gap:8px;padding:0 15px 0 4px}
   .h-db .ic,.h-db .ic-logo svg.hvlogo{width:32px;height:32px}
-  .h-db .ic-logo svg.hvlogo{border-radius:10px}
   .h-db svg{width:17px;height:17px}
   body.timer-on .h-db,body.in-room .h-db{padding:0 4px}
 }
@@ -1284,7 +1283,7 @@ body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-event
 <div class="h-dock glass" id="hDock">
   <button class="h-db" data-qadd aria-label="Add a task"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="dl">Add task</span></button>
   <i class="h-sep"></i>
-  <button class="h-db" data-plan="ai" aria-label="HV AI"><span class="ic ic-logo"><svg class="hvlogo" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="hvdkD1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241F5C"/><stop offset=".55" stop-color="#5146C8"/><stop offset="1" stop-color="#8E67E6"/></linearGradient><radialGradient id="hvdkD2" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E4DDFF"/><stop offset="1" stop-color="#B7A6FF" stop-opacity="0"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#hvdkD1)"/><circle cx="24" cy="24" r="15" fill="url(#hvdkD2)" opacity=".6"/><circle cx="24" cy="24" r="7.5" fill="#fff"/><circle cx="24" cy="11.5" r="3" fill="#34C77B"/><circle cx="34.8" cy="30.2" r="3" fill="#F2C063"/><circle cx="13.2" cy="30.2" r="3" fill="#5B86D6"/></svg></span><span class="dl">HV AI</span></button>
+  <button class="h-db" data-plan="ai" aria-label="HV AI"><span class="ic ic-logo"><svg class="hvlogo" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="hvdkD1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241F5C"/><stop offset=".55" stop-color="#5146C8"/><stop offset="1" stop-color="#8E67E6"/></linearGradient><radialGradient id="hvdkD2" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E4DDFF"/><stop offset="1" stop-color="#B7A6FF" stop-opacity="0"/></radialGradient></defs><circle cx="24" cy="24" r="24" fill="url(#hvdkD1)"/><circle cx="24" cy="24" r="15" fill="url(#hvdkD2)" opacity=".6"/><circle cx="24" cy="24" r="7.5" fill="#fff"/><circle cx="24" cy="11.5" r="3" fill="#34C77B"/><circle cx="34.8" cy="30.2" r="3" fill="#F2C063"/><circle cx="13.2" cy="30.2" r="3" fill="#5B86D6"/></svg></span><span class="dl">HV AI</span></button>
 </div>
 
 <div class="room" id="room" role="dialog" aria-label="Your task">
