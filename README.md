@@ -5,7 +5,12 @@ original file bit for bit. Nothing is re-encoded, so there is no quality loss.
 
 3840x2160, 60 fps, 12:37, 383 MB.
 
-## Join
+## Download everything at once
+
+On GitHub: green **Code** button → **Download ZIP**. Unzip it, then double-click **join-windows.bat**
+(Windows). The full video `HV_Reset_Tutorial_4K60.mp4` appears in the same folder.
+
+## Join by hand
 
 Download all `.part` files into one folder, then run one of these in that folder:
 
