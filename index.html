@@ -278,6 +278,7 @@ body.noplan.ob-intro .hvai-fab{display:none}
 .w-note{margin:18px 0 0;font-size:13.5px;color:var(--muted)}
 /* tutorial link: a small glass chip on the welcome screen, and a row in the account menu */
 .w-watch{display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:7px 16px 7px 7px;border-radius:999px;background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-hi);font-size:14px;color:var(--muted);text-decoration:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.ob-watch{text-align:center}.w-watch[hidden]{display:none}
 .w-watch b{color:var(--ink);font-weight:700}.w-watch:hover{transform:translateY(-1px)}
 .w-watch i,.acc-tut i{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#4F66E0,#7C5CE0);box-shadow:0 6px 14px -4px rgba(79,102,224,.55)}
 .w-watch i svg,.acc-tut i svg{width:13px;height:13px;margin-left:2px}
@@ -1308,7 +1309,6 @@ body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-event
       <p class="w-lead">Plan your day, stay consistent, and see yourself get better every week.</p>
       <div class="w-ctas"><button class="begin" data-ob-next>Get started</button></div>
       <p class="w-note">Takes 30 seconds. No account needed.</p>
-      <a class="w-watch" href="https://youtu.be/LS57TvSbOwM" target="_blank" rel="noopener" data-tut="welcome"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#fff"/></svg></i><span>New here? <b>Watch the 12-min guide</b></span></a>
     </div>
     <div class="ob-slide" data-ob="1" hidden>
       <p class="w-eyebrow">1 of 4</p>
@@ -1365,6 +1365,7 @@ body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-event
       <button class="ob-go" data-ob-next>Next</button>
     </div>
     <button class="ob-skip" data-ob-skip>Skip</button>
+    <div class="ob-watch"><a class="w-watch" href="https://youtu.be/LS57TvSbOwM" target="_blank" rel="noopener" data-tut="welcome" id="obWatch" hidden><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#fff"/></svg></i><span>New here? <b>Watch the 12-min guide</b></span></a></div>
   </div>
   <div class="intro-inner">
     <div class="h-legacy" hidden aria-hidden="true">
@@ -2648,6 +2649,7 @@ function obShow(n,dir){
   w.querySelector(".ob-go").textContent=obStep===OB_LAST-1?"Let's plan":"Next";
   w.querySelectorAll(".ob-dots i").forEach((d,i)=>d.classList.toggle("on",i===obStep));
   w.querySelector("[data-ob-skip]").hidden=obStep===0||obStep===OB_LAST;
+  $("obWatch").hidden=obStep===0||obStep===OB_LAST;   // the tutorial chip rides along on the walkthrough slides
   document.body.classList.toggle("ob-intro",obStep<OB_LAST);                 // HV AI comes back on the last step
   if(obStep===OB_LAST){ try{ localStorage.setItem("hr-onboard-seen","1"); }catch(e){} }
 }
