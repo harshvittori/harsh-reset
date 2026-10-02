@@ -276,6 +276,13 @@ body.noplan.ob-intro .hvai-fab{display:none}
 .w-ctas{display:flex;flex-direction:column;align-items:center;gap:12px}
 .w-ai{background:none;border:0;color:var(--ink);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.85}
 .w-note{margin:18px 0 0;font-size:13.5px;color:var(--muted)}
+/* tutorial link: a small glass chip on the welcome screen, and a row in the account menu */
+.w-watch{display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:7px 16px 7px 7px;border-radius:999px;background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-hi);font-size:14px;color:var(--muted);text-decoration:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.w-watch b{color:var(--ink);font-weight:700}.w-watch:hover{transform:translateY(-1px)}
+.w-watch i,.acc-tut i{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#4F66E0,#7C5CE0);box-shadow:0 6px 14px -4px rgba(79,102,224,.55)}
+.w-watch i svg,.acc-tut i svg{width:13px;height:13px;margin-left:2px}
+.acc-tut{display:flex;align-items:center;gap:12px;margin-top:14px;padding:10px 12px;border-radius:14px;border:1px solid var(--glass-border);background:var(--glass);color:var(--ink);text-decoration:none}
+.acc-tut b{display:block;font-size:14px}.acc-tut small{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
 @media (max-width:720px){.welcome{padding:70px 16px 110px}.ob-row{font-size:14px}.ob-timer strong{font-size:44px}.w-lead{font-size:16px}.w-title{font-size:32px}.rs-ans{font-size:15px}.rs-probs s{font-size:13px}.obd-kpis b{font-size:15px}.obd-num{min-width:96px}.obd-num b{font-size:42px}}
 body:not(.jobhunt) .jobonly{display:none!important}
 body.jobhunt .userplan{display:none!important}
@@ -1301,6 +1308,7 @@ body.drawer-open .dashbtn,body:has(#scrim.open) .dashbtn{opacity:0;pointer-event
       <p class="w-lead">Plan your day, stay consistent, and see yourself get better every week.</p>
       <div class="w-ctas"><button class="begin" data-ob-next>Get started</button></div>
       <p class="w-note">Takes 30 seconds. No account needed.</p>
+      <a class="w-watch" href="https://youtu.be/LS57TvSbOwM" target="_blank" rel="noopener" data-tut="welcome"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#fff"/></svg></i><span>New here? <b>Watch the 12-min guide</b></span></a>
     </div>
     <div class="ob-slide" data-ob="1" hidden>
       <p class="w-eyebrow">1 of 4</p>
@@ -1918,14 +1926,16 @@ function aboutReady(){
 const GLOGO='<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
 function avatarHTML(){ const u=HVC()&&HVC().user, ini=esc(((AC.email||"?")[0]||"?").toUpperCase());
   return '<span class="av">'+(u&&u.photo?'<img src="'+esc(u.photo)+'" alt="" referrerpolicy="no-referrer">':ini)+'</span>'; }
+const TUT_URL="https://youtu.be/LS57TvSbOwM";
+const TUT_ROW='<a class="acc-tut" href="'+TUT_URL+'" target="_blank" rel="noopener" data-tut="menu"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="#fff"/></svg></i><span><b>Watch the tutorial</b><small>Learn HV Reset in 12 minutes</small></span></a>';
 function accRender(){
   const w=$("accWrap"); if(!ACC){ w.hidden=true; return; } w.hidden=false;
   const b=$("accBtn"), u=HVC().user, name=(AC.uid&&aboutName())||(u&&u.name)||AC.email;
   b.classList.toggle("signed",!!AC.uid);
   b.innerHTML=AC.uid?avatarHTML()+'<span class="nm">'+esc(String(name).split(" ")[0])+'</span>':'<span class="g">'+GLOGO+'</span><span class="nm">Sign in</span>';
   b.setAttribute("aria-label",AC.uid?"Account: "+AC.email:"Sign in with Google");
-  $("accMenu").innerHTML=AC.uid?'<div class="who">'+avatarHTML()+'<div><b>'+esc(name)+'</b>'+(name!==AC.email?'<small>'+esc(AC.email)+'</small>':'<small>Google account</small>')+'</div></div><p>Your plan is saved to this Google account. Only you can see it.</p>'+(aboutOcc()?'<p class="acc-occ">'+esc(aboutOcc())+'</p>':'')+'<div class="row"><button data-abedit>Edit my details</button><button data-gate="out">Sign out</button></div>'
-    :'<div class="who"><span class="av">'+GLOGO.replace('<svg','<svg style="width:22px;height:22px;background:#fff;border-radius:50%;padding:3px"')+'</span><div><b>Not signed in</b><small>Try everything freely</small></div></div><p>Sign in with Google to save your plan and use it on your phone and laptop.</p><div class="row"><button data-gate="in">Continue with Google</button></div>';
+  $("accMenu").innerHTML=AC.uid?'<div class="who">'+avatarHTML()+'<div><b>'+esc(name)+'</b>'+(name!==AC.email?'<small>'+esc(AC.email)+'</small>':'<small>Google account</small>')+'</div></div><p>Your plan is saved to this Google account. Only you can see it.</p>'+(aboutOcc()?'<p class="acc-occ">'+esc(aboutOcc())+'</p>':'')+'<div class="row"><button data-abedit>Edit my details</button><button data-gate="out">Sign out</button></div>'+TUT_ROW
+    :'<div class="who"><span class="av">'+GLOGO.replace('<svg','<svg style="width:22px;height:22px;background:#fff;border-radius:50%;padding:3px"')+'</span><div><b>Not signed in</b><small>Try everything freely</small></div></div><p>Sign in with Google to save your plan and use it on your phone and laptop.</p><div class="row"><button data-gate="in">Continue with Google</button></div>'+TUT_ROW;
 }
 /* The account button sits top-right on the start screen, and in the top bar inside the day. */
 /* v2: the account button stays top-right on every screen; the task card opens as a sheet below it */
@@ -3252,6 +3262,7 @@ document.addEventListener("click",e=>{
   if($("tpop")&&!e.target.closest("#tpop,[data-pick]")) pickClose();
   if(!e.target.closest("#rescue")){ const hm=$("helpMenu"); if(hm) hm.classList.remove("open"); }
   if(e.target.id==="rscrim") return closeCard();
+  const tut=e.target.closest("[data-tut]"); if(tut){ track("tutorial_open"); if(tut.dataset.tut==="menu") accMenu(false); return; }
   const t=e.target.closest("button"); if(!t) return;
   if(t.id==="accBtn"){ if(AC.uid||!$("accMenu").hidden) accMenu($("accMenu").hidden); else { accMenu(false); const c=HVC(); c.signIn().catch(err=>{ const m=gateError(err); if(m) toast(m); }); } return; }
   if(t.hasAttribute("data-gate")){ const k=t.getAttribute("data-gate"), c=HVC(); if(!c) return;
