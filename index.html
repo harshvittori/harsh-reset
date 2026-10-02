@@ -1077,6 +1077,10 @@ body.timer-on .h-db,body.in-room .h-db{padding:0 5px}
   .h-db svg{width:17px;height:17px}
   body.timer-on .h-db,body.in-room .h-db{padding:0 4px}
 }
+/* while HV AI is open its panel owns the screen: the dock steps away (it would sit on the message box) */
+body:has(.hvai:not([hidden])) .h-dock{opacity:0;pointer-events:none;transition:opacity .25s}
+@media (max-width:760px){ body:has(.hvai:not([hidden])) .h-top,body:has(.hvai:not([hidden])) .dashbtn{opacity:0;pointer-events:none} }
+body .hvai .hvai-send{background:linear-gradient(135deg,#4F66E0 0%,#7C5CE0 100%);box-shadow:0 6px 16px -8px rgba(79,102,224,.9)}
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
