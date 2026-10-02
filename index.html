@@ -1162,6 +1162,10 @@ body .hvai .hvai-typing::before{content:"";flex:none;width:22px;height:22px;bord
 .room #helpBtn{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:var(--muted);font-weight:600;font-size:14.5px;padding:10px 14px;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--muted) 40%,transparent);text-underline-offset:4px}
 .room #helpBtn:hover{color:var(--ink)}
 body.in-room #hTActs,body.in-room #hTm::after{opacity:0;pointer-events:none;transition:opacity .3s}
+.room .helpmenu{background:color-mix(in srgb,#fff 92%,transparent)!important;border:1px solid color-mix(in srgb,#fff 80%,transparent)!important;border-radius:20px!important;padding:6px!important;box-shadow:0 20px 50px -18px rgba(30,36,110,.45)!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.room .helpmenu button{border-radius:14px!important;padding:11px 16px!important;font-weight:600;font-size:15px;color:var(--ink);background:none!important;border:0!important;text-align:left}
+.room .helpmenu button:hover{background:color-mix(in srgb,#5B6CE0 10%,transparent)!important}
+:root[data-theme="dark"] .room .helpmenu{background:color-mix(in srgb,var(--sky1) 92%,#fff 4%)!important;border-color:rgba(255,255,255,.12)!important}
 @media (max-width:760px){ body.in-room .h-dock{opacity:0;pointer-events:none} }
 .room .sh-x{background:color-mix(in srgb,#fff 60%,transparent);border-color:color-mix(in srgb,#fff 70%,transparent);top:16px;right:16px}
 :root[data-theme="dark"] .room .sh-x{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
