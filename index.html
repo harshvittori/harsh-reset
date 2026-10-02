@@ -989,7 +989,7 @@ body:not(.noplan) .intro-inner{width:100%;padding:118px 16px 130px;display:flex;
 .h-tacts .h-btn{margin-top:0}
 /* the task card: a sheet that slides up over the timer ("Back to my task") */
 body.in-room .intro{opacity:1;filter:none;transform:none;pointer-events:none}
-.room{position:fixed;inset:auto 0 0 50%;top:auto;width:min(780px,100%);height:min(86vh,860px);translate:-50% 104%;opacity:1;pointer-events:none;z-index:85;display:grid;grid-template-rows:minmax(0,1fr) auto;padding:26px 22px 18px;border-radius:30px 30px 0 0;
+.room{position:fixed;inset:auto 0 0 50%;top:auto;width:min(680px,100%);height:min(86vh,860px);translate:-50% 104%;opacity:1;pointer-events:none;z-index:85;display:grid;grid-template-rows:minmax(0,1fr) auto;padding:26px 22px 18px;border-radius:30px 30px 0 0;
   background:color-mix(in srgb,var(--sky1) 70%,var(--glass));-webkit-backdrop-filter:blur(30px) saturate(140%);backdrop-filter:blur(30px) saturate(140%);border:1px solid var(--glass-border);border-bottom:0;box-shadow:0 -20px 60px rgba(20,30,80,.22);transition:translate .7s cubic-bezier(.65,0,.25,1)}
 body.in-room .room{translate:-50% 0;pointer-events:auto;opacity:1}
 .room::before{content:"";position:absolute;left:50%;top:10px;translate:-50% 0;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
@@ -1139,6 +1139,32 @@ body .hvai .hvai-typing::before{content:"";flex:none;width:22px;height:22px;bord
 .h-slide.drag .knob{transition:none;cursor:grabbing}
 .h-slide .knob svg{width:18px;height:18px}
 @media (max-width:760px){ body[data-home="run"] #hTm::after{content:"Swipe up for your task";display:block;margin-top:14px;font-size:12.5px;letter-spacing:.04em;color:var(--muted);opacity:.85} }
+/* ---------- task card v2: a white glass sheet, one title, quiet help ---------- */
+.room{background:color-mix(in srgb,#fff 84%,transparent);-webkit-backdrop-filter:blur(36px) saturate(170%);backdrop-filter:blur(36px) saturate(170%);
+  border:1px solid color-mix(in srgb,#fff 75%,transparent);border-bottom:0;box-shadow:0 -24px 70px -20px rgba(30,36,110,.45),inset 0 1px 0 rgba(255,255,255,.8);overflow:hidden;isolation:isolate}
+.room::after{content:"";position:absolute;inset:-10% -20% auto;height:60%;z-index:-1;pointer-events:none;opacity:.5;
+  background:radial-gradient(40% 50% at 20% 30%,rgba(124,92,224,.22),transparent 70%),radial-gradient(35% 45% at 85% 20%,rgba(79,102,224,.2),transparent 70%)}
+:root[data-theme="dark"] .room{background:color-mix(in srgb,var(--sky1) 86%,rgba(20,24,60,.7));border-color:rgba(255,255,255,.12);box-shadow:0 -24px 70px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08)}
+.room::before{background:color-mix(in srgb,var(--ink) 18%,transparent);width:40px;height:5px;top:9px}
+.room .card{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:8px 6px 0!important}
+.room .focus{padding:0 4px}
+.room .c-title{font-family:var(--body);font-size:12px!important;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:4px 0 4px!important}
+.room.same-title .c-title{display:none}
+.room .c-time{font-size:14px;color:var(--muted)}
+.room .c-time b,.room .c-time strong{color:var(--tc,#4F66E0)}
+.room .stepzone{margin:14px 0 0!important}
+.room .step-card{padding:6px 2px 4px!important;text-align:left!important;justify-content:flex-start!important;align-items:flex-start!important}
+.room .s-head{font-family:var(--display);font-weight:600;font-size:clamp(26px,7vw,34px)!important;letter-spacing:-.02em;line-height:1.15}
+.room .s-pts{color:var(--muted);font-size:16px;line-height:1.5}
+.room .s-actions{position:static!important;background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:22px 0 0!important;padding:0!important}
+.room .s-actions .primary{height:56px;font-size:17px}
+.room .foot{padding-top:6px}
+.room #helpBtn{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:var(--muted);font-weight:600;font-size:14.5px;padding:10px 14px;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--muted) 40%,transparent);text-underline-offset:4px}
+.room #helpBtn:hover{color:var(--ink)}
+body.in-room #hTActs,body.in-room #hTm::after{opacity:0;pointer-events:none;transition:opacity .3s}
+@media (max-width:760px){ body.in-room .h-dock{opacity:0;pointer-events:none} }
+.room .sh-x{background:color-mix(in srgb,#fff 60%,transparent);border-color:color-mix(in srgb,#fff 70%,transparent);top:16px;right:16px}
+:root[data-theme="dark"] .room .sh-x{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
 /* v2 phone pass: fewer things on screen, the task and the time first */
 .room .run-row,.room .upnext,.room .s-meta{display:none}
 .room{height:auto;max-height:86vh}
@@ -3122,6 +3148,8 @@ function homeAct(a){
 }
 /* "Back to my task": the task card slides up over the timer */
 function openCard(){ const first=!started; started=true; document.body.classList.add("in-room"); if(first||!liveCard()) renderCard(true); else renderCard(false); if(ACC) guestNudge(); }
+function sameTitle(){ const r=$("room"), a=r.querySelector(".c-title"), b=r.querySelector(".s-head"); r.classList.toggle("same-title",!!(a&&b&&a.textContent.trim().toLowerCase()===b.textContent.trim().toLowerCase())); }
+new MutationObserver(sameTitle).observe(document.getElementById("stage")||document.body,{childList:true,subtree:true});
 function closeCard(){ document.body.classList.remove("in-room"); $("room").style.translate=""; tickTimers(); }
 /* phone gestures: slide the knob to pause; swipe up on the timer for the task card; pull the card down to close it */
 { let sl=null;
